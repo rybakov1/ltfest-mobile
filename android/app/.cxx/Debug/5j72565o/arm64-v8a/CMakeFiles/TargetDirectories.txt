@@ -1,0 +1,2 @@
+C:/Users/vlad/Desktop/project/ltfest/android/app/.cxx/Debug/5j72565o/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/vlad/Desktop/project/ltfest/android/app/.cxx/Debug/5j72565o/arm64-v8a/CMakeFiles/rebuild_cache.dir
