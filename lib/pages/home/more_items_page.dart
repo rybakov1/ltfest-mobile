@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../data/models/news.dart';
-import '../data/models/upcoming_events.dart';
+import '../../data/models/news.dart';
+import '../../data/models/upcoming_events.dart';
 
 
 class AllItemsPage<T> extends ConsumerWidget {

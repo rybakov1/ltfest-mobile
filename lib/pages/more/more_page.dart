@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../constants.dart';
-import '../providers/auth_state.dart';
-import '../providers/user_provider.dart';
+import '../../constants.dart';
+import '../../providers/auth_state.dart';
+import '../../providers/user_provider.dart';
 
 class MorePage extends ConsumerWidget {
   const MorePage({super.key});
@@ -180,7 +180,7 @@ class _ProfileCard extends ConsumerWidget {
       data: (data) {
         if (data is Authenticated) {
           final user = data.user;
-          final displayName = '${user.firstname} ${user.lastname}'.trim();
+          final displayName = user.lastname.trim();
           final points = user.bonuses;
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),

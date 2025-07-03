@@ -7,8 +7,8 @@ import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../data/models/laboratory.dart';
-import '../data/models/teacher.dart';
+import '../../data/models/laboratory.dart';
+import '../../data/models/teacher.dart';
 
 final tabIndexProvider = StateProvider<int>((ref) => 0);
 final learningTypeIndexProvider = StateProvider<int>((ref) => 0);

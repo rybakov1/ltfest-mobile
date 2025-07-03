@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/constants.dart';
 
-import '../data/models/festival.dart';
-import '../data/services/api_service.dart';
-import '../providers/direction_provider.dart';
+import '../../data/models/festival.dart';
+import '../../data/services/api_service.dart';
+import '../../providers/direction_provider.dart';
 
 final festivalsProvider =
     AsyncNotifierProvider<FestivalsNotifier, List<Festival>>(

@@ -6,7 +6,7 @@ import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../data/models/jury.dart';
+import '../../data/models/jury.dart';
 
 class FestivalDetailPage extends ConsumerWidget {
   final String id;

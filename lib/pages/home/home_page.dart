@@ -4,12 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/router/app_routes.dart';
-import '../data/models/news.dart';
-import '../data/models/upcoming_events.dart';
-import '../providers/auth_state.dart';
-import '../providers/news_provider.dart';
-import '../providers/upcoming_provider.dart';
-import '../providers/user_provider.dart';
+import '../../data/models/news.dart';
+import '../../data/models/upcoming_events.dart';
+import '../../providers/auth_state.dart';
+import '../../providers/news_provider.dart';
+import '../../providers/upcoming_provider.dart';
+import '../../providers/user_provider.dart';
 import 'more_items_page.dart';
 
 class HomePage extends ConsumerWidget {

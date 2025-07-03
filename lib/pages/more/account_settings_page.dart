@@ -399,7 +399,7 @@ Widget _buildReadOnlySection(dynamic user) {
             style: Styles.h5.copyWith(color: Palette.gray)),
         const SizedBox(height: 16),
         _buildReadOnlyField(
-            'ФИО', '${user?.firstname ?? ''} ${user?.lastname ?? ''}'.trim()),
+            'ФИО', '${user?.lastname ?? ''}'.trim()), //${user?.firstname ?? ''}
         const Divider(),
         _buildReadOnlyField('Номер телефона', formatPhoneNumber(user?.phone)),
         const Divider(),
@@ -414,7 +414,7 @@ Widget _buildReadOnlySection(dynamic user) {
 }
 
 final _phoneFormatter = MaskTextInputFormatter(
-  mask: '+7 (###) ###-##-##',
+  mask: '+# (###) ###-##-##',
   filter: {"#": RegExp(r'[0-9]')},
   type: MaskAutoCompletionType.lazy,
 );

@@ -5,8 +5,8 @@ import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 
-import '../data/models/laboratory.dart';
-import '../providers/direction_provider.dart';
+import '../../data/models/laboratory.dart';
+import '../../providers/direction_provider.dart';
 
 class LaboratoryPage extends ConsumerWidget {
   const LaboratoryPage({super.key});
