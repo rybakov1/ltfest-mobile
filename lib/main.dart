@@ -28,6 +28,20 @@ class MyApp extends ConsumerWidget {
       ],
       title: 'LTFest',
       routerConfig: router,
+      builder: (context, child) {
+        if (child == null) return const SizedBox.shrink();
+
+        return Listener(
+          onPointerDown: (_) {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus &&
+                currentFocus.focusedChild != null) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            }
+          },
+          child: child,
+        );
+      },
     );
   }
 }
