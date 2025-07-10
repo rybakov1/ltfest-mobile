@@ -97,93 +97,116 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         ? (authState.value as Authenticated).user
         : null;
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Palette.black,
-        appBar: AppBar(
-          backgroundColor: Palette.black,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Palette.black),
-            style: IconButton.styleFrom(
-                backgroundColor: Palette.primaryLime,
-                foregroundColor: Palette.black),
-            onPressed: () => context.pop(),
-          ),
-          title: Text('Настройки аккаунта',
-              style: Styles.h3.copyWith(color: Palette.white)),
-          centerTitle: true,
-        ),
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: Decor.base,
-                    margin: const EdgeInsets.only(top: 16),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0, right: 16, top: 22, bottom: 26),
-                          child: _CustomSegmentedControl(
-                            selectedIndex: _selectedIndex,
-                            onTap: _onTabTapped,
+    return Scaffold(
+      backgroundColor: Palette.black,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      top: 24 + MediaQuery.of(context).padding.top,
+                      bottom: 16),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Настройки аккаунта",
+                          style: Styles.h3.copyWith(color: Palette.white),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          height: 43,
+                          width: 43,
+                          decoration:
+                              Decor.base.copyWith(color: Palette.primaryLime),
+                          child: IconButton(
+                            onPressed: () => context.pop(),
+                            icon: Icon(Icons.arrow_back, color: Palette.black),
                           ),
                         ),
-                        // const SizedBox(height: 24),
-                        AnimatedSize(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          child: Column(
-                            children: [
-                              Visibility(
-                                visible: _selectedIndex == 0,
-                                maintainState: true,
-                                child: _AboutMeForm(
-                                  emailController: _emailController,
-                                  cityController: _cityController,
-                                  educationController: _educationController,
-                                  masterFioController: _masterFioController,
-                                ),
-                              ),
-                              Visibility(
-                                visible: _selectedIndex == 1,
-                                maintainState: true,
-                                child: _CollectiveForm(
-                                  collectiveNameController:
-                                      _collectiveNameController,
-                                  collectiveDirectionController:
-                                      _collectiveDirectionController,
-                                  collectiveCityController:
-                                      _collectiveCityController,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 22),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  _buildReadOnlySection(user),
-                  const SizedBox(height: 78),
-                ],
-              ),
+                ),
+                Container(
+                  width: double.infinity,
+                  decoration: Decor.base,
+                  margin: const EdgeInsets.only(top: 16),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16.0, right: 16, top: 22, bottom: 26),
+                        child: _CustomSegmentedControl(
+                          selectedIndex: _selectedIndex,
+                          onTap: _onTabTapped,
+                        ),
+                      ),
+                      // const SizedBox(height: 24),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        child: Column(
+                          children: [
+                            Visibility(
+                              visible: _selectedIndex == 0,
+                              maintainState: true,
+                              child: _AboutMeForm(
+                                emailController: _emailController,
+                                cityController: _cityController,
+                                educationController: _educationController,
+                                masterFioController: _masterFioController,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _selectedIndex == 1,
+                              maintainState: true,
+                              child: _CollectiveForm(
+                                collectiveNameController:
+                                    _collectiveNameController,
+                                collectiveDirectionController:
+                                    _collectiveDirectionController,
+                                collectiveCityController:
+                                    _collectiveCityController,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                    ],
+                  ),
+                ),
+                _buildReadOnlySection(user),
+                SizedBox(height: 78 + MediaQuery.of(context).padding.bottom),
+              ],
             ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              left: 0,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(8),
-                        topLeft: Radius.circular(8)),
-                    color: Colors.white),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: Container(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom,
+                  top: 16,
+                  left: 16,
+                  right: 16),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(8),
+                      topLeft: Radius.circular(8)),
+                  color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
                 child: SizedBox(
                   width: double.infinity,
                   height: 44,
@@ -208,8 +231,8 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

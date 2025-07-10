@@ -17,46 +17,69 @@ class AboutAppPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Palette.black,
-        appBar: AppBar(
-          backgroundColor: Palette.black,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Palette.black),
-            style: IconButton.styleFrom(backgroundColor: Palette.primaryLime),
-            onPressed: () => context.pop(),
-          ),
-          title: Text('О приложении',
-              style: Styles.h3.copyWith(color: Palette.white)),
-          centerTitle: true,
-        ),
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          margin: const EdgeInsets.fromLTRB(4, 16, 4, 4),
-          decoration: Decor.base,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+    return Scaffold(
+      backgroundColor: Palette.black,
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 24 + MediaQuery.of(context).padding.top,
+                bottom: 16),
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                const SizedBox(height: 12),
-                Image.asset('assets/images/logo_black.png', height: 60),
-                const SizedBox(height: 16),
-                Text('Версия 0.0.1, сборка 1',
-                    style: Styles.b3.copyWith(color: Palette.gray)),
-                const SizedBox(height: 24),
-                _buildContactInfo(),
-                const SizedBox(height: 24),
-                _buildDescription(),
-                const SizedBox(height: 24),
-                _buildLinkSection(),
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "О приложении",
+                    style: Styles.h3.copyWith(color: Palette.white),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    height: 43,
+                    width: 43,
+                    decoration: Decor.base.copyWith(color: Palette.primaryLime),
+                    child: IconButton(
+                      onPressed: () => context.pop(),
+                      icon: Icon(Icons.arrow_back, color: Palette.black),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-        ),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              margin: EdgeInsets.fromLTRB(4, 16, 4, MediaQuery.of(context).padding.bottom),
+              decoration: Decor.base,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 12),
+                    Image.asset('assets/images/logo_black.png', height: 60),
+                    const SizedBox(height: 16),
+                    Text('Версия 0.0.1, сборка 1',
+                        style: Styles.b3.copyWith(color: Palette.gray)),
+                    const SizedBox(height: 24),
+                    _buildContactInfo(),
+                    const SizedBox(height: 24),
+                    _buildDescription(),
+                    const SizedBox(height: 24),
+                    _buildLinkSection(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

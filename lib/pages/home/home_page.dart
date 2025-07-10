@@ -226,12 +226,13 @@ class HomePage extends ConsumerWidget {
                         child: Text(
                           event.direction.title,
                           style: TextStyle(
-                              color: event.direction.title == "Театр"
-                                  ? Colors.black
-                                  : Colors.white,
-                              fontSize: 14,
-                              fontFamily: "Mulish",
-                              fontWeight: FontWeight.w400),
+                            color: event.direction.title == "Театр"
+                                ? Colors.black
+                                : Colors.white,
+                            fontSize: 14,
+                            fontFamily: "Mulish",
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),

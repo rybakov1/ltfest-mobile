@@ -49,72 +49,93 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Palette.black,
-        appBar: AppBar(
-          backgroundColor: Palette.black,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Palette.black),
-            style: IconButton.styleFrom(backgroundColor: Palette.primaryLime),
-            onPressed: () => context.pop(),
-          ),
-          title: Text('Настройки приложения',
-              style: Styles.h3.copyWith(color: Palette.white)),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                margin: const EdgeInsets.fromLTRB(4, 16, 4, 0),
-                decoration: Decor.base,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Уведомления',
-                        style: Styles.h5.copyWith(color: Palette.gray)),
-                    const SizedBox(height: 16),
-                    _SettingsSwitchTile(
-                      iconPath: 'assets/icons/news.svg',
-                      // Укажите правильные пути к иконкам
-                      title: 'Получать уведомления о новостях',
-                      value: _newsNotifications,
-                      onChanged: (value) {
-                        setState(() {
-                          _newsNotifications = value;
-                        });
-                      },
-                    ),
-                    Divider(color: Palette.stroke),
-                    _SettingsSwitchTile(
-                      iconPath: 'assets/icons/favourite.svg',
-                      // Укажите правильные пути к иконкам
-                      title: 'Новые события',
-                      value: _eventNotifications,
-                      onChanged: (value) {
-                        setState(() {
-                          _eventNotifications = value;
-                        });
-                      },
-                    ),
-                  ],
+    return Scaffold(
+      backgroundColor: Palette.black,
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 24 + MediaQuery.of(context).padding.top,
+                bottom: 16),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Настройки приложения",
+                    style: Styles.h3.copyWith(color: Palette.white),
+                  ),
                 ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    height: 43,
+                    width: 43,
+                    decoration: Decor.base.copyWith(color: Palette.primaryLime),
+                    child: IconButton(
+                      onPressed: () => context.pop(),
+                      icon: Icon(Icons.arrow_back, color: Palette.black),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              margin: const EdgeInsets.fromLTRB(4, 16, 4, 2),
+              decoration: Decor.base,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Уведомления',
+                      style: Styles.h5.copyWith(color: Palette.gray)),
+                  const SizedBox(height: 16),
+                  _SettingsSwitchTile(
+                    iconPath: 'assets/icons/news.svg',
+                    // Укажите правильные пути к иконкам
+                    title: 'Получать уведомления о новостях',
+                    value: _newsNotifications,
+                    onChanged: (value) {
+                      setState(() {
+                        _newsNotifications = value;
+                      });
+                    },
+                  ),
+                  Divider(color: Palette.stroke),
+                  _SettingsSwitchTile(
+                    iconPath: 'assets/icons/favourite.svg',
+                    // Укажите правильные пути к иконкам
+                    title: 'Новые события',
+                    value: _eventNotifications,
+                    onChanged: (value) {
+                      setState(() {
+                        _eventNotifications = value;
+                      });
+                    },
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 1), // TODO:
-            // Кнопка сохранения "прилипает" к низу
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(8),
-                      topLeft: Radius.circular(8)),
-                  color: Colors.white),
+          ),
+          // Кнопка сохранения "прилипает" к низу
+          Container(
+            padding: EdgeInsets.only(
+                top: 16,
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.of(context).padding.bottom),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(8), topLeft: Radius.circular(8)),
+                color: Colors.white),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
               child: SizedBox(
                 width: double.infinity,
                 height: 44,
@@ -138,8 +159,8 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
