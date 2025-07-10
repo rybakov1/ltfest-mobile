@@ -47,25 +47,32 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: widget.child,
-        bottomNavigationBar: SizedBox(
-          height: 84,
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: _getCurrentIndex(context),
-            onTap: (index) => _onTap(context, index),
-            iconSize: 24,
-            backgroundColor: Palette.white,
-            selectedLabelStyle: Styles.b4
-                .copyWith(fontWeight: FontWeight.w500, color: Palette.black),
-            showUnselectedLabels: true,
-            selectedItemColor: Palette.black,
-            unselectedItemColor: Palette.gray,
-            unselectedLabelStyle: Styles.b4.copyWith(color: Palette.gray),
-            items: [
-              BottomNavigationBarItem(
+    return Scaffold(
+      body: widget.child,
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.only(bottom: 16, top: 16),
+        color: Palette.white,
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              currentIndex: _getCurrentIndex(context),
+              onTap: (index) => _onTap(context, index),
+              iconSize: 24,
+              backgroundColor: Palette.white,
+              selectedLabelStyle: Styles.b4
+                  .copyWith(fontWeight: FontWeight.w500, color: Palette.black),
+              showUnselectedLabels: true,
+              selectedItemColor: Palette.black,
+              unselectedItemColor: Palette.gray,
+              unselectedLabelStyle: Styles.b4.copyWith(color: Palette.gray),
+              items: [
+                BottomNavigationBarItem(
                   icon: SvgPicture.asset(
                     _getCurrentIndex(context) == 0
                         ? "assets/icons/bottom_bar/home/home_active.svg"
@@ -73,8 +80,9 @@ class _MainScreenState extends State<MainScreen> {
                     width: 24,
                     height: 24,
                   ),
-                  label: 'Главная'),
-              BottomNavigationBarItem(
+                  label: 'Главная',
+                ),
+                BottomNavigationBarItem(
                   icon: SvgPicture.asset(
                     _getCurrentIndex(context) == 1
                         ? "assets/icons/bottom_bar/lt/lt_active.svg"
@@ -82,8 +90,9 @@ class _MainScreenState extends State<MainScreen> {
                     width: 24,
                     height: 24,
                   ),
-                  label: 'Фестивали'),
-              BottomNavigationBarItem(
+                  label: 'Фестивали',
+                ),
+                BottomNavigationBarItem(
                   icon: SvgPicture.asset(
                     _getCurrentIndex(context) == 2
                         ? "assets/icons/bottom_bar/lab/lab_active.svg"
@@ -91,8 +100,9 @@ class _MainScreenState extends State<MainScreen> {
                     width: 24,
                     height: 24,
                   ),
-                  label: 'Лаборатории'),
-              BottomNavigationBarItem(
+                  label: 'Лаборатории',
+                ),
+                BottomNavigationBarItem(
                   icon: SvgPicture.asset(
                     _getCurrentIndex(context) == 3
                         ? "assets/icons/bottom_bar/blog/blog_active.svg"
@@ -100,8 +110,9 @@ class _MainScreenState extends State<MainScreen> {
                     width: 24,
                     height: 24,
                   ),
-                  label: 'Новости'),
-              BottomNavigationBarItem(
+                  label: 'Новости',
+                ),
+                BottomNavigationBarItem(
                   icon: SvgPicture.asset(
                     "assets/icons/bottom_bar/more.svg",
                     width: 24,
@@ -110,8 +121,10 @@ class _MainScreenState extends State<MainScreen> {
                         ? ColorFilter.mode(Palette.black, BlendMode.srcIn)
                         : ColorFilter.mode(Palette.gray, BlendMode.srcIn),
                   ),
-                  label: 'Ещё'),
-            ],
+                  label: 'Ещё',
+                ),
+              ],
+            ),
           ),
         ),
       ),

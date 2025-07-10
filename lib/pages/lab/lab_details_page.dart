@@ -223,70 +223,70 @@ class LaboratoryDetailPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Palette.black,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            laboratoryAsync.when(
-              data: (laboratory) {
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(12),
-                              bottomRight: Radius.circular(12),
-                            ),
-                            child: laboratory.image!.isNotEmpty
-                                ? Image.network(laboratory.image!,
-                                    height: 393,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover)
-                                : Image.asset(
-                                    'assets/images/teatr_placeholder.png',
-                                    height: 393,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover),
+      body: Stack(
+        children: [
+          laboratoryAsync.when(
+            data: (laboratory) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
                           ),
-                          content(context, ref, laboratory),
-                        ],
-                      ),
-                      const SizedBox(height: 96),
-                    ],
-                  ),
-                );
-              },
-              loading: () => const SingleChildScrollView(),
-              error: (error, stack) => Container(),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                height: 92,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                  color: Palette.white,
+                          child: laboratory.image!.isNotEmpty
+                              ? Image.network(laboratory.image!,
+                                  height: 393,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover)
+                              : Image.asset(
+                                  'assets/images/teatr_placeholder.png',
+                                  height: 393,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover),
+                        ),
+                        SafeArea(child: content(context, ref, laboratory)),
+                      ],
+                    ),
+                     SizedBox(height: 48 + MediaQuery.of(context).padding.bottom),
+                  ],
                 ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                child: GestureDetector(
-                  onTap: () async {
-                    final Uri uri = Uri.parse(
-                      'https://ltfest.artpro.art/webapp/public/application/af419d70-ec8d-42fb-a4b1-65482dcd3236',
-                    );
-                    await launchUrl(
-                      uri,
-                      mode: LaunchMode.externalApplication,
-                    );
-                  },
+              );
+            },
+            loading: () => const SingleChildScrollView(),
+            error: (error, stack) => Container(),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                color: Palette.white,
+              ),
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom, top: 24, right: 16, left: 16),
+              child: GestureDetector(
+                onTap: () async {
+                  final Uri uri = Uri.parse(
+                    'https://ltfest.artpro.art/webapp/public/application/af419d70-ec8d-42fb-a4b1-65482dcd3236',
+                  );
+                  await launchUrl(
+                    uri,
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
                   child: Container(
                     width: double.infinity,
+                    height: 44,
                     decoration: BoxDecoration(
                       color: Palette.primaryLime,
                       borderRadius: BorderRadius.circular(8),
@@ -305,8 +305,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

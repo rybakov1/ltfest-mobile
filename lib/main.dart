@@ -31,15 +31,20 @@ class MyApp extends ConsumerWidget {
       builder: (context, child) {
         if (child == null) return const SizedBox.shrink();
 
-        return Listener(
-          onPointerDown: (_) {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus &&
-                currentFocus.focusedChild != null) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            }
-          },
-          child: child,
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(1.0), // Игнор системный масштаб и "Жирный текст"
+          ),
+          child: Listener(
+            onPointerDown: (_) {
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus &&
+                  currentFocus.focusedChild != null) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              }
+            },
+            child: child,
+          ),
         );
       },
     );

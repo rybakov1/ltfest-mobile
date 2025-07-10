@@ -22,123 +22,125 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Palette.black,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _HomeHeader(),
-            Padding(
-              padding: const EdgeInsets.all(4),
-              child: Container(
-                decoration: Decor.base,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0, vertical: 16),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 96,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            _buildCarouselItem('assets/images/ex.png'),
-                            _buildCarouselItem('assets/images/ex.png'),
-                            _buildCarouselItem('assets/images/ex.png'),
-                            _buildCarouselItem('assets/images/ex.png'),
-                            _buildCarouselItem('assets/images/ex.png'),
-                            _buildCarouselItem('assets/images/ex.png'),
-                            _buildCarouselItem('assets/images/ex.png'),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      _buildSectionHeader(
-                          'Ближайшие мероприятия', context, ref),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 250,
-                        child: upcomingEvents.when(
-                          data: (events) => ListView.builder(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _HomeHeader(),
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: Container(
+                  decoration: Decor.base,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 16),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 96,
+                          child: ListView(
                             scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemCount: events.length,
-                            itemBuilder: (context, index) {
-                              final event = events[index];
-                              return Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (event.type == EventType.festival) {
-                                        context.push('/fest/${event.id}');
-                                      } else {
-                                        context.push('/lab/${event.id}');
-                                      }
-                                    },
-                                    child: _buildEventCard(
-                                        event: event,
-                                        imageUrl: 'assets/images/ex.png'),
-                                  ),
-                                  const SizedBox(width: 12),
-                                ],
-                              );
-                            },
-                          ),
-                          loading: () => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          error: (error, stack) => Center(
-                            child: Text('Ошибка: $error'),
+                            children: [
+                              _buildCarouselItem('assets/images/ex.png'),
+                              _buildCarouselItem('assets/images/ex.png'),
+                              _buildCarouselItem('assets/images/ex.png'),
+                              _buildCarouselItem('assets/images/ex.png'),
+                              _buildCarouselItem('assets/images/ex.png'),
+                              _buildCarouselItem('assets/images/ex.png'),
+                              _buildCarouselItem('assets/images/ex.png'),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 32),
-                      Container(
-                        height: 100,
-                        color: Palette.white,
-                        alignment: Alignment.center,
-                        child: const Text('Баннеры'),
-                      ),
-                      const SizedBox(height: 20),
-                      _buildSectionHeader('Последние новости', context, ref),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 250,
-                        child: news.when(
-                          data: (news) => ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemCount: news.length,
-                            itemBuilder: (context, index) {
-                              final article = news[index];
-                              return Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: _buildNewsCard(
-                                      title: article.title,
-                                      date: article.date,
-                                      image: 'assets/images/ex.png',
+                        const SizedBox(height: 32),
+                        _buildSectionHeader(
+                            'Ближайшие мероприятия', context, ref),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 250,
+                          child: upcomingEvents.when(
+                            data: (events) => ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              itemCount: events.length,
+                              itemBuilder: (context, index) {
+                                final event = events[index];
+                                return Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        if (event.type == EventType.festival) {
+                                          context.push('/fest/${event.id}');
+                                        } else {
+                                          context.push('/lab/${event.id}');
+                                        }
+                                      },
+                                      child: _buildEventCard(
+                                          event: event,
+                                          imageUrl: 'assets/images/ex.png'),
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                ],
-                              );
-                            },
-                          ),
-                          loading: () => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          error: (error, stack) => Center(
-                            child: Text('Ошибка: $error'),
+                                    const SizedBox(width: 12),
+                                  ],
+                                );
+                              },
+                            ),
+                            loading: () => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            error: (error, stack) => Center(
+                              child: Text('Ошибка: $error'),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 32),
+                        Container(
+                          height: 100,
+                          color: Palette.white,
+                          alignment: Alignment.center,
+                          child: const Text('Баннеры'),
+                        ),
+                        const SizedBox(height: 20),
+                        _buildSectionHeader('Последние новости', context, ref),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 250,
+                          child: news.when(
+                            data: (news) => ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              itemCount: news.length,
+                              itemBuilder: (context, index) {
+                                final article = news[index];
+                                return Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: _buildNewsCard(
+                                        title: article.title,
+                                        date: article.date,
+                                        image: 'assets/images/ex.png',
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                  ],
+                                );
+                              },
+                            ),
+                            loading: () => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            error: (error, stack) => Center(
+                              child: Text('Ошибка: $error'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -214,7 +216,9 @@ class HomePage extends ConsumerWidget {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                          color: event.direction.title == "Театр" ? Palette.primaryLime : Palette.primaryPink,
+                          color: event.direction.title == "Театр"
+                              ? Palette.primaryLime
+                              : Palette.primaryPink,
                           borderRadius: BorderRadius.circular(8)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -222,7 +226,9 @@ class HomePage extends ConsumerWidget {
                         child: Text(
                           event.direction.title,
                           style: TextStyle(
-                              color: event.direction.title == "Театр" ? Colors.black : Colors.white,
+                              color: event.direction.title == "Театр"
+                                  ? Colors.black
+                                  : Colors.white,
                               fontSize: 14,
                               fontFamily: "Mulish",
                               fontWeight: FontWeight.w400),
@@ -366,7 +372,7 @@ class _HomeHeader extends ConsumerWidget {
       data: (data) {
         if (data is Authenticated) {
           final user = data.user;
-          final displayName = '${user.firstname} ${user.lastname}'.trim();
+          final displayName = user.lastname.trim();
           final points = user.bonuses;
 
           return Padding(
@@ -381,7 +387,6 @@ class _HomeHeader extends ConsumerWidget {
                     child: Text(
                       displayName,
                       style: Styles.h3.copyWith(color: Palette.white),
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -390,7 +395,10 @@ class _HomeHeader extends ConsumerWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Palette.primaryPink, Palette.primary2Gradient],
+                          colors: [
+                            Palette.primaryPink,
+                            Palette.primary2Gradient
+                          ],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ),

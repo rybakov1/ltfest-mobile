@@ -86,84 +86,87 @@ class MorePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Palette.black,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32),
-            child: Text("Еще", style: Styles.h3.copyWith(color: Palette.white)),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4),
-            child: _ProfileCard(),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: Row(
-              children: [
-                _ActionCard(
-                  iconPath: 'assets/icons/tg.svg',
-                  title: "Telegram",
-                  onTap: () {
-                    launchUrl(Uri.parse('https://t.me/ltfest'),
-                        mode: LaunchMode.externalApplication);
-                  },
-                ),
-                const SizedBox(width: 2),
-                _ActionCard(
-                  iconPath: 'assets/icons/favourite.svg',
-                  title: "Избранное",
-                  onTap: () {
-                    // TODO: Добавить навигацию на страницу избранного
-                  },
-                ),
-              ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child:
+                  Text("Еще", style: Styles.h3.copyWith(color: Palette.white)),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-                decoration: Decor.base,
-                child: Column(
-                  children: [
-                    _MenuTile(
-                      iconPath: 'assets/icons/person.svg',
-                      title: "Настройки аккаунта",
-                      onTap: () {
-                        context.push(AppRoutes.accountSettings);
-                      },
-                    ),
-                    _MenuTile(
-                      iconPath: 'assets/icons/settings.svg',
-                      title: "Настройки приложения",
-                      onTap: () {
-                        context.push(AppRoutes.appSettings);
-                      },
-                    ),
-                    _MenuTile(
-                      iconPath: 'assets/icons/info.svg',
-                      title: "О приложении",
-                      onTap: () {
-                        context.push(AppRoutes.about);
-                      },
-                    ),
-                    const Spacer(),
-                    // Кнопка выхода
-                    TextButton(
-                      onPressed: () => _showExitPopup(context, ref),
-                      child: Text(
-                        "Выйти из аккаунта",
-                        style: Styles.button1.copyWith(color: Palette.error),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4),
+              child: _ProfileCard(),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Row(
+                children: [
+                  _ActionCard(
+                    iconPath: 'assets/icons/tg.svg',
+                    title: "Telegram",
+                    onTap: () {
+                      launchUrl(Uri.parse('https://t.me/ltfest'),
+                          mode: LaunchMode.externalApplication);
+                    },
+                  ),
+                  const SizedBox(width: 2),
+                  _ActionCard(
+                    iconPath: 'assets/icons/favourite.svg',
+                    title: "Избранное",
+                    onTap: () {
+                      // TODO: Добавить навигацию на страницу избранного
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  decoration: Decor.base,
+                  child: Column(
+                    children: [
+                      _MenuTile(
+                        iconPath: 'assets/icons/person.svg',
+                        title: "Настройки аккаунта",
+                        onTap: () {
+                          context.push(AppRoutes.accountSettings);
+                        },
                       ),
-                    ),
-                  ],
+                      _MenuTile(
+                        iconPath: 'assets/icons/settings.svg',
+                        title: "Настройки приложения",
+                        onTap: () {
+                          context.push(AppRoutes.appSettings);
+                        },
+                      ),
+                      _MenuTile(
+                        iconPath: 'assets/icons/info.svg',
+                        title: "О приложении",
+                        onTap: () {
+                          context.push(AppRoutes.about);
+                        },
+                      ),
+                      const Spacer(),
+                      // Кнопка выхода
+                      TextButton(
+                        onPressed: () => _showExitPopup(context, ref),
+                        child: Text(
+                          "Выйти из аккаунта",
+                          style: Styles.button1.copyWith(color: Palette.error),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

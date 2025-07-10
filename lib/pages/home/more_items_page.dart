@@ -35,29 +35,27 @@ class AllItemsPage<T> extends ConsumerWidget {
         ),
         centerTitle: true,
       ),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Container(
-                decoration: Decor.base,
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.top -
-                      kToolbarHeight,
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Container(
+              decoration: Decor.base,
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    kToolbarHeight,
+              ),
+              child: itemsAsync.when(
+                data: (items) => _buildListView(items, context),
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Center(child: CircularProgressIndicator()),
                 ),
-                child: itemsAsync.when(
-                  data: (items) => _buildListView(items, context),
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                  error: (error, stack) => const Center(child: CircularProgressIndicator()),
-                ),
+                error: (error, stack) => const Center(child: CircularProgressIndicator()),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
