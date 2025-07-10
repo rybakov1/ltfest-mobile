@@ -56,17 +56,19 @@ class AboutAppPage extends StatelessWidget {
             child: Container(
               width: double.infinity,
               height: double.infinity,
-              margin: EdgeInsets.fromLTRB(4, 16, 4, MediaQuery.of(context).padding.bottom),
+              margin: EdgeInsets.fromLTRB(
+                  4, 16, 4, MediaQuery.of(context).padding.bottom),
               decoration: Decor.base,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 12),
                     Image.asset('assets/images/logo_black.png', height: 60),
                     const SizedBox(height: 16),
-                    Text('Версия 0.0.1, сборка 1',
+                    Text('Версия 0.1.1, сборка 3',
                         style: Styles.b3.copyWith(color: Palette.gray)),
                     const SizedBox(height: 24),
                     _buildContactInfo(),
@@ -111,8 +113,7 @@ class AboutAppPage extends StatelessWidget {
             //     iconPath: 'assets/icons/youtube.svg',
             //     url: 'https://youtube.com'),
             // const SizedBox(width: 16),
-            _SocialIcon(
-                iconPath: 'assets/icons/tg.svg', url: 'https://t.me'),
+            _SocialIcon(iconPath: 'assets/icons/tg.svg', url: 'https://t.me'),
           ],
         ),
       ],
@@ -151,21 +152,21 @@ class AboutAppPage extends StatelessWidget {
             // TODO: Открыть ссылку или страницу
           },
         ),
-        Divider(color: Palette.stroke),
+        const SizedBox(height: 8),
         _InfoLinkTile(
           title: 'Оферта',
           onTap: () {
             // TODO: Открыть ссылку или страницу
           },
         ),
-        Divider(color: Palette.stroke),
+        const SizedBox(height: 8),
         _InfoLinkTile(
           title: 'Основы режиссуры',
           onTap: () {
             // TODO: Открыть ссылку или страницу
           },
         ),
-        Divider(color: Palette.stroke),
+        const SizedBox(height: 8),
         _InfoLinkTile(
           title: 'Сценическая речь',
           onTap: () {
@@ -208,11 +209,29 @@ class _InfoLinkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title, style: Styles.b2),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Palette.gray),
-      contentPadding: const EdgeInsets.symmetric(vertical: 4),
+    return InkWell(
       onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Palette.background,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: Styles.b2,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: Palette.gray)
+          ],
+        ),
+      ),
     );
   }
 }
