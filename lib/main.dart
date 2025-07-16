@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/router/router.dart';
 
-// 03.07 build
+// 14.07 build
 void main() {
   runApp(const ProviderScope(child: MyApp()));
 }

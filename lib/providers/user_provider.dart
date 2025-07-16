@@ -13,7 +13,9 @@ class AuthNotifier extends _$AuthNotifier {
 
   @override
   FutureOr<AuthState> build() async {
-    final accessToken = await _tokenStorage.getAccessToken();
+    final accessToken = await _tokenStorage.getJwt();
+
+
     if (accessToken == null) {
       return const AuthState.unauthenticated();
     }
@@ -26,7 +28,7 @@ class AuthNotifier extends _$AuthNotifier {
         return AuthState.authenticated(user: user);
       }
     } catch (e) {
-      await _tokenStorage.clearTokens();
+      await _tokenStorage.clearToken();
       return const AuthState.unauthenticated();
     }
   }
@@ -67,6 +69,7 @@ class AuthNotifier extends _$AuthNotifier {
     String? collectiveCity,
   }) async {
     final currentState = state.value;
+    final userId = await _tokenStorage.getUserId();
     if (currentState is! NeedsRegistration && currentState is! Authenticated) {
       throw Exception(
           "Пользователь не аутентифицирован для завершения регистрации.");
@@ -84,6 +87,7 @@ class AuthNotifier extends _$AuthNotifier {
         activityId: activityId,
         collectiveName: collectiveName,
         collectiveCity: collectiveCity,
+        userId: userId!,
       );
 
       return AuthState.authenticated(user: updatedUser);
@@ -93,7 +97,7 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> logout() async {
     state = const AsyncLoading();
     try {
-      await _tokenStorage.clearTokens();
+      await _tokenStorage.clearToken();
 
       // ref.invalidate(userSpecificDataProvider);
       // ref.invalidate(cartProvider);

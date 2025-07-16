@@ -17,7 +17,7 @@ class FestivalsNotifier extends AsyncNotifier<List<Festival>> {
   Future<List<Festival>> build() async {
     final apiService = ref.read(apiServiceProvider);
     final direction = ref.watch(selectedDirectionProvider);
-    return await apiService.getFestivals(direction: direction);
+    return await apiService.getFestivals(); //direction: direction
   }
 
   Future<void> refresh() async {
@@ -25,7 +25,7 @@ class FestivalsNotifier extends AsyncNotifier<List<Festival>> {
     state = await AsyncValue.guard(() async {
       final apiService = ref.read(apiServiceProvider);
       final direction = ref.read(selectedDirectionProvider);
-      return await apiService.getFestivals(direction: direction);
+      return await apiService.getFestivals(); //direction: direction
     });
   }
 }
