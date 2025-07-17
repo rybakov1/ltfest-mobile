@@ -219,7 +219,7 @@ Widget buildNewsCard({required News news}) {
                 borderRadius:
                 const BorderRadius.vertical(top: Radius.circular(12)),
                 child: Image.asset(
-                  news.image!,
+                  'http://37.46.132.144:1337${news.image?.formats?.medium?.url ?? news.image?.url ?? ''}',
                   height: 170,
                   width: double.infinity,
                   fit: BoxFit.cover,

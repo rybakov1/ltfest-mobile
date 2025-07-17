@@ -16,11 +16,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LaboratoryDay {
   int? get id;
-  @JsonKey(name: 'laboratory_id')
-  int? get laboratoryId;
   @JsonKey(name: 'day_number')
   int? get dayNumber;
   DateTime? get date;
+  @JsonKey(name: 'laboratory_day_events')
   List<LaboratoryDayEvent>? get events;
 
   /// Create a copy of LaboratoryDay
@@ -40,8 +39,6 @@ mixin _$LaboratoryDay {
         (other.runtimeType == runtimeType &&
             other is LaboratoryDay &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.laboratoryId, laboratoryId) ||
-                other.laboratoryId == laboratoryId) &&
             (identical(other.dayNumber, dayNumber) ||
                 other.dayNumber == dayNumber) &&
             (identical(other.date, date) || other.date == date) &&
@@ -50,12 +47,12 @@ mixin _$LaboratoryDay {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, laboratoryId, dayNumber,
-      date, const DeepCollectionEquality().hash(events));
+  int get hashCode => Object.hash(runtimeType, id, dayNumber, date,
+      const DeepCollectionEquality().hash(events));
 
   @override
   String toString() {
-    return 'LaboratoryDay(id: $id, laboratoryId: $laboratoryId, dayNumber: $dayNumber, date: $date, events: $events)';
+    return 'LaboratoryDay(id: $id, dayNumber: $dayNumber, date: $date, events: $events)';
   }
 }
 
@@ -67,9 +64,9 @@ abstract mixin class $LaboratoryDayCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
-      @JsonKey(name: 'laboratory_id') int? laboratoryId,
       @JsonKey(name: 'day_number') int? dayNumber,
       DateTime? date,
+      @JsonKey(name: 'laboratory_day_events')
       List<LaboratoryDayEvent>? events});
 }
 
@@ -87,7 +84,6 @@ class _$LaboratoryDayCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
-    Object? laboratoryId = freezed,
     Object? dayNumber = freezed,
     Object? date = freezed,
     Object? events = freezed,
@@ -96,10 +92,6 @@ class _$LaboratoryDayCopyWithImpl<$Res>
       id: freezed == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int?,
-      laboratoryId: freezed == laboratoryId
-          ? _self.laboratoryId
-          : laboratoryId // ignore: cast_nullable_to_non_nullable
               as int?,
       dayNumber: freezed == dayNumber
           ? _self.dayNumber
@@ -122,9 +114,9 @@ class _$LaboratoryDayCopyWithImpl<$Res>
 class _LaboratoryDay implements LaboratoryDay {
   const _LaboratoryDay(
       {this.id,
-      @JsonKey(name: 'laboratory_id') this.laboratoryId,
       @JsonKey(name: 'day_number') this.dayNumber,
       this.date,
+      @JsonKey(name: 'laboratory_day_events')
       final List<LaboratoryDayEvent>? events})
       : _events = events;
   factory _LaboratoryDay.fromJson(Map<String, dynamic> json) =>
@@ -133,15 +125,13 @@ class _LaboratoryDay implements LaboratoryDay {
   @override
   final int? id;
   @override
-  @JsonKey(name: 'laboratory_id')
-  final int? laboratoryId;
-  @override
   @JsonKey(name: 'day_number')
   final int? dayNumber;
   @override
   final DateTime? date;
   final List<LaboratoryDayEvent>? _events;
   @override
+  @JsonKey(name: 'laboratory_day_events')
   List<LaboratoryDayEvent>? get events {
     final value = _events;
     if (value == null) return null;
@@ -171,8 +161,6 @@ class _LaboratoryDay implements LaboratoryDay {
         (other.runtimeType == runtimeType &&
             other is _LaboratoryDay &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.laboratoryId, laboratoryId) ||
-                other.laboratoryId == laboratoryId) &&
             (identical(other.dayNumber, dayNumber) ||
                 other.dayNumber == dayNumber) &&
             (identical(other.date, date) || other.date == date) &&
@@ -181,12 +169,12 @@ class _LaboratoryDay implements LaboratoryDay {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, laboratoryId, dayNumber,
-      date, const DeepCollectionEquality().hash(_events));
+  int get hashCode => Object.hash(runtimeType, id, dayNumber, date,
+      const DeepCollectionEquality().hash(_events));
 
   @override
   String toString() {
-    return 'LaboratoryDay(id: $id, laboratoryId: $laboratoryId, dayNumber: $dayNumber, date: $date, events: $events)';
+    return 'LaboratoryDay(id: $id, dayNumber: $dayNumber, date: $date, events: $events)';
   }
 }
 
@@ -200,9 +188,9 @@ abstract mixin class _$LaboratoryDayCopyWith<$Res>
   @useResult
   $Res call(
       {int? id,
-      @JsonKey(name: 'laboratory_id') int? laboratoryId,
       @JsonKey(name: 'day_number') int? dayNumber,
       DateTime? date,
+      @JsonKey(name: 'laboratory_day_events')
       List<LaboratoryDayEvent>? events});
 }
 
@@ -220,7 +208,6 @@ class __$LaboratoryDayCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = freezed,
-    Object? laboratoryId = freezed,
     Object? dayNumber = freezed,
     Object? date = freezed,
     Object? events = freezed,
@@ -229,10 +216,6 @@ class __$LaboratoryDayCopyWithImpl<$Res>
       id: freezed == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int?,
-      laboratoryId: freezed == laboratoryId
-          ? _self.laboratoryId
-          : laboratoryId // ignore: cast_nullable_to_non_nullable
               as int?,
       dayNumber: freezed == dayNumber
           ? _self.dayNumber

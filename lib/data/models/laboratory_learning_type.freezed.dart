@@ -17,8 +17,6 @@ T _$identity<T>(T value) => value;
 mixin _$LearningType {
   @JsonKey(name: 'id')
   int get id;
-  @JsonKey(name: 'laboratory_id')
-  int get laboratoryId;
   @JsonKey(name: 'type')
   String get type;
   @JsonKey(name: 'price')
@@ -49,8 +47,6 @@ mixin _$LearningType {
         (other.runtimeType == runtimeType &&
             other is LearningType &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.laboratoryId, laboratoryId) ||
-                other.laboratoryId == laboratoryId) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.dateInfo, dateInfo) ||
@@ -65,12 +61,12 @@ mixin _$LearningType {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, laboratoryId, type, price,
-      dateInfo, location, duration, certificate);
+  int get hashCode => Object.hash(
+      runtimeType, id, type, price, dateInfo, location, duration, certificate);
 
   @override
   String toString() {
-    return 'LearningType(id: $id, laboratoryId: $laboratoryId, type: $type, price: $price, dateInfo: $dateInfo, location: $location, duration: $duration, certificate: $certificate)';
+    return 'LearningType(id: $id, type: $type, price: $price, dateInfo: $dateInfo, location: $location, duration: $duration, certificate: $certificate)';
   }
 }
 
@@ -82,7 +78,6 @@ abstract mixin class $LearningTypeCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'id') int id,
-      @JsonKey(name: 'laboratory_id') int laboratoryId,
       @JsonKey(name: 'type') String type,
       @JsonKey(name: 'price') int price,
       @JsonKey(name: 'date_info') String? dateInfo,
@@ -104,7 +99,6 @@ class _$LearningTypeCopyWithImpl<$Res> implements $LearningTypeCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? laboratoryId = null,
     Object? type = null,
     Object? price = null,
     Object? dateInfo = freezed,
@@ -116,10 +110,6 @@ class _$LearningTypeCopyWithImpl<$Res> implements $LearningTypeCopyWith<$Res> {
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      laboratoryId: null == laboratoryId
-          ? _self.laboratoryId
-          : laboratoryId // ignore: cast_nullable_to_non_nullable
               as int,
       type: null == type
           ? _self.type
@@ -154,7 +144,6 @@ class _$LearningTypeCopyWithImpl<$Res> implements $LearningTypeCopyWith<$Res> {
 class _LearningType implements LearningType {
   const _LearningType(
       {@JsonKey(name: 'id') required this.id,
-      @JsonKey(name: 'laboratory_id') required this.laboratoryId,
       @JsonKey(name: 'type') required this.type,
       @JsonKey(name: 'price') required this.price,
       @JsonKey(name: 'date_info') this.dateInfo,
@@ -167,9 +156,6 @@ class _LearningType implements LearningType {
   @override
   @JsonKey(name: 'id')
   final int id;
-  @override
-  @JsonKey(name: 'laboratory_id')
-  final int laboratoryId;
   @override
   @JsonKey(name: 'type')
   final String type;
@@ -210,8 +196,6 @@ class _LearningType implements LearningType {
         (other.runtimeType == runtimeType &&
             other is _LearningType &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.laboratoryId, laboratoryId) ||
-                other.laboratoryId == laboratoryId) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.dateInfo, dateInfo) ||
@@ -226,12 +210,12 @@ class _LearningType implements LearningType {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, laboratoryId, type, price,
-      dateInfo, location, duration, certificate);
+  int get hashCode => Object.hash(
+      runtimeType, id, type, price, dateInfo, location, duration, certificate);
 
   @override
   String toString() {
-    return 'LearningType(id: $id, laboratoryId: $laboratoryId, type: $type, price: $price, dateInfo: $dateInfo, location: $location, duration: $duration, certificate: $certificate)';
+    return 'LearningType(id: $id, type: $type, price: $price, dateInfo: $dateInfo, location: $location, duration: $duration, certificate: $certificate)';
   }
 }
 
@@ -245,7 +229,6 @@ abstract mixin class _$LearningTypeCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: 'id') int id,
-      @JsonKey(name: 'laboratory_id') int laboratoryId,
       @JsonKey(name: 'type') String type,
       @JsonKey(name: 'price') int price,
       @JsonKey(name: 'date_info') String? dateInfo,
@@ -268,7 +251,6 @@ class __$LearningTypeCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? laboratoryId = null,
     Object? type = null,
     Object? price = null,
     Object? dateInfo = freezed,
@@ -280,10 +262,6 @@ class __$LearningTypeCopyWithImpl<$Res>
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      laboratoryId: null == laboratoryId
-          ? _self.laboratoryId
-          : laboratoryId // ignore: cast_nullable_to_non_nullable
               as int,
       type: null == type
           ? _self.type

@@ -17,11 +17,11 @@ T _$identity<T>(T value) => value;
 mixin _$Laboratory {
   int get id;
   String get title;
-  String? get image;
+  ImageData? get image;
   String? get description;
   String? get address;
   Direction get direction;
-  List<Teacher>? get teachers;
+  List<Person>? get persons;
   @JsonKey(name: 'learning_types')
   List<LearningType>? get learningTypes;
   List<LaboratoryDay>? get days;
@@ -49,7 +49,7 @@ mixin _$Laboratory {
             (identical(other.address, address) || other.address == address) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
-            const DeepCollectionEquality().equals(other.teachers, teachers) &&
+            const DeepCollectionEquality().equals(other.persons, persons) &&
             const DeepCollectionEquality()
                 .equals(other.learningTypes, learningTypes) &&
             const DeepCollectionEquality().equals(other.days, days));
@@ -65,13 +65,13 @@ mixin _$Laboratory {
       description,
       address,
       direction,
-      const DeepCollectionEquality().hash(teachers),
+      const DeepCollectionEquality().hash(persons),
       const DeepCollectionEquality().hash(learningTypes),
       const DeepCollectionEquality().hash(days));
 
   @override
   String toString() {
-    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, direction: $direction, teachers: $teachers, learningTypes: $learningTypes, days: $days)';
+    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
 }
 
@@ -84,14 +84,15 @@ abstract mixin class $LaboratoryCopyWith<$Res> {
   $Res call(
       {int id,
       String title,
-      String? image,
+      ImageData? image,
       String? description,
       String? address,
       Direction direction,
-      List<Teacher>? teachers,
+      List<Person>? persons,
       @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
       List<LaboratoryDay>? days});
 
+  $ImageDataCopyWith<$Res>? get image;
   $DirectionCopyWith<$Res> get direction;
 }
 
@@ -113,7 +114,7 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
     Object? description = freezed,
     Object? address = freezed,
     Object? direction = null,
-    Object? teachers = freezed,
+    Object? persons = freezed,
     Object? learningTypes = freezed,
     Object? days = freezed,
   }) {
@@ -129,7 +130,7 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as ImageData?,
       description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -142,10 +143,10 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
           ? _self.direction
           : direction // ignore: cast_nullable_to_non_nullable
               as Direction,
-      teachers: freezed == teachers
-          ? _self.teachers
-          : teachers // ignore: cast_nullable_to_non_nullable
-              as List<Teacher>?,
+      persons: freezed == persons
+          ? _self.persons
+          : persons // ignore: cast_nullable_to_non_nullable
+              as List<Person>?,
       learningTypes: freezed == learningTypes
           ? _self.learningTypes
           : learningTypes // ignore: cast_nullable_to_non_nullable
@@ -155,6 +156,20 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
           : days // ignore: cast_nullable_to_non_nullable
               as List<LaboratoryDay>?,
     ));
+  }
+
+  /// Create a copy of Laboratory
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ImageDataCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $ImageDataCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
+    });
   }
 
   /// Create a copy of Laboratory
@@ -178,10 +193,10 @@ class _Laboratory implements Laboratory {
       this.description,
       this.address,
       required this.direction,
-      final List<Teacher>? teachers,
+      final List<Person>? persons,
       @JsonKey(name: 'learning_types') final List<LearningType>? learningTypes,
       final List<LaboratoryDay>? days})
-      : _teachers = teachers,
+      : _persons = persons,
         _learningTypes = learningTypes,
         _days = days;
   factory _Laboratory.fromJson(Map<String, dynamic> json) =>
@@ -192,19 +207,19 @@ class _Laboratory implements Laboratory {
   @override
   final String title;
   @override
-  final String? image;
+  final ImageData? image;
   @override
   final String? description;
   @override
   final String? address;
   @override
   final Direction direction;
-  final List<Teacher>? _teachers;
+  final List<Person>? _persons;
   @override
-  List<Teacher>? get teachers {
-    final value = _teachers;
+  List<Person>? get persons {
+    final value = _persons;
     if (value == null) return null;
-    if (_teachers is EqualUnmodifiableListView) return _teachers;
+    if (_persons is EqualUnmodifiableListView) return _persons;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
@@ -258,7 +273,7 @@ class _Laboratory implements Laboratory {
             (identical(other.address, address) || other.address == address) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
-            const DeepCollectionEquality().equals(other._teachers, _teachers) &&
+            const DeepCollectionEquality().equals(other._persons, _persons) &&
             const DeepCollectionEquality()
                 .equals(other._learningTypes, _learningTypes) &&
             const DeepCollectionEquality().equals(other._days, _days));
@@ -274,13 +289,13 @@ class _Laboratory implements Laboratory {
       description,
       address,
       direction,
-      const DeepCollectionEquality().hash(_teachers),
+      const DeepCollectionEquality().hash(_persons),
       const DeepCollectionEquality().hash(_learningTypes),
       const DeepCollectionEquality().hash(_days));
 
   @override
   String toString() {
-    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, direction: $direction, teachers: $teachers, learningTypes: $learningTypes, days: $days)';
+    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
 }
 
@@ -295,14 +310,16 @@ abstract mixin class _$LaboratoryCopyWith<$Res>
   $Res call(
       {int id,
       String title,
-      String? image,
+      ImageData? image,
       String? description,
       String? address,
       Direction direction,
-      List<Teacher>? teachers,
+      List<Person>? persons,
       @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
       List<LaboratoryDay>? days});
 
+  @override
+  $ImageDataCopyWith<$Res>? get image;
   @override
   $DirectionCopyWith<$Res> get direction;
 }
@@ -325,7 +342,7 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
     Object? description = freezed,
     Object? address = freezed,
     Object? direction = null,
-    Object? teachers = freezed,
+    Object? persons = freezed,
     Object? learningTypes = freezed,
     Object? days = freezed,
   }) {
@@ -341,7 +358,7 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as ImageData?,
       description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -354,10 +371,10 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
           ? _self.direction
           : direction // ignore: cast_nullable_to_non_nullable
               as Direction,
-      teachers: freezed == teachers
-          ? _self._teachers
-          : teachers // ignore: cast_nullable_to_non_nullable
-              as List<Teacher>?,
+      persons: freezed == persons
+          ? _self._persons
+          : persons // ignore: cast_nullable_to_non_nullable
+              as List<Person>?,
       learningTypes: freezed == learningTypes
           ? _self._learningTypes
           : learningTypes // ignore: cast_nullable_to_non_nullable
@@ -367,6 +384,20 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
           : days // ignore: cast_nullable_to_non_nullable
               as List<LaboratoryDay>?,
     ));
+  }
+
+  /// Create a copy of Laboratory
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ImageDataCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $ImageDataCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
+    });
   }
 
   /// Create a copy of Laboratory

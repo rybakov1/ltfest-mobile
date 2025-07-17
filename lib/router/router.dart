@@ -7,7 +7,7 @@ import 'package:ltfest/pages/more/app_settings_page.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:ltfest/pages/auth/login_page.dart';
 import 'package:ltfest/pages/auth/registration_page.dart';
-import 'package:ltfest/pages/blog_page.dart';
+import 'package:ltfest/pages/news_page.dart';
 import 'package:ltfest/pages/fest/fest_details_page.dart';
 import 'package:ltfest/pages/fest/fest_page.dart';
 import 'package:ltfest/pages/home/home_page.dart';
@@ -113,7 +113,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.blog,
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: BlogPage(),
+              child: NewsPage(),
             ),
           ),
           GoRoute(

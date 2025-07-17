@@ -15,14 +15,13 @@ class AuthNotifier extends _$AuthNotifier {
   FutureOr<AuthState> build() async {
     final accessToken = await _tokenStorage.getJwt();
 
-
     if (accessToken == null) {
       return const AuthState.unauthenticated();
     }
 
     try {
       final user = await _apiService.getMe();
-      if (user.firstname == "Unknown") {
+      if (user.firstname == user.phone || user.firstname == "Unknown") {
         return AuthState.needsRegistration(user: user);
       } else {
         return AuthState.authenticated(user: user);
@@ -47,8 +46,9 @@ class AuthNotifier extends _$AuthNotifier {
     state = await AsyncValue.guard(() async {
       await _apiService.verifyOtp(phone, otp);
       final user = await _apiService.getMe();
+      print("USER $user");
 
-      if (user.firstname == "Unknown") {
+      if (user.firstname == user.phone || user.firstname == "Unknown") {
         return AuthState.needsRegistration(user: user);
       } else {
         return AuthState.authenticated(user: user);

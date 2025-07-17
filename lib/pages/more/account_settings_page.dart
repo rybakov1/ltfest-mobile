@@ -41,7 +41,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       final user = (authState.value as Authenticated).user;
 
       _emailController.text = user.email;
-      _cityController.text = user.residence;
+      _cityController.text = user.residence!;
       _educationController.text = '';
       _masterFioController.text = '';
       _collectiveNameController.text = user.collectivename ?? '';

@@ -18,7 +18,7 @@ mixin _$News {
   int get id;
   String get title;
   DateTime get date;
-  String? get image;
+  ImageData? get image;
   String? get url;
   String? get description;
 
@@ -66,9 +66,11 @@ abstract mixin class $NewsCopyWith<$Res> {
       {int id,
       String title,
       DateTime date,
-      String? image,
+      ImageData? image,
       String? url,
       String? description});
+
+  $ImageDataCopyWith<$Res>? get image;
 }
 
 /// @nodoc
@@ -106,7 +108,7 @@ class _$NewsCopyWithImpl<$Res> implements $NewsCopyWith<$Res> {
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as ImageData?,
       url: freezed == url
           ? _self.url
           : url // ignore: cast_nullable_to_non_nullable
@@ -116,6 +118,20 @@ class _$NewsCopyWithImpl<$Res> implements $NewsCopyWith<$Res> {
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
+  }
+
+  /// Create a copy of News
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ImageDataCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $ImageDataCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
+    });
   }
 }
 
@@ -138,7 +154,7 @@ class _News implements News {
   @override
   final DateTime date;
   @override
-  final String? image;
+  final ImageData? image;
   @override
   final String? url;
   @override
@@ -194,9 +210,12 @@ abstract mixin class _$NewsCopyWith<$Res> implements $NewsCopyWith<$Res> {
       {int id,
       String title,
       DateTime date,
-      String? image,
+      ImageData? image,
       String? url,
       String? description});
+
+  @override
+  $ImageDataCopyWith<$Res>? get image;
 }
 
 /// @nodoc
@@ -234,7 +253,7 @@ class __$NewsCopyWithImpl<$Res> implements _$NewsCopyWith<$Res> {
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as ImageData?,
       url: freezed == url
           ? _self.url
           : url // ignore: cast_nullable_to_non_nullable
@@ -244,6 +263,20 @@ class __$NewsCopyWithImpl<$Res> implements _$NewsCopyWith<$Res> {
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
+  }
+
+  /// Create a copy of News
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ImageDataCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $ImageDataCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
+    });
   }
 }
 

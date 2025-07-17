@@ -8,7 +8,7 @@ import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/models/laboratory.dart';
-import '../../data/models/teacher.dart';
+import '../../data/models/person.dart';
 
 final tabIndexProvider = StateProvider<int>((ref) => 0);
 final learningTypeIndexProvider = StateProvider<int>((ref) => 0);
@@ -33,7 +33,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
       builder: (BuildContext context) {
         return Container(
           height: 300,
-          padding: EdgeInsets.only(left: 16, right: 16, bottom: 24 + bottomPadding),
+          padding:
+              EdgeInsets.only(left: 16, right: 16, bottom: 24 + bottomPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -122,7 +123,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
     );
   }
 
-  void _showTeacherInfo(BuildContext context, Teacher teacher) {
+  void _showTeacherInfo(BuildContext context, Person person) {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
     showModalBottomSheet(
@@ -135,7 +136,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
       isScrollControlled: true,
       builder: (BuildContext context) {
         return Container(
-          padding: EdgeInsets.only(left: 16, right: 16, bottom: 24 + bottomPadding),
+          padding:
+              EdgeInsets.only(left: 16, right: 16, bottom: 24 + bottomPadding),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,15 +159,15 @@ class LaboratoryDetailPage extends ConsumerWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                "${teacher.firstname} ${teacher.lastname}",
+                "${person.firstname} ${person.lastname}",
                 style: Styles.h3,
               ),
               const SizedBox(height: 16),
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: teacher.image != null && teacher.image!.isNotEmpty
+                child: person.image != null
                     ? Image.network(
-                        teacher.image!,
+                        person.image!.url,
                         height: 240,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -186,7 +188,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                teacher.description ?? 'Описание отсутствует',
+                person.description ?? 'Описание отсутствует',
                 style: Styles.b2,
               ),
               const SizedBox(height: 32),
@@ -233,25 +235,20 @@ class LaboratoryDetailPage extends ConsumerWidget {
                     Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
-                          child: laboratory.image!.isNotEmpty
-                              ? Image.network(laboratory.image!,
-                                  height: 393,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover)
-                              : Image.asset(
-                                  'assets/images/teatr_placeholder.png',
-                                  height: 393,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover),
-                        ),
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                            ),
+                            child: Image.network(
+                                'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}',
+                                height: 393,
+                                width: double.infinity,
+                                fit: BoxFit.cover)),
                         SafeArea(child: content(context, ref, laboratory)),
                       ],
                     ),
-                     SizedBox(height: 48 + MediaQuery.of(context).padding.bottom),
+                    SizedBox(
+                        height: 48 + MediaQuery.of(context).padding.bottom),
                   ],
                 ),
               );
@@ -271,7 +268,11 @@ class LaboratoryDetailPage extends ConsumerWidget {
                 ),
                 color: Palette.white,
               ),
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom, top: 24, right: 16, left: 16),
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom,
+                  top: 24,
+                  right: 16,
+                  left: 16),
               child: GestureDetector(
                 onTap: () async {
                   final Uri uri = Uri.parse(
@@ -474,11 +475,11 @@ class LaboratoryDetailPage extends ConsumerWidget {
                       style: Styles.h4,
                     ),
                     const SizedBox(height: 16),
-                    laboratory.teachers?.isNotEmpty ?? false
+                    laboratory.persons?.isNotEmpty ?? false
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: laboratory.teachers!
+                            children: laboratory.persons!
                                 .asMap()
                                 .entries
                                 .expand(
@@ -500,11 +501,9 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                                 borderRadius:
                                                     BorderRadius.circular(12),
                                                 child: entry.value.image !=
-                                                            null &&
-                                                        entry.value.image!
-                                                            .isNotEmpty
+                                                            null
                                                     ? Image.network(
-                                                        entry.value.image!,
+                                                        entry.value.image!.url,
                                                         height: 150,
                                                         width: double.infinity,
                                                         fit: BoxFit.cover,
@@ -552,7 +551,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                       ),
                                     ),
                                     if (entry.key <
-                                        laboratory.teachers!.length - 1)
+                                        laboratory.persons!.length - 1)
                                       const SizedBox(width: 12),
                                   ],
                                 )
@@ -587,7 +586,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                           style: Styles.h4,
                                         ),
                                         subtitle: Text(
-                                          DateFormat('dd MMMM yyyy', 'ru').format(day.date!),
+                                          DateFormat('dd MMMM yyyy', 'ru')
+                                              .format(day.date!),
                                           style: Styles.b2
                                               .copyWith(color: Palette.gray),
                                         ),

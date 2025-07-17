@@ -211,8 +211,8 @@ class FestivalPage extends ConsumerWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'assets/images/teatr_placeholder.png',
+                child: Image.network(
+                  'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',//'assets/images/teatr_placeholder.png',
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -236,10 +236,10 @@ class FestivalPage extends ConsumerWidget {
             festival.address ?? 'Не указано',
             style: Styles.b2.copyWith(color: Palette.gray),
           ),
-          Text(
-            festival.date,
-            style: Styles.b2.copyWith(color: Palette.gray),
-          ),
+          // TODO: Text(
+          //   festival.date,
+          //   style: Styles.b2.copyWith(color: Palette.gray),
+          // ),
         ],
       ),
     );

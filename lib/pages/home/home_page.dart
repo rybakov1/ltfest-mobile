@@ -374,8 +374,6 @@ class _HomeHeader extends ConsumerWidget {
         if (data is Authenticated) {
           final user = data.user;
           final displayName = user.lastname.trim();
-          final points = user.bonuses;
-
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16.0),
             child: SizedBox(
@@ -388,29 +386,6 @@ class _HomeHeader extends ConsumerWidget {
                     child: Text(
                       displayName,
                       style: Styles.h3.copyWith(color: Palette.white),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  InkWell(
-                    onTap: () => context.push(AppRoutes.more),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Palette.primaryPink,
-                            Palette.primary2Gradient
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 4),
-                      child: Text(
-                        "$points LT",
-                        style: Styles.h5.copyWith(color: Palette.white),
-                      ),
                     ),
                   ),
                 ],

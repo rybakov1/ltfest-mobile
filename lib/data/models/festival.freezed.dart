@@ -17,15 +17,14 @@ T _$identity<T>(T value) => value;
 mixin _$Festival {
   int get id;
   String get title;
-  String? get image;
-  int get price;
-  String get date;
+  ImageData? get image;
+  int get price; // required String date,
   String? get address;
   String? get description;
   String? get pdfurl;
   @JsonKey(name: 'direction')
   Direction get direction;
-  List<Jury> get jury;
+  List<Person>? get persons;
 
   /// Create a copy of Festival
   /// with the given fields replaced by the non-null parameter values.
@@ -46,14 +45,13 @@ mixin _$Festival {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.image, image) || other.image == image) &&
             (identical(other.price, price) || other.price == price) &&
-            (identical(other.date, date) || other.date == date) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.pdfurl, pdfurl) || other.pdfurl == pdfurl) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
-            const DeepCollectionEquality().equals(other.jury, jury));
+            const DeepCollectionEquality().equals(other.persons, persons));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -64,16 +62,15 @@ mixin _$Festival {
       title,
       image,
       price,
-      date,
       address,
       description,
       pdfurl,
       direction,
-      const DeepCollectionEquality().hash(jury));
+      const DeepCollectionEquality().hash(persons));
 
   @override
   String toString() {
-    return 'Festival(id: $id, title: $title, image: $image, price: $price, date: $date, address: $address, description: $description, pdfurl: $pdfurl, direction: $direction, jury: $jury)';
+    return 'Festival(id: $id, title: $title, image: $image, price: $price, address: $address, description: $description, pdfurl: $pdfurl, direction: $direction, persons: $persons)';
   }
 }
 
@@ -85,15 +82,15 @@ abstract mixin class $FestivalCopyWith<$Res> {
   $Res call(
       {int id,
       String title,
-      String? image,
+      ImageData? image,
       int price,
-      String date,
       String? address,
       String? description,
       String? pdfurl,
       @JsonKey(name: 'direction') Direction direction,
-      List<Jury> jury});
+      List<Person>? persons});
 
+  $ImageDataCopyWith<$Res>? get image;
   $DirectionCopyWith<$Res> get direction;
 }
 
@@ -113,12 +110,11 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
     Object? title = null,
     Object? image = freezed,
     Object? price = null,
-    Object? date = null,
     Object? address = freezed,
     Object? description = freezed,
     Object? pdfurl = freezed,
     Object? direction = null,
-    Object? jury = null,
+    Object? persons = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -132,15 +128,11 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as ImageData?,
       price: null == price
           ? _self.price
           : price // ignore: cast_nullable_to_non_nullable
               as int,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as String,
       address: freezed == address
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
@@ -157,11 +149,25 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
           ? _self.direction
           : direction // ignore: cast_nullable_to_non_nullable
               as Direction,
-      jury: null == jury
-          ? _self.jury
-          : jury // ignore: cast_nullable_to_non_nullable
-              as List<Jury>,
+      persons: freezed == persons
+          ? _self.persons
+          : persons // ignore: cast_nullable_to_non_nullable
+              as List<Person>?,
     ));
+  }
+
+  /// Create a copy of Festival
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ImageDataCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $ImageDataCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
+    });
   }
 
   /// Create a copy of Festival
@@ -183,13 +189,12 @@ class _Festival implements Festival {
       required this.title,
       this.image,
       required this.price,
-      required this.date,
       this.address,
       this.description,
       this.pdfurl,
       @JsonKey(name: 'direction') required this.direction,
-      required final List<Jury> jury})
-      : _jury = jury;
+      final List<Person>? persons})
+      : _persons = persons;
   factory _Festival.fromJson(Map<String, dynamic> json) =>
       _$FestivalFromJson(json);
 
@@ -198,11 +203,10 @@ class _Festival implements Festival {
   @override
   final String title;
   @override
-  final String? image;
+  final ImageData? image;
   @override
   final int price;
-  @override
-  final String date;
+// required String date,
   @override
   final String? address;
   @override
@@ -212,12 +216,14 @@ class _Festival implements Festival {
   @override
   @JsonKey(name: 'direction')
   final Direction direction;
-  final List<Jury> _jury;
+  final List<Person>? _persons;
   @override
-  List<Jury> get jury {
-    if (_jury is EqualUnmodifiableListView) return _jury;
+  List<Person>? get persons {
+    final value = _persons;
+    if (value == null) return null;
+    if (_persons is EqualUnmodifiableListView) return _persons;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_jury);
+    return EqualUnmodifiableListView(value);
   }
 
   /// Create a copy of Festival
@@ -244,14 +250,13 @@ class _Festival implements Festival {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.image, image) || other.image == image) &&
             (identical(other.price, price) || other.price == price) &&
-            (identical(other.date, date) || other.date == date) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.pdfurl, pdfurl) || other.pdfurl == pdfurl) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
-            const DeepCollectionEquality().equals(other._jury, _jury));
+            const DeepCollectionEquality().equals(other._persons, _persons));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -262,16 +267,15 @@ class _Festival implements Festival {
       title,
       image,
       price,
-      date,
       address,
       description,
       pdfurl,
       direction,
-      const DeepCollectionEquality().hash(_jury));
+      const DeepCollectionEquality().hash(_persons));
 
   @override
   String toString() {
-    return 'Festival(id: $id, title: $title, image: $image, price: $price, date: $date, address: $address, description: $description, pdfurl: $pdfurl, direction: $direction, jury: $jury)';
+    return 'Festival(id: $id, title: $title, image: $image, price: $price, address: $address, description: $description, pdfurl: $pdfurl, direction: $direction, persons: $persons)';
   }
 }
 
@@ -285,15 +289,16 @@ abstract mixin class _$FestivalCopyWith<$Res>
   $Res call(
       {int id,
       String title,
-      String? image,
+      ImageData? image,
       int price,
-      String date,
       String? address,
       String? description,
       String? pdfurl,
       @JsonKey(name: 'direction') Direction direction,
-      List<Jury> jury});
+      List<Person>? persons});
 
+  @override
+  $ImageDataCopyWith<$Res>? get image;
   @override
   $DirectionCopyWith<$Res> get direction;
 }
@@ -314,12 +319,11 @@ class __$FestivalCopyWithImpl<$Res> implements _$FestivalCopyWith<$Res> {
     Object? title = null,
     Object? image = freezed,
     Object? price = null,
-    Object? date = null,
     Object? address = freezed,
     Object? description = freezed,
     Object? pdfurl = freezed,
     Object? direction = null,
-    Object? jury = null,
+    Object? persons = freezed,
   }) {
     return _then(_Festival(
       id: null == id
@@ -333,15 +337,11 @@ class __$FestivalCopyWithImpl<$Res> implements _$FestivalCopyWith<$Res> {
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as ImageData?,
       price: null == price
           ? _self.price
           : price // ignore: cast_nullable_to_non_nullable
               as int,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as String,
       address: freezed == address
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
@@ -358,11 +358,25 @@ class __$FestivalCopyWithImpl<$Res> implements _$FestivalCopyWith<$Res> {
           ? _self.direction
           : direction // ignore: cast_nullable_to_non_nullable
               as Direction,
-      jury: null == jury
-          ? _self._jury
-          : jury // ignore: cast_nullable_to_non_nullable
-              as List<Jury>,
+      persons: freezed == persons
+          ? _self._persons
+          : persons // ignore: cast_nullable_to_non_nullable
+              as List<Person>?,
     ));
+  }
+
+  /// Create a copy of Festival
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ImageDataCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $ImageDataCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
+    });
   }
 
   /// Create a copy of Festival

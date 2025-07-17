@@ -3,28 +3,28 @@ class User {
   final String firstname;
   final String lastname;
   final String email;
-  final DateTime birthdate;
-  final String residence;
-  final String phone;
-  final int directionid;
-  final int activityid;
+  final DateTime? birthdate; // Сделаем nullable на случай отсутствия
+  final String? residence;   // Сделаем nullable
+  final String? phone;       // Сделаем nullable
+  final int? directionid;   // Сделаем nullable
+  final int? activityid;    // Сделаем nullable
   final String? collectivename;
   final String? collectivecity;
-  final int bonuses;
+  final String? ltpriority;       // Сделаем nullable
 
   User({
     required this.id,
     required this.firstname,
     required this.lastname,
     required this.email,
-    required this.birthdate,
-    required this.residence,
-    required this.phone,
-    required this.directionid,
-    required this.activityid,
+    this.birthdate,
+    this.residence,
+    this.phone,
+    this.directionid,
+    this.activityid,
     this.collectivename,
     this.collectivecity,
-    required this.bonuses,
+    this.ltpriority,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -40,7 +40,7 @@ class User {
       activityid: json['activityid'],
       collectivename: json['collectivename'],
       collectivecity: json['collectivecity'],
-      bonuses: json['bonuses'],
+      ltpriority: json['ltpriority'],
     );
   }
 
@@ -49,14 +49,14 @@ class User {
       'firstname': firstname,
       'lastname': lastname,
       'email': email,
-      'birthdate': birthdate.toIso8601String().split('T')[0],  // Формат YYYY-MM-DD
+      'birthdate': birthdate!.toIso8601String().split('T')[0],  // Формат YYYY-MM-DD
       'residence': residence,
       'phone': phone,
       'directionid': directionid,
       'activityid': activityid,
       'collectivename': collectivename,
       'collectivecity': collectivecity,
-      'bonuses': bonuses,
+      'ltpriority': ltpriority,
     };
   }
 }

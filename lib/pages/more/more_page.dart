@@ -184,7 +184,6 @@ class _ProfileCard extends ConsumerWidget {
         if (data is Authenticated) {
           final user = data.user;
           final displayName = user.lastname.trim();
-          final points = user.bonuses;
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
             decoration: Decor.base.copyWith(color: Palette.primaryLime),
@@ -196,14 +195,17 @@ class _ProfileCard extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Баллы LT", style: Styles.b2),
+                    Text("LT priority", style: Styles.b2),
                     Text(
-                      "$points LT",
-                      style: const TextStyle(
-                          fontFamily: "Unbounded",
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600),
-                    ),
+                        user.ltpriority != "Base1"
+                            ? "${user.ltpriority}"
+                            : "Подробнее",
+                        style: user.ltpriority != "Base1"
+                            ? const TextStyle(
+                                fontFamily: "Unbounded",
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600)
+                            : Styles.button1),
                   ],
                 )
               ],

@@ -4,7 +4,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'teacher.dart';
+part of 'person.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,28 +14,28 @@ part of 'teacher.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$Teacher {
+mixin _$Person {
   int get id;
   String get firstname;
   String get lastname;
-  String? get image;
+  ImageData? get image;
   String? get description;
 
-  /// Create a copy of Teacher
+  /// Create a copy of Person
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $TeacherCopyWith<Teacher> get copyWith =>
-      _$TeacherCopyWithImpl<Teacher>(this as Teacher, _$identity);
+  $PersonCopyWith<Person> get copyWith =>
+      _$PersonCopyWithImpl<Person>(this as Person, _$identity);
 
-  /// Serializes this Teacher to a JSON map.
+  /// Serializes this Person to a JSON map.
   Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is Teacher &&
+            other is Person &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.firstname, firstname) ||
                 other.firstname == firstname) &&
@@ -53,31 +53,33 @@ mixin _$Teacher {
 
   @override
   String toString() {
-    return 'Teacher(id: $id, firstname: $firstname, lastname: $lastname, image: $image, description: $description)';
+    return 'Person(id: $id, firstname: $firstname, lastname: $lastname, image: $image, description: $description)';
   }
 }
 
 /// @nodoc
-abstract mixin class $TeacherCopyWith<$Res> {
-  factory $TeacherCopyWith(Teacher value, $Res Function(Teacher) _then) =
-      _$TeacherCopyWithImpl;
+abstract mixin class $PersonCopyWith<$Res> {
+  factory $PersonCopyWith(Person value, $Res Function(Person) _then) =
+      _$PersonCopyWithImpl;
   @useResult
   $Res call(
       {int id,
       String firstname,
       String lastname,
-      String? image,
+      ImageData? image,
       String? description});
+
+  $ImageDataCopyWith<$Res>? get image;
 }
 
 /// @nodoc
-class _$TeacherCopyWithImpl<$Res> implements $TeacherCopyWith<$Res> {
-  _$TeacherCopyWithImpl(this._self, this._then);
+class _$PersonCopyWithImpl<$Res> implements $PersonCopyWith<$Res> {
+  _$PersonCopyWithImpl(this._self, this._then);
 
-  final Teacher _self;
-  final $Res Function(Teacher) _then;
+  final Person _self;
+  final $Res Function(Person) _then;
 
-  /// Create a copy of Teacher
+  /// Create a copy of Person
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -104,26 +106,39 @@ class _$TeacherCopyWithImpl<$Res> implements $TeacherCopyWith<$Res> {
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as ImageData?,
       description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
+
+  /// Create a copy of Person
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ImageDataCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $ImageDataCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
+    });
+  }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _Teacher implements Teacher {
-  const _Teacher(
+class _Person implements Person {
+  const _Person(
       {required this.id,
       required this.firstname,
       required this.lastname,
       this.image,
       this.description});
-  factory _Teacher.fromJson(Map<String, dynamic> json) =>
-      _$TeacherFromJson(json);
+  factory _Person.fromJson(Map<String, dynamic> json) => _$PersonFromJson(json);
 
   @override
   final int id;
@@ -132,21 +147,21 @@ class _Teacher implements Teacher {
   @override
   final String lastname;
   @override
-  final String? image;
+  final ImageData? image;
   @override
   final String? description;
 
-  /// Create a copy of Teacher
+  /// Create a copy of Person
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$TeacherCopyWith<_Teacher> get copyWith =>
-      __$TeacherCopyWithImpl<_Teacher>(this, _$identity);
+  _$PersonCopyWith<_Person> get copyWith =>
+      __$PersonCopyWithImpl<_Person>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$TeacherToJson(
+    return _$PersonToJson(
       this,
     );
   }
@@ -155,7 +170,7 @@ class _Teacher implements Teacher {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _Teacher &&
+            other is _Person &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.firstname, firstname) ||
                 other.firstname == firstname) &&
@@ -173,32 +188,35 @@ class _Teacher implements Teacher {
 
   @override
   String toString() {
-    return 'Teacher(id: $id, firstname: $firstname, lastname: $lastname, image: $image, description: $description)';
+    return 'Person(id: $id, firstname: $firstname, lastname: $lastname, image: $image, description: $description)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$TeacherCopyWith<$Res> implements $TeacherCopyWith<$Res> {
-  factory _$TeacherCopyWith(_Teacher value, $Res Function(_Teacher) _then) =
-      __$TeacherCopyWithImpl;
+abstract mixin class _$PersonCopyWith<$Res> implements $PersonCopyWith<$Res> {
+  factory _$PersonCopyWith(_Person value, $Res Function(_Person) _then) =
+      __$PersonCopyWithImpl;
   @override
   @useResult
   $Res call(
       {int id,
       String firstname,
       String lastname,
-      String? image,
+      ImageData? image,
       String? description});
+
+  @override
+  $ImageDataCopyWith<$Res>? get image;
 }
 
 /// @nodoc
-class __$TeacherCopyWithImpl<$Res> implements _$TeacherCopyWith<$Res> {
-  __$TeacherCopyWithImpl(this._self, this._then);
+class __$PersonCopyWithImpl<$Res> implements _$PersonCopyWith<$Res> {
+  __$PersonCopyWithImpl(this._self, this._then);
 
-  final _Teacher _self;
-  final $Res Function(_Teacher) _then;
+  final _Person _self;
+  final $Res Function(_Person) _then;
 
-  /// Create a copy of Teacher
+  /// Create a copy of Person
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -209,7 +227,7 @@ class __$TeacherCopyWithImpl<$Res> implements _$TeacherCopyWith<$Res> {
     Object? image = freezed,
     Object? description = freezed,
   }) {
-    return _then(_Teacher(
+    return _then(_Person(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -225,12 +243,26 @@ class __$TeacherCopyWithImpl<$Res> implements _$TeacherCopyWith<$Res> {
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as ImageData?,
       description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
+  }
+
+  /// Create a copy of Person
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ImageDataCopyWith<$Res>? get image {
+    if (_self.image == null) {
+      return null;
+    }
+
+    return $ImageDataCopyWith<$Res>(_self.image!, (value) {
+      return _then(_self.copyWith(image: value));
+    });
   }
 }
 

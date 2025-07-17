@@ -9,7 +9,6 @@ part of 'laboratory_learning_type.dart';
 _LearningType _$LearningTypeFromJson(Map<String, dynamic> json) =>
     _LearningType(
       id: (json['id'] as num).toInt(),
-      laboratoryId: (json['laboratory_id'] as num).toInt(),
       type: json['type'] as String,
       price: (json['price'] as num).toInt(),
       dateInfo: json['date_info'] as String?,
@@ -21,7 +20,6 @@ _LearningType _$LearningTypeFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$LearningTypeToJson(_LearningType instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'laboratory_id': instance.laboratoryId,
       'type': instance.type,
       'price': instance.price,
       'date_info': instance.dateInfo,

@@ -1,7 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ltfest/data/models/teacher.dart';
+import 'package:ltfest/data/models/person.dart';
 
 import 'direction.dart';
+import 'image_data.dart';
 import 'laboratory_day.dart';
 import 'laboratory_learning_type.dart';
 
@@ -13,11 +14,11 @@ abstract class Laboratory with _$Laboratory {
   const factory Laboratory({
     required int id,
     required String title,
-    String? image,
+    ImageData? image,
     String? description,
     String? address,
     required Direction direction,
-    List<Teacher>? teachers,
+    List<Person>? persons,
     @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
     List<LaboratoryDay>? days,
   }) = _Laboratory;

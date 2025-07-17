@@ -10,7 +10,9 @@ _News _$NewsFromJson(Map<String, dynamic> json) => _News(
       id: (json['id'] as num).toInt(),
       title: json['title'] as String,
       date: DateTime.parse(json['date'] as String),
-      image: json['image'] as String?,
+      image: json['image'] == null
+          ? null
+          : ImageData.fromJson(json['image'] as Map<String, dynamic>),
       url: json['url'] as String?,
       description: json['description'] as String?,
     );

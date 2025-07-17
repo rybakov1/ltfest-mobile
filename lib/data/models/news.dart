@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:ltfest/data/models/image_data.dart';
 
 part 'news.freezed.dart';
 part 'news.g.dart';
@@ -9,7 +10,7 @@ abstract class News with _$News {
     required int id,
     required String title,
     required DateTime date,
-    String? image,
+    ImageData? image,
     String? url,
     String? description,
   }) = _News;

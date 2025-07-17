@@ -8,7 +8,6 @@ part 'laboratory_learning_type.g.dart';
 abstract class LearningType with _$LearningType {
   const factory LearningType({
     @JsonKey(name: 'id') required int id,
-    @JsonKey(name: 'laboratory_id') required int laboratoryId,
     @JsonKey(name: 'type') required String type,
     @JsonKey(name: 'price') required int price,
     @JsonKey(name: 'date_info') String? dateInfo,

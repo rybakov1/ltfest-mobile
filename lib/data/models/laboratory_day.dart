@@ -10,10 +10,9 @@ part 'laboratory_day.g.dart';
 abstract class LaboratoryDay with _$LaboratoryDay {
   const factory LaboratoryDay({
     int? id,
-    @JsonKey(name: 'laboratory_id') int? laboratoryId,
     @JsonKey(name: 'day_number') int? dayNumber,
     DateTime? date,
-    List<LaboratoryDayEvent>? events,
+    @JsonKey(name: 'laboratory_day_events') List<LaboratoryDayEvent>? events,
   }) = _LaboratoryDay;
 
   factory LaboratoryDay.fromJson(Map<String, dynamic> json) => _$LaboratoryDayFromJson(json);
