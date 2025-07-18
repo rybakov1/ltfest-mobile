@@ -88,7 +88,7 @@ class LaboratoryPage extends ConsumerWidget {
                                     .state = direction;
                               },
                             ),
-                            const SizedBox(height: 12),
+                            // const SizedBox(height: 12),
                           ],
                         ),
                       ),

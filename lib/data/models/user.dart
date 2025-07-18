@@ -1,15 +1,15 @@
 class User {
   final int id;
-  final String firstname;
-  final String lastname;
-  final String email;
+  final String? firstname;
+  final String? lastname;
+  final String? email;
   final DateTime? birthdate; // Сделаем nullable на случай отсутствия
   final String? residence;   // Сделаем nullable
   final String? phone;       // Сделаем nullable
   final int? directionid;   // Сделаем nullable
   final int? activityid;    // Сделаем nullable
-  final String? collectivename;
-  final String? collectivecity;
+  final String? collectiveName;
+  final String? collectiveCity;
   final String? ltpriority;       // Сделаем nullable
 
   User({
@@ -22,8 +22,8 @@ class User {
     this.phone,
     this.directionid,
     this.activityid,
-    this.collectivename,
-    this.collectivecity,
+    this.collectiveName,
+    this.collectiveCity,
     this.ltpriority,
   });
 
@@ -33,13 +33,13 @@ class User {
       firstname: json['firstname'],
       lastname: json['lastname'],
       email: json['email'],
-      birthdate: DateTime.parse(json['birthdate']),
+      birthdate: json['birthdate'] != null ? DateTime.parse(json['birthdate']) : null,
       residence: json['residence'],
       phone: json['phone'],
       directionid: json['directionid'],
       activityid: json['activityid'],
-      collectivename: json['collectivename'],
-      collectivecity: json['collectivecity'],
+      collectiveName: json['collectiveName'],
+      collectiveCity: json['collectiveCity'],
       ltpriority: json['ltpriority'],
     );
   }
@@ -54,8 +54,8 @@ class User {
       'phone': phone,
       'directionid': directionid,
       'activityid': activityid,
-      'collectivename': collectivename,
-      'collectivecity': collectivecity,
+      'collectiveName': collectiveName,
+      'collectiveCity': collectiveCity,
       'ltpriority': ltpriority,
     };
   }

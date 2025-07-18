@@ -46,7 +46,6 @@ class AuthNotifier extends _$AuthNotifier {
     state = await AsyncValue.guard(() async {
       await _apiService.verifyOtp(phone, otp);
       final user = await _apiService.getMe();
-      print("USER $user");
 
       if (user.firstname == user.phone || user.firstname == "Unknown") {
         return AuthState.needsRegistration(user: user);

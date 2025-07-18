@@ -4,16 +4,14 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+
+Future<void> _launchUrl(String urlString) async {
+  final uri = Uri.parse(urlString);
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
 class AboutAppPage extends StatelessWidget {
   const AboutAppPage({super.key});
-
-  // Хелпер для запуска URL
-  Future<void> _launchUrl(String urlString) async {
-    final uri = Uri.parse(urlString);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,13 +105,13 @@ class AboutAppPage extends StatelessWidget {
         const Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // _SocialIcon(iconPath: 'assets/icons/vk.svg', url: 'https://vk.com'),
-            // const SizedBox(width: 16),
-            // _SocialIcon(
-            //     iconPath: 'assets/icons/youtube.svg',
-            //     url: 'https://youtube.com'),
-            // const SizedBox(width: 16),
-            _SocialIcon(iconPath: 'assets/icons/tg.svg', url: 'https://t.me'),
+            _SocialIcon(iconPath: 'assets/icons/social/vk.svg', url: 'https://vk.com/lt_fest'),
+            SizedBox(width: 8),
+            _SocialIcon(
+                iconPath: 'assets/icons/social/yt.svg',
+                url: 'https://youtube.com'),
+            SizedBox(width: 8),
+            _SocialIcon(iconPath: 'assets/icons/social/tg.svg', url: 'https://t.me'),
           ],
         ),
       ],
@@ -144,34 +142,51 @@ class AboutAppPage extends StatelessWidget {
   }
 
   Widget _buildLinkSection() {
-    return Column(
+    return const Column(
       children: [
         _InfoLinkTile(
-          title: 'Политика обработки персональных данных',
-          onTap: () {
-            // TODO: Открыть ссылку или страницу
-          },
-        ),
-        const SizedBox(height: 8),
+            title: 'Политика обработки персональных данных',
+            url: 'https://ltfest.ru/privacy'),
+        SizedBox(height: 8),
         _InfoLinkTile(
-          title: 'Оферта',
-          onTap: () {
-            // TODO: Открыть ссылку или страницу
-          },
-        ),
-        const SizedBox(height: 8),
-        _InfoLinkTile(
-          title: 'Основы режиссуры',
-          onTap: () {
-            // TODO: Открыть ссылку или страницу
-          },
-        ),
-        const SizedBox(height: 8),
+            title: 'Основы режиссуры',
+            url:
+                'https://drive.google.com/file/d/186cxovf8pIoNBP2-jQk7pE_hBB8cK12U/view'),
+        SizedBox(height: 8),
         _InfoLinkTile(
           title: 'Сценическая речь',
-          onTap: () {
-            // TODO: Открыть ссылку или страницу
-          },
+          url:
+              'https://drive.google.com/file/d/1aH7Pxm-mCRl0GzoxvhE_fpIhduvHLlY1/view',
+        ),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+            title: 'ПУБЛИЧНЫЙ ДОГОВОР-ОФЕРТА',
+            url: 'https://ltfest.ru/offerdoc'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+            title: 'ДОПОЛНЕНИЕ К ПУБЛИЧНОМУ ДОГОВОРУ-ОФЕРТЕ',
+            url: 'https://ltfest.ru/offerdoc/add'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+            title: 'ПУБЛИЧНЫЙ ДОГОВОР-ОФЕРТА',
+            url: 'https://ltfest.ru/offerdoc'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+            title:
+                'ДОГОВОР-ОФЕРТА О ПРЕДОСТАВЛЕНИИ КАРТЫ ЛОЯЛЬНОСТИ "LT PRIORITY"',
+            url: 'https://ltfest.ru/offercards'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+            title: 'ПУБЛИЧНЫЙ ДОГОВОР-ОФЕРТА LT Счастливчик',
+            url: 'https://ltfest.ru/winner'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+            title: 'ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ «LT Консьерж»',
+            url: 'https://ltfest.ru/concierge'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+          title: 'ПУБЛИЧНЫЙ ДОГОВОР-ОФЕРТА (международные фестивали)',
+          url: 'https://ltfest.ru/offerglobal',
         ),
       ],
     );
@@ -188,12 +203,7 @@ class _SocialIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () async {
-        final uri = Uri.parse(url);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        }
-      },
+      onTap: () => _launchUrl(url),
       borderRadius: BorderRadius.circular(20),
       child: SvgPicture.asset(iconPath, width: 40, height: 40),
     );
@@ -203,14 +213,14 @@ class _SocialIcon extends StatelessWidget {
 // Переиспользуемый виджет для ссылок внизу
 class _InfoLinkTile extends StatelessWidget {
   final String title;
-  final VoidCallback onTap;
+  final String url;
 
-  const _InfoLinkTile({required this.title, required this.onTap});
+  const _InfoLinkTile({required this.title, required this.url});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: () => _launchUrl(url),
       child: Container(
         decoration: BoxDecoration(
           color: Palette.background,
@@ -224,10 +234,11 @@ class _InfoLinkTile extends StatelessWidget {
               child: Text(
                 title,
                 style: Styles.b2,
-                maxLines: 2,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 4),
             Icon(Icons.arrow_forward_ios, size: 16, color: Palette.gray)
           ],
         ),

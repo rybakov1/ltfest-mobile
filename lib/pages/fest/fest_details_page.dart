@@ -190,239 +190,241 @@ class FestivalDetailPage extends ConsumerWidget {
             data: (festival) => SingleChildScrollView(
               child: Column(
                 children: [
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(12),
-                          bottomRight: Radius.circular(12),
-                        ),
-                        child: Image.network(
-                          'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
-                          height: 393,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(12)),
-                                    child: Container(
-                                      width: 43,
-                                      height: 43,
-                                      color: const Color.fromRGBO(
-                                          142, 142, 142, 1),
-                                      child: IconButton(
-                                        icon: Icon(
-                                          Icons.arrow_back,
-                                          color: Palette.white,
-                                          size: 18,
-                                        ),
-                                        onPressed: () {
-                                          context.pop();
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 300),
-                            Container(
-                              width: double.infinity,
-                              decoration: Decor.base,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0, vertical: 20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      festival.title,
-                                      style: Styles.h3,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "от ${festival.price} ₽/чел",
-                                          style: Styles.h4
-                                              .copyWith(color: Palette.gray),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        GestureDetector(
-                                          onTap: () => _showPriceInfo(context),
-                                          child: SvgPicture.asset(
-                                              'assets/icons/info.svg'),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 24),
-                                    Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                            'assets/icons/calendar.svg'),
-                                        const SizedBox(width: 12),
-                                        // TODO: Text(festival.date, style: Styles.b2),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                            'assets/icons/map_point.svg'),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          festival.address ?? 'Не указано',
-                                          style: Styles.b2,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: Decor.base,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0, vertical: 20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Описание",
-                                      style: Styles.h4,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      festival.description ??
-                                          'Описание отсутствует',
-                                      style: Styles.b2,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: Palette.black,
-                                        ),
-                                      ),
-                                      child: const Center(
-                                        child: Text(
-                                          "Подробнее в положении",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 24),
-                                    Text(
-                                      "Жюри",
-                                      style: Styles.h4,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    if (festival.persons!.isEmpty)
-                                      Text(
-                                        "Информация о жюри отсутствует",
-                                        style: TextStyle(color: Palette.gray),
-                                      )
-                                    else
-                                      Row(
-                                        children: [
-                                          ...festival.persons!
-                                              .expand(
-                                                (person) => [
-                                                  Flexible(
-                                                    child: InkWell(
-                                                      onTap: () =>
-                                                          _showJuryInfo(
-                                                              context, person),
-                                                      child: Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
-                                                        ),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            ClipRRect(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12),
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/jury_placeholder.png',
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                                height: 12),
-                                                            Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  '${person.firstname}\n${person.lastname}',
-                                                                  style:
-                                                                      Styles.h4,
-                                                                ),
-                                                                const SizedBox(
-                                                                    height: 4),
-                                                                Text(
-                                                                  'Подробнее',
-                                                                  style: Styles
-                                                                      .b3
-                                                                      .copyWith(
-                                                                          color:
-                                                                              Palette.secondary),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 12),
-                                                ],
-                                              )
-                                              .toList()
-                                            ..removeLast(),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 96 + MediaQuery.of(context).padding.bottom),
+                 Stack(
+                   children: [
+                     ClipRRect(
+                       borderRadius: const BorderRadius.only(
+                         bottomLeft: Radius.circular(12),
+                         bottomRight: Radius.circular(12),
+                       ),
+                       child: Image.network(
+                         'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
+                         height: 393,
+                         width: double.infinity,
+                         fit: BoxFit.cover,
+                       ),
+                     ),
+                     SafeArea(
+                       child: Padding(
+                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                         child: Column(
+                           children: [
+                             Row(
+                               children: [
+                                 Padding(
+                                   padding: const EdgeInsets.all(12.0),
+                                   child: ClipRRect(
+                                     borderRadius: const BorderRadius.all(
+                                         Radius.circular(12)),
+                                     child: Container(
+                                       width: 43,
+                                       height: 43,
+                                       color: const Color.fromRGBO(
+                                           142, 142, 142, 1),
+                                       child: IconButton(
+                                         icon: Icon(
+                                           Icons.arrow_back,
+                                           color: Palette.white,
+                                           size: 18,
+                                         ),
+                                         onPressed: () {
+                                           context.pop();
+                                         },
+                                       ),
+                                     ),
+                                   ),
+                                 ),
+                               ],
+                             ),
+                             const SizedBox(height: 300),
+                             Container(
+                               width: double.infinity,
+                               decoration: Decor.base,
+                               child: Padding(
+                                 padding: const EdgeInsets.symmetric(
+                                     horizontal: 12.0, vertical: 20),
+                                 child: Column(
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: [
+                                     Text(
+                                       festival.title,
+                                       style: Styles.h3,
+                                     ),
+                                     const SizedBox(height: 12),
+                                     Row(
+                                       children: [
+                                         Text(
+                                           "от ${festival.price} ₽/чел",
+                                           style: Styles.h4
+                                               .copyWith(color: Palette.gray),
+                                         ),
+                                         const SizedBox(width: 8),
+                                         GestureDetector(
+                                           onTap: () => _showPriceInfo(context),
+                                           child: SvgPicture.asset(
+                                               'assets/icons/info.svg'),
+                                         ),
+                                       ],
+                                     ),
+                                     const SizedBox(height: 24),
+                                     Row(
+                                       children: [
+                                         SvgPicture.asset(
+                                             'assets/icons/calendar.svg'),
+                                         const SizedBox(width: 12),
+                                         // TODO: Text(festival.date, style: Styles.b2),
+                                       ],
+                                     ),
+                                     const SizedBox(height: 16),
+                                     Row(
+                                       children: [
+                                         SvgPicture.asset(
+                                             'assets/icons/map_point.svg'),
+                                         const SizedBox(width: 12),
+                                         Text(
+                                           festival.address ?? 'Не указано',
+                                           style: Styles.b2,
+                                         ),
+                                       ],
+                                     ),
+                                   ],
+                                 ),
+                               ),
+                             ),
+                             Container(
+                               width: double.infinity,
+                               decoration: Decor.base,
+                               child: Padding(
+                                 padding: const EdgeInsets.symmetric(
+                                     horizontal: 12.0, vertical: 20),
+                                 child: Column(
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: [
+                                     Text(
+                                       "Описание",
+                                       style: Styles.h4,
+                                     ),
+                                     const SizedBox(height: 16),
+                                     Text(
+                                       festival.description ??
+                                           'Описание отсутствует',
+                                       style: Styles.b2,
+                                     ),
+                                     const SizedBox(height: 16),
+                                     Container(
+                                       width: double.infinity,
+                                       padding: const EdgeInsets.symmetric(
+                                           vertical: 12),
+                                       decoration: BoxDecoration(
+                                         borderRadius: BorderRadius.circular(8),
+                                         border: Border.all(
+                                           color: Palette.black,
+                                         ),
+                                       ),
+                                       child: const Center(
+                                         child: Text(
+                                           "Подробнее в положении",
+                                           style: TextStyle(
+                                             fontWeight: FontWeight.w500,
+                                             fontSize: 16,
+                                           ),
+                                         ),
+                                       ),
+                                     ),
+                                     const SizedBox(height: 24),
+                                     Text(
+                                       "Жюри",
+                                       style: Styles.h4,
+                                     ),
+                                     const SizedBox(height: 16),
+                                     if (festival.persons!.isEmpty)
+                                       Text(
+                                         "Информация о жюри отсутствует",
+                                         style: TextStyle(color: Palette.gray),
+                                       )
+                                     else
+                                       Row(
+                                         children: [
+                                           ...festival.persons!
+                                               .expand(
+                                                 (person) => [
+                                                   Flexible(
+                                                     child: InkWell(
+                                                       onTap: () =>
+                                                           _showJuryInfo(
+                                                               context, person),
+                                                       child: Container(
+                                                         decoration:
+                                                             BoxDecoration(
+                                                           borderRadius:
+                                                               BorderRadius
+                                                                   .circular(8),
+                                                         ),
+                                                         child: Column(
+                                                           crossAxisAlignment:
+                                                               CrossAxisAlignment
+                                                                   .start,
+                                                           children: [
+                                                             ClipRRect(
+                                                               borderRadius:
+                                                                   BorderRadius
+                                                                       .circular(
+                                                                           12),
+                                                               child:
+                                                                   Image.asset(
+                                                                 'assets/images/jury_placeholder.png',
+                                                               ),
+                                                             ),
+                                                             const SizedBox(
+                                                                 height: 12),
+                                                             Column(
+                                                               crossAxisAlignment:
+                                                                   CrossAxisAlignment
+                                                                       .start,
+                                                               mainAxisAlignment:
+                                                                   MainAxisAlignment
+                                                                       .start,
+                                                               children: [
+                                                                 Text(
+                                                                   '${person.firstname}\n${person.lastname}',
+                                                                   style:
+                                                                       Styles.h4,
+                                                                 ),
+                                                                 const SizedBox(
+                                                                     height: 4),
+                                                                 Text(
+                                                                   'Подробнее',
+                                                                   style: Styles
+                                                                       .b3
+                                                                       .copyWith(
+                                                                           color:
+                                                                               Palette.secondary),
+                                                                 ),
+                                                               ],
+                                                             ),
+                                                           ],
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   ),
+                                                   const SizedBox(width: 12),
+                                                 ],
+                                               )
+                                               .toList()
+                                             ..removeLast(),
+                                         ],
+                                       ),
+                                   ],
+                                 ),
+                               ),
+                             ),
+                           ],
+                         ),
+                       ),
+                     ),
+                   ],
+                 ),
+                  SizedBox(height: 48 + MediaQuery.of(context).padding.bottom),
                 ],
               ),
             ),

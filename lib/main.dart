@@ -33,7 +33,9 @@ class MyApp extends ConsumerWidget {
 
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(1.0), // Игнор системный масштаб и "Жирный текст"
+            textScaler: const TextScaler.linear(
+              1.0,
+            ), // Игнор системный масштаб и "Жирный текст"
           ),
           child: Listener(
             onPointerDown: (_) {

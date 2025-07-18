@@ -140,13 +140,13 @@ class FestivalPage extends ConsumerWidget {
                               shrinkWrap: true,
                               physics: const ClampingScrollPhysics(),
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 12.0),
+                                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12),
                               itemCount: festivals.length,
                               itemBuilder: (context, index) {
                                 final festival = festivals[index];
                                 return Column(
                                   children: [
-                                    const SizedBox(height: 6),
+                                    // const SizedBox(height: 12),
                                     _buildEventCard(
                                         festival: festival,
                                         category: selectedDirection ?? 'Театр',

@@ -40,13 +40,13 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
     if (authState.value is Authenticated) {
       final user = (authState.value as Authenticated).user;
 
-      _emailController.text = user.email;
+      _emailController.text = user.email!;
       _cityController.text = user.residence!;
       _educationController.text = '';
       _masterFioController.text = '';
-      _collectiveNameController.text = user.collectivename ?? '';
+      _collectiveNameController.text = user.collectiveName ?? '';
       _collectiveDirectionController.text = user.activityid.toString();
-      _collectiveCityController.text = user.collectivecity ?? '';
+      _collectiveCityController.text = user.collectiveCity ?? '';
     }
   }
 

@@ -37,22 +37,23 @@ class HomePage extends ConsumerWidget {
                         horizontal: 12.0, vertical: 16),
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: 96,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: [
-                              _buildCarouselItem('assets/images/ex.png'),
-                              _buildCarouselItem('assets/images/ex.png'),
-                              _buildCarouselItem('assets/images/ex.png'),
-                              _buildCarouselItem('assets/images/ex.png'),
-                              _buildCarouselItem('assets/images/ex.png'),
-                              _buildCarouselItem('assets/images/ex.png'),
-                              _buildCarouselItem('assets/images/ex.png'),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 32),
+                        // TODO: сторисы
+                        // SizedBox(
+                        //   height: 96,
+                        //   child: ListView(
+                        //     scrollDirection: Axis.horizontal,
+                        //     children: [
+                        //       _buildCarouselItem('assets/images/ex.png'),
+                        //       _buildCarouselItem('assets/images/ex.png'),
+                        //       _buildCarouselItem('assets/images/ex.png'),
+                        //       _buildCarouselItem('assets/images/ex.png'),
+                        //       _buildCarouselItem('assets/images/ex.png'),
+                        //       _buildCarouselItem('assets/images/ex.png'),
+                        //       _buildCarouselItem('assets/images/ex.png'),
+                        //     ],
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 32),
                         _buildSectionHeader(
                             'Ближайшие мероприятия', context, ref),
                         const SizedBox(height: 16),
@@ -93,13 +94,14 @@ class HomePage extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 32),
-                        Container(
-                          height: 100,
-                          color: Palette.white,
-                          alignment: Alignment.center,
-                          child: const Text('Баннеры'),
-                        ),
-                        const SizedBox(height: 20),
+                        // TODO: Баннеры
+                        // Container(
+                        //   height: 100,
+                        //   color: Palette.white,
+                        //   alignment: Alignment.center,
+                        //   child: const Text('Баннеры'),
+                        // ),
+                        // const SizedBox(height: 20),
                         _buildSectionHeader('Последние новости', context, ref),
                         const SizedBox(height: 16),
                         SizedBox(
@@ -373,7 +375,7 @@ class _HomeHeader extends ConsumerWidget {
       data: (data) {
         if (data is Authenticated) {
           final user = data.user;
-          final displayName = user.lastname.trim();
+          final displayName = user.lastname!.trim();
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16.0),
             child: SizedBox(
