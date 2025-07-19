@@ -58,7 +58,6 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> completeRegistration({
     required String firstName,
     required String lastName,
-    String? patronymic,
     required String email,
     required String birthDate,
     required String residence,

@@ -1,16 +1,19 @@
+import 'direction.dart';
+import 'activity.dart';
+
 class User {
   final int id;
   final String? firstname;
   final String? lastname;
   final String? email;
-  final DateTime? birthdate; // Сделаем nullable на случай отсутствия
-  final String? residence;   // Сделаем nullable
-  final String? phone;       // Сделаем nullable
-  final int? directionid;   // Сделаем nullable
-  final int? activityid;    // Сделаем nullable
+  final DateTime? birthdate;
+  final String? residence;
+  final String? phone;
+  final Activity? activity;
+  final Direction? direction;
   final String? collectiveName;
   final String? collectiveCity;
-  final String? ltpriority;       // Сделаем nullable
+  final String? ltpriority;
 
   User({
     required this.id,
@@ -20,8 +23,8 @@ class User {
     this.birthdate,
     this.residence,
     this.phone,
-    this.directionid,
-    this.activityid,
+    this.activity,
+    this.direction,
     this.collectiveName,
     this.collectiveCity,
     this.ltpriority,
@@ -36,8 +39,13 @@ class User {
       birthdate: json['birthdate'] != null ? DateTime.parse(json['birthdate']) : null,
       residence: json['residence'],
       phone: json['phone'],
-      directionid: json['directionid'],
-      activityid: json['activityid'],
+      direction: json['direction'] != null
+          ? Direction.fromJson(json['direction'])
+          : null,
+
+      activity: json['activity'] != null
+          ? Activity.fromJson(json['activity'])
+          : null,
       collectiveName: json['collectiveName'],
       collectiveCity: json['collectiveCity'],
       ltpriority: json['ltpriority'],
@@ -52,8 +60,8 @@ class User {
       'birthdate': birthdate!.toIso8601String().split('T')[0],  // Формат YYYY-MM-DD
       'residence': residence,
       'phone': phone,
-      'directionid': directionid,
-      'activityid': activityid,
+      'direction': direction,
+      'activity': activity,
       'collectiveName': collectiveName,
       'collectiveCity': collectiveCity,
       'ltpriority': ltpriority,

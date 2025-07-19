@@ -83,7 +83,7 @@ class ApiService {
 
   Future<User> getMe() async {
     try {
-      final response = await _dio.get(ApiEndpoints.me);
+      final response = await _dio.get(ApiEndpoints.me, queryParameters: {'populate': '*'});
       if (response.statusCode == 200) {
         return User.fromJson(response.data);
       } else {
@@ -117,8 +117,8 @@ class ApiService {
         'email': email,
         'birthdate': birthDate,
         'residence': residence,
-        // 'direction': directionId,
-        // 'activity': activityId,
+        'direction': directionId,
+        'activity': activityId,
         'collectiveName': collectiveName,
         'collectiveCity': collectiveCity,
       };

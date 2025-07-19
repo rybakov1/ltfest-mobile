@@ -119,14 +119,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     setState(() => _isLoading = true);
 
     final authNotifier = ref.read(authNotifierProvider.notifier);
-    // final patronymic = _patronymicController.text.trim();
 
     try {
       await authNotifier.completeRegistration(
         lastName: _lastNameController.text.trim(),
         firstName: _lastNameController.text.trim(),
-        patronymic: null,
-        // patronymic: patronymic.isEmpty ? null : patronymic,
         email: _emailController.text.trim(),
         birthDate: _birthDateController.text,
         residence: _residenceCityController.text.trim(),

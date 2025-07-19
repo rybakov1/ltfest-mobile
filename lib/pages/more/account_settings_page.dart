@@ -45,7 +45,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       _educationController.text = '';
       _masterFioController.text = '';
       _collectiveNameController.text = user.collectiveName ?? '';
-      _collectiveDirectionController.text = user.activityid.toString();
+      _collectiveDirectionController.text = user.direction!.title == "Театр" ? "Театральный коллектив" : "Танцевальный коллектив" ?? '';
       _collectiveCityController.text = user.collectiveCity ?? '';
     }
   }
@@ -430,7 +430,7 @@ Widget _buildReadOnlySection(dynamic user) {
             DateFormat('dd.MM.yyyy', 'ru').format(user?.birthdate)),
         const Divider(),
         _buildReadOnlyField(
-            'Сфера деятельности', user?.activityid.toString() ?? 'Не указана'),
+            'Сфера деятельности', user?.activity!.title.toString() ?? 'Не указана'),
       ],
     ),
   );
