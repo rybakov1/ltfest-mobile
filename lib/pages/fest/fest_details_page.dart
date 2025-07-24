@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ltfest/data/models/person.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/constants.dart';
@@ -89,6 +90,7 @@ class FestivalDetailPage extends ConsumerWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
+                              color: Colors.white
                             ),
                           ),
                         ),
@@ -97,6 +99,7 @@ class FestivalDetailPage extends ConsumerWidget {
                   ),
                 ],
               ),
+              SizedBox(height: MediaQuery.of(context).padding.bottom)
             ],
           ),
         );
@@ -107,6 +110,7 @@ class FestivalDetailPage extends ConsumerWidget {
   void _showJuryInfo(BuildContext context, Person person) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Palette.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -139,8 +143,8 @@ class FestivalDetailPage extends ConsumerWidget {
               const SizedBox(height: 16),
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'assets/images/jury_placeholder.png',
+                child: Image.network(
+                  'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
                   height: 240,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -171,6 +175,7 @@ class FestivalDetailPage extends ConsumerWidget {
                   ),
                 ),
               ),
+              SizedBox(height: MediaQuery.of(context).padding.bottom)
             ],
           ),
         );
@@ -272,7 +277,10 @@ class FestivalDetailPage extends ConsumerWidget {
                                          SvgPicture.asset(
                                              'assets/icons/calendar.svg'),
                                          const SizedBox(width: 12),
-                                         // TODO: Text(festival.date, style: Styles.b2),
+                                         Text(
+                                           "${DateFormat("dd.MM.yyyy", "ru").format(festival.dateStart!)} - ${DateFormat("dd.MM.yyyy", "ru").format(festival.dateEnd!)} ",
+                                           style: Styles.b2.copyWith(color: Palette.gray),
+                                         ),
                                        ],
                                      ),
                                      const SizedBox(height: 16),
@@ -348,7 +356,8 @@ class FestivalDetailPage extends ConsumerWidget {
                                            ...festival.persons!
                                                .expand(
                                                  (person) => [
-                                                   Flexible(
+                                                   SizedBox(
+                                                     width: person.lastname.toLowerCase().startsWith("утверждается") ? 170*2 : 170,
                                                      child: InkWell(
                                                        onTap: () =>
                                                            _showJuryInfo(
@@ -367,12 +376,29 @@ class FestivalDetailPage extends ConsumerWidget {
                                                            children: [
                                                              ClipRRect(
                                                                borderRadius:
-                                                                   BorderRadius
-                                                                       .circular(
-                                                                           12),
-                                                               child:
-                                                                   Image.asset(
+                                                               BorderRadius.circular(12),
+                                                               child: person.image != null
+                                                                   ? Image.network(
+                                                                 'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
+                                                                 height: 150,
+                                                                 width: double.infinity,
+                                                                 fit: BoxFit.cover,
+                                                                 errorBuilder: (context,
+                                                                     error,
+                                                                     stackTrace) =>
+                                                                     Image.asset(
+                                                                       'assets/images/jury_placeholder.png',
+                                                                       height: 150,
+                                                                       width:
+                                                                       double.infinity,
+                                                                       fit: BoxFit.cover,
+                                                                     ),
+                                                               )
+                                                                   : Image.asset(
                                                                  'assets/images/jury_placeholder.png',
+                                                                 height: 150,
+                                                                 width: double.infinity,
+                                                                 fit: BoxFit.cover,
                                                                ),
                                                              ),
                                                              const SizedBox(
@@ -469,12 +495,8 @@ class FestivalDetailPage extends ConsumerWidget {
                     ),
                     child: Center(
                       child: Text(
-                        "Заявка на обучение",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: Palette.black,
-                        ),
+                        "Заявка на участие",
+                        style: Styles.button1.copyWith(color: Palette.white)
                       ),
                     ),
                   ),

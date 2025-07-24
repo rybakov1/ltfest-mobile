@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ltfest/data/models/ltstory.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../models/ltbanner.dart';
 import 'dio_provider.dart';
 import '../models/news.dart';
 import '../models/upcoming_events.dart';
@@ -83,7 +85,8 @@ class ApiService {
 
   Future<User> getMe() async {
     try {
-      final response = await _dio.get(ApiEndpoints.me, queryParameters: {'populate': '*'});
+      final response =
+          await _dio.get(ApiEndpoints.me, queryParameters: {'populate': '*'});
       if (response.statusCode == 200) {
         return User.fromJson(response.data);
       } else {
@@ -171,6 +174,24 @@ class ApiService {
   //   }
   // }
 
+  Future<T> _fetchOneWithArrayWithoutPopulate<T>(
+      String endpoint, T Function(Map<String, dynamic>) fromJson) async {
+    try {
+      final response = await _dio.get(endpoint);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> dataList = response.data['data'];
+        final Map<String, dynamic> festivalData = dataList[0];
+
+        return fromJson(festivalData);
+      } else {
+        throw ApiException(message: 'Failed to load item $endpoint');
+      }
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
   Future<T> _fetchOneWithArray<T>(
       String endpoint, T Function(Map<String, dynamic>) fromJson) async {
     try {
@@ -199,17 +220,33 @@ class ApiService {
   Future<List<Festival>> getFestivals() =>
       _fetchCollection(ApiEndpoints.festivals, Festival.fromJson);
 
+  Future<List<LTStory>> getLTStories() =>
+      _fetchCollection(ApiEndpoints.stories, LTStory.fromJson);
+
   Future<Festival> getFestivalById(String id) =>
-      _fetchOneWithArray(ApiEndpoints.festivalById(id), Festival.fromJson);
+      _fetchOneWithArrayWithoutPopulate(
+          ApiEndpoints.festivalById(id), Festival.fromJson);
 
   Future<List<Laboratory>> getLaboratories() =>
       _fetchCollection(ApiEndpoints.laboratories, Laboratory.fromJson);
 
   Future<Laboratory> getLaboratoryById(String id) =>
-      _fetchOneWithArray(ApiEndpoints.laboratoryById(id), Laboratory.fromJson);
+      _fetchOneWithArrayWithoutPopulate(
+          ApiEndpoints.laboratoryById(id), Laboratory.fromJson);
+
+  Future<List<Laboratory>> getLaboratoriesByDirection(String direction) =>
+      _fetchCollection(
+          ApiEndpoints.laboratoriesByDirection(direction), Laboratory.fromJson);
+
+  Future<List<Festival>> getFestivalsByDirection(String direction) =>
+      _fetchCollection(
+          ApiEndpoints.festivalsByDirection(direction), Festival.fromJson);
 
   Future<News> getNewsById(String id) =>
       _fetchOneWithArray(ApiEndpoints.newsById(id), News.fromJson);
+
+  Future<LTBanner> getBanners() =>
+      _fetchOneWithArray(ApiEndpoints.banners, LTBanner.fromJson);
 
   Future<List<News>> getNews() =>
       _fetchCollection(ApiEndpoints.news, News.fromJson);

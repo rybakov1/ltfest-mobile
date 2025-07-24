@@ -92,70 +92,79 @@ class LaboratoryPage extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      laboratoriesAsync.when(
-                        data: (laboratories) {
-                          if (laboratories.isEmpty) {
-                            return Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Center(
-                                child: Text(
-                                  'Лаборатории не найдены',
-                                  style: TextStyle(color: Palette.black),
-                                ),
-                              ),
-                            );
-                          }
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12.0),
-                            itemCount: laboratories.length,
-                            itemBuilder: (context, index) {
-                              final laboratory = laboratories[index];
+                      Expanded(
+                        child: laboratoriesAsync.when(
+                          data: (laboratories) {
+                            if (laboratories.isEmpty) {
                               return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  _buildEventCard(
-                                    laboratory: laboratory,
-                                    category: selectedDirection ?? 'Театр',
-                                    context: context,
+                                  Center(
+                                    child: Image.asset(
+                                      "assets/icons/states/nothing.png",
+                                      width: 192,
+                                    ),
                                   ),
-                                  if (index < laboratories.length - 1)
-                                    const SizedBox(height: 32),
-                                  if (index == laboratories.length - 1)
-                                    const SizedBox(height: 20),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    "По вашему запросу ничего не найдено",
+                                    style: Styles.b3.copyWith(color: Palette.gray),
+                                  ),
                                 ],
                               );
-                            },
-                          );
-                        },
-                        loading: () => Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Center(
-                              child: CircularProgressIndicator(
-                                  color: Palette.primaryLime)),
-                        ),
-                        error: (error, stack) => Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Center(
-                                child: Text(
-                                  'Ошибка: $error',
-                                  style: TextStyle(color: Palette.black),
+                            }
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: const ClampingScrollPhysics(),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12.0),
+                              itemCount: laboratories.length,
+                              itemBuilder: (context, index) {
+                                final laboratory = laboratories[index];
+                                return Column(
+                                  children: [
+                                    _buildEventCard(
+                                      laboratory: laboratory,
+                                      category: selectedDirection ?? 'Театр',
+                                      context: context,
+                                    ),
+                                    if (index < laboratories.length - 1)
+                                      const SizedBox(height: 32),
+                                    if (index == laboratories.length - 1)
+                                      const SizedBox(height: 20),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          loading: () => Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Center(
+                                child: CircularProgressIndicator(
+                                    color: Palette.primaryLime)),
+                          ),
+                          error: (error, stack) => Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Text(
+                                    'Ошибка: $error',
+                                    style: TextStyle(color: Palette.black),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: () => ref.refresh(
-                                    laboratoriesProvider(selectedDirection)),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Palette.primaryLime,
-                                  foregroundColor: Palette.black,
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () => ref.refresh(
+                                      laboratoriesProvider(selectedDirection)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Palette.primaryLime,
+                                    foregroundColor: Palette.black,
+                                  ),
+                                  child: const Text('Попробовать снова'),
                                 ),
-                                child: const Text('Попробовать снова'),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -187,8 +196,8 @@ class LaboratoryPage extends ConsumerWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'assets/images/teatr_placeholder.png',
+                child: Image.network(
+                  'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}',//'assets/images/teatr_placeholder.png',
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,

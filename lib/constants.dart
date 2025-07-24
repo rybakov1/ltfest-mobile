@@ -16,6 +16,9 @@ class Palette {
   static Color error = const Color(0xFFEC3437);
   static Color success = const Color(0xFF48A74C);
 
+  static Color shimmerBase = const Color(0xFFF0F2F5);
+  static Color shimmerHighlight = const Color(0xFFE7EAED);
+
   static Color grayTimer = const Color.fromRGBO(157, 157, 157, 1);
 }
 

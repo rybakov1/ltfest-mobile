@@ -9,6 +9,7 @@ part of 'image_data.dart';
 _ImageData _$ImageDataFromJson(Map<String, dynamic> json) => _ImageData(
       id: (json['id'] as num).toInt(),
       url: json['url'] as String,
+      mime: json['mime'] as String,
       formats: json['formats'] == null
           ? null
           : ImageFormats.fromJson(json['formats'] as Map<String, dynamic>),
@@ -18,6 +19,7 @@ Map<String, dynamic> _$ImageDataToJson(_ImageData instance) =>
     <String, dynamic>{
       'id': instance.id,
       'url': instance.url,
+      'mime': instance.mime,
       'formats': instance.formats,
     };
 

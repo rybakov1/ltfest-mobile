@@ -107,9 +107,7 @@ class CustomChip extends StatelessWidget {
                 Text(
                   selectedDirection,
                   style: Styles.b2.copyWith(
-                    color: selectedDirection == 'Танцы'
-                        ? Palette.white
-                        : Palette.black,
+                    color: Palette.white,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -117,7 +115,7 @@ class CustomChip extends StatelessWidget {
                   'assets/icons/drop_down_arrow.svg',
                   colorFilter: selectedDirection == 'Танцы'
                       ? ColorFilter.mode(Palette.white, BlendMode.srcIn)
-                      : ColorFilter.mode(Palette.black, BlendMode.srcIn),
+                      : ColorFilter.mode(Palette.white, BlendMode.srcIn),
                 ),
               ],
             ),
@@ -148,8 +146,7 @@ class CustomChipWithName extends StatelessWidget {
           Text(
             selectedDirection,
             style: Styles.b2.copyWith(
-              color:
-                  selectedDirection == 'Танцы' ? Palette.white : Palette.black,
+              color: Palette.white,
             ),
           ),
         ],

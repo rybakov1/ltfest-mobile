@@ -194,30 +194,38 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 24),
-                    decoration: Decor.base,
-                    child: Form(
-                      key: _formKeyStep1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildStepIndicator(),
-                          const SizedBox(height: 32),
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
-                            transitionBuilder: (child, animation) {
-                              return FadeTransition(
-                                  opacity: animation, child: child);
-                            },
-                            child: _isSecondStep
-                                ? _buildSecondStepFields()
-                                : _buildFirstStepFields(),
-                          ),
-                          const SizedBox(height: 100),
-                          _buildActionButtons(),
-                        ],
+                  //TODO:
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context)
+                          .viewInsets
+                          .bottom, // Учет высоты клавиатуры
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 24),
+                      decoration: Decor.base,
+                      child: Form(
+                        key: _formKeyStep1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildStepIndicator(),
+                            const SizedBox(height: 32),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              transitionBuilder: (child, animation) {
+                                return FadeTransition(
+                                    opacity: animation, child: child);
+                              },
+                              child: _isSecondStep
+                                  ? _buildSecondStepFields()
+                                  : _buildFirstStepFields(),
+                            ),
+                            const SizedBox(height: 100),
+                            _buildActionButtons(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -240,11 +248,16 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submitRegistration,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primaryLime,
-                  foregroundColor: Palette.black),
+                backgroundColor: Palette.primaryLime,
+                foregroundColor: Palette.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide.none,
+                ),
+              ),
               child: _isLoading
                   ? CircularProgressIndicator(color: Palette.black)
-                  : Text('Завершить регистрацию', style: Styles.button1),
+                  : Text('Зарегистрироваться', style: Styles.button1),
             ),
           ),
           const SizedBox(height: 12),
@@ -254,7 +267,13 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             child: OutlinedButton(
               onPressed: _isLoading ? null : _goBackToStep1,
               style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Palette.stroke)),
+                side: BorderSide(color: Palette.stroke),
+                foregroundColor: Palette.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide.none,
+                ),
+              ),
               child: Text('Назад', style: Styles.button1),
             ),
           ),
@@ -268,8 +287,13 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         child: ElevatedButton(
           onPressed: _handleContinue,
           style: ElevatedButton.styleFrom(
-              backgroundColor: Palette.primaryLime,
-              foregroundColor: Palette.black),
+            backgroundColor: Palette.primaryLime,
+            foregroundColor: Palette.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide.none,
+            ),
+          ),
           child: Text('Продолжить', style: Styles.button1),
         ),
       );
@@ -339,8 +363,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             keyboardType: TextInputType.emailAddress),
         const SizedBox(height: 16),
         CitySearchField(
-            label: "Город коллектива",
-            hint: "Начните вводить город",
+            label: "Город проживания*",
+            hint: "Город",
             controller: _residenceCityController,
             isRequired: false),
       ],
@@ -488,8 +512,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (modalContext) {
-        return Consumer(
-            builder: (context, ref, child) {
+        return Consumer(builder: (context, ref, child) {
           return StatefulBuilder(
             builder: (context, setModalState) {
               final asyncValue = ref.watch(provider);
@@ -570,10 +593,10 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Palette.primaryLime,
                             disabledBackgroundColor: Palette.stroke,
-                            foregroundColor: Palette.black,
+                            foregroundColor: Palette.white,
                             disabledForegroundColor: Palette.gray,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
+                                borderRadius: BorderRadius.circular(8)),
                           ),
                           child: Text('Выбрать', style: Styles.button1),
                         ),
@@ -687,10 +710,12 @@ Widget _buildModalSelectorField({
         controller: TextEditingController(text: value ?? ''),
         readOnly: true,
         onTap: onTap,
+        style: Styles.b2.copyWith(color: Palette.gray),
         decoration: InputDecoration(
           isDense: true,
           hintText: hint,
           hintStyle: Styles.b2.copyWith(color: Palette.gray),
+          suffixIcon: const Icon(Icons.chevron_right, size: 24),
           contentPadding:
               const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           border: OutlineInputBorder(
@@ -709,10 +734,6 @@ Widget _buildModalSelectorField({
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Palette.error, width: 1.5)),
         ),
-        // decoration: InputDecoration(
-        //   hintText: hint,
-        //   suffixIcon: const Icon(Icons.arrow_drop_down),
-        // ),
         validator: validator,
       ),
     ],
@@ -759,38 +780,54 @@ class CitySearchField extends StatelessWidget {
         Text(label, style: Styles.b3.copyWith(color: Palette.gray)),
         const SizedBox(height: 6),
         TypeAheadField<String>(
-          // Используем builder для кастомизации поля ввода
+          hideOnUnfocus: false,
           builder: (context, controller, focusNode) {
             return TextFormField(
               controller: controller,
               focusNode: focusNode,
               decoration: InputDecoration(
                 hintText: hint,
+                hintStyle: Styles.b2.copyWith(color: Palette.gray),
+                labelStyle: Styles.b2.copyWith(color: Palette.gray),
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Palette.stroke)),
+                    borderSide: BorderSide(color: Palette.stroke, width: 1)),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Palette.stroke)),
+                    borderSide: BorderSide(color: Palette.stroke, width: 1)),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Palette.primaryLime, width: 1.5)),
+                errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Palette.error, width: 1)),
+                focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Palette.error, width: 1.5)),
               ),
+              onChanged: (value) => this.controller.text = value,
+              validator: (value) {
+                if (isRequired && (value == null || value.isEmpty)) {
+                  return 'Обязательное поле';
+                }
+                return null;
+              },
             );
           },
-          // Передаем наш контроллер извне
           controller: controller,
-
           suggestionsCallback: _getCitySuggestions,
-
           itemBuilder: (context, suggestion) {
             return ListTile(title: Text(suggestion));
           },
-
           onSelected: (suggestion) {
+            // ИЗМЕНЕНИЕ 2: После выбора подсказки мы обновляем текст
+            // и ВРУЧНУЮ убираем фокус, чтобы закрыть клавиатуру и список.
             controller.text = suggestion;
+            FocusScope.of(context).unfocus();
           },
-
-          // Виджет для отображения, когда нет подсказок
           emptyBuilder: (context) => const Padding(
             padding: EdgeInsets.all(12.0),
             child:
@@ -801,8 +838,6 @@ class CitySearchField extends StatelessWidget {
     );
   }
 }
-
-// --- Кастомные виджеты полей ---
 
 class DatePickerTextField extends StatefulWidget {
   final String label;
@@ -873,6 +908,15 @@ class _DatePickerTextFieldState extends State<DatePickerTextField> {
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Palette.stroke, width: 1)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.primaryLime, width: 1.5)),
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.error, width: 1)),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.error, width: 1.5)),
           ),
           onTap: () => _selectDate(context),
           validator: (value) =>
@@ -919,6 +963,15 @@ class CitySearch extends StatelessWidget {
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Palette.stroke, width: 1)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.primaryLime, width: 1.5)),
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.error, width: 1)),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.error, width: 1.5)),
           ),
           validator: (value) =>
               (value == null || value.isEmpty) ? 'Обязательное поле' : null,

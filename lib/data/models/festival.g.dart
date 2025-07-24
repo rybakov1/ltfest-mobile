@@ -13,6 +13,12 @@ _Festival _$FestivalFromJson(Map<String, dynamic> json) => _Festival(
           ? null
           : ImageData.fromJson(json['image'] as Map<String, dynamic>),
       price: (json['price'] as num).toInt(),
+      dateStart: json['date_start'] == null
+          ? null
+          : DateTime.parse(json['date_start'] as String),
+      dateEnd: json['date_end'] == null
+          ? null
+          : DateTime.parse(json['date_end'] as String),
       address: json['address'] as String?,
       description: json['description'] as String?,
       pdfurl: json['pdfurl'] as String?,
@@ -27,6 +33,8 @@ Map<String, dynamic> _$FestivalToJson(_Festival instance) => <String, dynamic>{
       'title': instance.title,
       'image': instance.image,
       'price': instance.price,
+      'date_start': instance.dateStart?.toIso8601String(),
+      'date_end': instance.dateEnd?.toIso8601String(),
       'address': instance.address,
       'description': instance.description,
       'pdfurl': instance.pdfurl,

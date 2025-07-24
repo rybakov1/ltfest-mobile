@@ -137,16 +137,17 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                           SizedBox(
                             height: 46,
                             child: ElevatedButton(
-                              onPressed: canAuth && !isLoading ? _requestOtp : null,
+                              onPressed:
+                                  canAuth && !isLoading ? _requestOtp : null,
                               style: ElevatedButton.styleFrom(
                                 disabledBackgroundColor: Palette.background,
                                 disabledForegroundColor: Palette.gray,
                                 backgroundColor: Palette.primaryLime,
-                                foregroundColor: Palette.black,
+                                foregroundColor: Palette.white,
                                 elevation: 0,
                                 minimumSize: const Size(double.infinity, 50),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(8),
                                   side: BorderSide.none,
                                 ),
                               ),
@@ -222,6 +223,15 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
   String? _errorText;
   final String _prefix = "+7 ";
 
+  @override
+  void initState() {
+    super.initState();
+    // Добавляем слушатель, чтобы обновлять состояние иконки очистки
+    widget.phoneController.addListener(() {
+      setState(() {});
+    });
+  }
+
   void _validatePhoneNumber(String value) {
     final phoneRegex = RegExp(r'^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$');
     if (value.isEmpty || value == _prefix) {
@@ -253,16 +263,26 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
           inputFormatters: [
             PhoneNumberFormatter(prefix: _prefix),
           ],
+          onTap: () {
+            if (widget.phoneController.text.isEmpty) {
+              widget.phoneController.value = TextEditingValue(
+                text: _prefix,
+                selection: TextSelection.collapsed(offset: _prefix.length),
+              );
+            }
+          },
           decoration: InputDecoration(
             hintText: _prefix,
-            prefix: const SizedBox(width: 16),
+            hintStyle: Styles.b2.copyWith(color: Palette.gray),
             isDense: true,
             suffixIcon: widget.phoneController.text.isNotEmpty
                 ? Padding(
-                    padding: const EdgeInsets.only(right: 18.0),
+                    padding: const EdgeInsets.only(right: 0.0),
                     child: IconButton(
                       icon: SvgPicture.asset(
                         "assets/icons/close.svg",
+                        width: 20,
+                        height: 20,
                         colorFilter:
                             ColorFilter.mode(Palette.stroke, BlendMode.srcIn),
                       ),
@@ -277,7 +297,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
             constraints: const BoxConstraints(minHeight: 43),
             errorStyle: Styles.b3.copyWith(color: Palette.error),
             contentPadding:
-                const EdgeInsets.symmetric(vertical: 14, horizontal: 0),
+                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Palette.stroke, width: 1),

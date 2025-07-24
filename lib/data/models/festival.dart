@@ -15,11 +15,12 @@ abstract class Festival with _$Festival {
         required String title,
         ImageData? image,
         required int price,
-        // required String date,
+        @JsonKey(name: "date_start") DateTime? dateStart,
+        @JsonKey(name: "date_end") DateTime? dateEnd,
         String? address,
         String? description,
         String? pdfurl,
-        @JsonKey(name: 'direction') required Direction direction,
+        required Direction direction,
         List<Person>? persons,
     }) = _Festival;
 

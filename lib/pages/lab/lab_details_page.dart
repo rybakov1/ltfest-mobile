@@ -167,7 +167,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: person.image != null
                     ? Image.network(
-                        person.image!.url,
+                        'http://37.46.132.144:1337${person.image!.url}',
                         height: 240,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -295,11 +295,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                     child: Center(
                       child: Text(
                         "Заявка на обучение",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: Palette.black,
-                        ),
+                        style: Styles.button1.copyWith(color: Colors.white)
                       ),
                     ),
                   ),
@@ -422,7 +418,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                   fontWeight: FontWeight.w500,
                                   fontSize: 16,
                                   color: tabIndex == 0
-                                      ? Palette.black
+                                      ? Palette.white
                                       : Palette.gray,
                                 ),
                               ),
@@ -448,7 +444,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                   fontWeight: FontWeight.w500,
                                   fontSize: 16,
                                   color: tabIndex == 1
-                                      ? Palette.black
+                                      ? Palette.white
                                       : Palette.gray,
                                 ),
                               ),
@@ -484,7 +480,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                 .entries
                                 .expand(
                                   (entry) => [
-                                    Flexible(
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width/2,
                                       child: InkWell(
                                         onTap: () => _showTeacherInfo(
                                             context, entry.value),
@@ -500,10 +497,9 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                               ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(12),
-                                                child: entry.value.image !=
-                                                            null
+                                                child: entry.value.image != null
                                                     ? Image.network(
-                                                        entry.value.image!.url,
+                                                        'http://37.46.132.144:1337${entry.value.image?.formats?.medium?.url ?? entry.value.image?.url ?? ''}',
                                                         height: 150,
                                                         width: double.infinity,
                                                         fit: BoxFit.cover,

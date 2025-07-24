@@ -267,7 +267,7 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
                             disabledBackgroundColor: Palette.background,
                             disabledForegroundColor: Palette.gray,
                             backgroundColor: Palette.primaryLime,
-                            foregroundColor: Palette.black,
+                            foregroundColor: Palette.white,
                             elevation: 0,
                             minimumSize: const Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(

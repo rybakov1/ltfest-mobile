@@ -10,7 +10,7 @@ final laboratoryByIdProvider = FutureProvider.family<Laboratory, String>((ref, i
 
 final laboratoriesProvider = FutureProvider.family<List<Laboratory>, String?>((ref, direction) async {
   final apiService = ref.read(apiServiceProvider);
-  return await apiService.getLaboratories(); //direction: direction
+  return await apiService.getLaboratoriesByDirection(direction!); //direction: direction
 });
 
 

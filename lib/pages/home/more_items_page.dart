@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../data/models/news.dart';
 import '../../data/models/upcoming_events.dart';
 
-
 class AllItemsPage<T> extends ConsumerWidget {
   final String title;
   final AsyncValue<List<T>> itemsAsync;
@@ -51,7 +50,8 @@ class AllItemsPage<T> extends ConsumerWidget {
                   padding: EdgeInsets.all(16.0),
                   child: Center(child: CircularProgressIndicator()),
                 ),
-                error: (error, stack) => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) =>
+                    const Center(child: CircularProgressIndicator()),
               ),
             ),
           ),
@@ -83,8 +83,8 @@ class AllItemsPage<T> extends ConsumerWidget {
         return Column(
           children: [
             _buildItem(item, context),
-            if (index < items.length - 1) const SizedBox(height: 32),
-            if (index == items.length - 1) const SizedBox(height: 20),
+            if (index < items.length - 1) const SizedBox(height: 16),
+            if (index == items.length - 1) const SizedBox(height: 40),
           ],
         );
       },
@@ -108,9 +108,9 @@ Widget buildEventCard({
   required BuildContext context,
 }) {
   final location =
-  event.address != null && event.address!.toLowerCase().contains('онлайн')
-      ? event.address!
-      : event.address ?? 'Онлайн';
+      event.address != null && event.address!.toLowerCase().contains('онлайн')
+          ? event.address!
+          : event.address ?? 'Онлайн';
 
   return GestureDetector(
     onTap: () async {
@@ -128,24 +128,24 @@ Widget buildEventCard({
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: event.image != null
-                  ? Image.asset(
-                event.image!,
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Image.asset(
-                  'assets/images/ex.png',
-                  height: 150,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              )
+                  ? Image.network(
+                      "http://37.46.132.144:1337${event.image}",
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                        'assets/images/ex.png',
+                        height: 150,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
                   : Image.asset(
-                'assets/images/ex.png',
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+                      'assets/images/ex.png',
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -154,7 +154,9 @@ Widget buildEventCard({
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                        color: Palette.primaryPink,
+                        color: event.direction.title == "Театр"
+                            ? Palette.primaryLime
+                            : Palette.primaryPink,
                         borderRadius: BorderRadius.circular(8)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -162,10 +164,11 @@ Widget buildEventCard({
                       child: Text(
                         event.direction.title,
                         style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontFamily: "Mulish",
-                            fontWeight: FontWeight.w400),
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontFamily: "Mulish",
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                   ),
@@ -207,9 +210,9 @@ Widget buildNewsCard({required News news}) {
       return GestureDetector(
         onTap: news.url != null
             ? () async {
-          final uri = Uri.parse(news.url!);
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        }
+                final uri = Uri.parse(news.url!);
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
             : null,
         child: SizedBox(
           child: Column(
@@ -217,7 +220,7 @@ Widget buildNewsCard({required News news}) {
             children: [
               ClipRRect(
                 borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(12)),
+                    const BorderRadius.vertical(top: Radius.circular(12)),
                 child: Image.asset(
                   'http://37.46.132.144:1337${news.image?.formats?.medium?.url ?? news.image?.url ?? ''}',
                   height: 170,

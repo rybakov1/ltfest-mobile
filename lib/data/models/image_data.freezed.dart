@@ -17,6 +17,7 @@ T _$identity<T>(T value) => value;
 mixin _$ImageData {
   int get id;
   String get url;
+  String get mime;
   ImageFormats? get formats;
 
   /// Create a copy of ImageData
@@ -36,16 +37,17 @@ mixin _$ImageData {
             other is ImageData &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.url, url) || other.url == url) &&
+            (identical(other.mime, mime) || other.mime == mime) &&
             (identical(other.formats, formats) || other.formats == formats));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, url, formats);
+  int get hashCode => Object.hash(runtimeType, id, url, mime, formats);
 
   @override
   String toString() {
-    return 'ImageData(id: $id, url: $url, formats: $formats)';
+    return 'ImageData(id: $id, url: $url, mime: $mime, formats: $formats)';
   }
 }
 
@@ -54,7 +56,7 @@ abstract mixin class $ImageDataCopyWith<$Res> {
   factory $ImageDataCopyWith(ImageData value, $Res Function(ImageData) _then) =
       _$ImageDataCopyWithImpl;
   @useResult
-  $Res call({int id, String url, ImageFormats? formats});
+  $Res call({int id, String url, String mime, ImageFormats? formats});
 
   $ImageFormatsCopyWith<$Res>? get formats;
 }
@@ -73,6 +75,7 @@ class _$ImageDataCopyWithImpl<$Res> implements $ImageDataCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? url = null,
+    Object? mime = null,
     Object? formats = freezed,
   }) {
     return _then(_self.copyWith(
@@ -83,6 +86,10 @@ class _$ImageDataCopyWithImpl<$Res> implements $ImageDataCopyWith<$Res> {
       url: null == url
           ? _self.url
           : url // ignore: cast_nullable_to_non_nullable
+              as String,
+      mime: null == mime
+          ? _self.mime
+          : mime // ignore: cast_nullable_to_non_nullable
               as String,
       formats: freezed == formats
           ? _self.formats
@@ -109,7 +116,8 @@ class _$ImageDataCopyWithImpl<$Res> implements $ImageDataCopyWith<$Res> {
 /// @nodoc
 @JsonSerializable()
 class _ImageData implements ImageData {
-  const _ImageData({required this.id, required this.url, this.formats});
+  const _ImageData(
+      {required this.id, required this.url, required this.mime, this.formats});
   factory _ImageData.fromJson(Map<String, dynamic> json) =>
       _$ImageDataFromJson(json);
 
@@ -117,6 +125,8 @@ class _ImageData implements ImageData {
   final int id;
   @override
   final String url;
+  @override
+  final String mime;
   @override
   final ImageFormats? formats;
 
@@ -142,16 +152,17 @@ class _ImageData implements ImageData {
             other is _ImageData &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.url, url) || other.url == url) &&
+            (identical(other.mime, mime) || other.mime == mime) &&
             (identical(other.formats, formats) || other.formats == formats));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, url, formats);
+  int get hashCode => Object.hash(runtimeType, id, url, mime, formats);
 
   @override
   String toString() {
-    return 'ImageData(id: $id, url: $url, formats: $formats)';
+    return 'ImageData(id: $id, url: $url, mime: $mime, formats: $formats)';
   }
 }
 
@@ -163,7 +174,7 @@ abstract mixin class _$ImageDataCopyWith<$Res>
       __$ImageDataCopyWithImpl;
   @override
   @useResult
-  $Res call({int id, String url, ImageFormats? formats});
+  $Res call({int id, String url, String mime, ImageFormats? formats});
 
   @override
   $ImageFormatsCopyWith<$Res>? get formats;
@@ -183,6 +194,7 @@ class __$ImageDataCopyWithImpl<$Res> implements _$ImageDataCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? url = null,
+    Object? mime = null,
     Object? formats = freezed,
   }) {
     return _then(_ImageData(
@@ -193,6 +205,10 @@ class __$ImageDataCopyWithImpl<$Res> implements _$ImageDataCopyWith<$Res> {
       url: null == url
           ? _self.url
           : url // ignore: cast_nullable_to_non_nullable
+              as String,
+      mime: null == mime
+          ? _self.mime
+          : mime // ignore: cast_nullable_to_non_nullable
               as String,
       formats: freezed == formats
           ? _self.formats

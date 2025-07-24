@@ -8,6 +8,7 @@ abstract class ImageData with _$ImageData {
   const factory ImageData({
     required int id,
     required String url,
+    required String mime,
     ImageFormats? formats,
   }) = _ImageData;
 

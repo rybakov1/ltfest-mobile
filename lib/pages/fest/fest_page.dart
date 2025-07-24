@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/constants.dart';
 
@@ -17,7 +18,7 @@ class FestivalsNotifier extends AsyncNotifier<List<Festival>> {
   Future<List<Festival>> build() async {
     final apiService = ref.read(apiServiceProvider);
     final direction = ref.watch(selectedDirectionProvider);
-    return await apiService.getFestivals(); //direction: direction
+    return await apiService.getFestivalsByDirection(direction!);
   }
 
   Future<void> refresh() async {
@@ -25,7 +26,7 @@ class FestivalsNotifier extends AsyncNotifier<List<Festival>> {
     state = await AsyncValue.guard(() async {
       final apiService = ref.read(apiServiceProvider);
       final direction = ref.read(selectedDirectionProvider);
-      return await apiService.getFestivals(); //direction: direction
+      return await apiService.getFestivalsByDirection(direction!);
     });
   }
 }
@@ -236,10 +237,10 @@ class FestivalPage extends ConsumerWidget {
             festival.address ?? 'Не указано',
             style: Styles.b2.copyWith(color: Palette.gray),
           ),
-          // TODO: Text(
-          //   festival.date,
-          //   style: Styles.b2.copyWith(color: Palette.gray),
-          // ),
+           Text(
+            "${DateFormat("dd.MM.yyyy", "ru").format(festival.dateStart!)} - ${DateFormat("dd.MM.yyyy", "ru").format(festival.dateEnd!)} ",
+            style: Styles.b2.copyWith(color: Palette.gray),
+          ),
         ],
       ),
     );
