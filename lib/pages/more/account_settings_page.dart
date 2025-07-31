@@ -129,7 +129,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                               Decor.base.copyWith(color: Palette.primaryLime),
                           child: IconButton(
                             onPressed: () => context.pop(),
-                            icon: Icon(Icons.arrow_back, color: Palette.black),
+                            icon: Icon(Icons.arrow_back, color: Palette.white),
                           ),
                         ),
                       ),

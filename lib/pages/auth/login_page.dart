@@ -174,7 +174,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launchUrl(Uri.parse(
-                                            'https://example.com/terms-and-conditions'));
+                                            'https://example.com/terms-and-conditions')); // TODO: url
                                       },
                                   ),
                                   const TextSpan(text: ' и '),
@@ -184,7 +184,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launchUrl(Uri.parse(
-                                            'https://example.com/privacy-policy'));
+                                            'https://ltfest.ru/privacy'));
                                       },
                                   ),
                                 ],

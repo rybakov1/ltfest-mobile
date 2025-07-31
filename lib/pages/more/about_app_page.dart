@@ -91,7 +91,7 @@ class AboutAppPage extends StatelessWidget {
       children: [
         InkWell(
           onTap: () => _launchUrl('mailto:lt_fest@mail.ru'),
-          child: Text('Lt_fest@mail.ru', style: Styles.h3),
+          child: Text('lt_fest@mail.ru', style: Styles.h3),
         ),
         const SizedBox(height: 8),
         InkWell(

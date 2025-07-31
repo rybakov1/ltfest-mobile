@@ -3,7 +3,7 @@ import 'package:dio/io.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:io';
-
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'token_storage.dart';
 
 part 'dio_provider.g.dart';
@@ -12,9 +12,9 @@ part 'dio_provider.g.dart';
 Dio dio(Ref ref) {
   final dio = Dio(
     BaseOptions(
-      baseUrl: 'http://37.46.132.144:1337/',
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
+      baseUrl: 'http://37.46.132.144:1337',
+      connectTimeout: const Duration(seconds: 20),
+      receiveTimeout: const Duration(seconds: 60),
       headers: {'Content-Type': 'application/json; charset=utf-8'},
     ),
   );
@@ -24,6 +24,17 @@ Dio dio(Ref ref) {
         (X509Certificate cert, String host, int port) => true;
     return client;
   };
+
+  dio.interceptors.add(RetryInterceptor(
+    dio: dio,
+    logPrint: print,
+    retries: 3,
+    retryDelays: const [
+      Duration(seconds: 2),
+      Duration(seconds: 4),
+      Duration(seconds: 6),
+    ],
+  ));
 
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {

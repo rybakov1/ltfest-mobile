@@ -32,12 +32,16 @@ class Styles {
   static TextStyle h4 = const TextStyle(
       fontFamily: "Mulish", fontWeight: FontWeight.w700, fontSize: 16);
   static TextStyle h5 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w600, fontSize: 14);
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w600,
+      fontSize: 15); // from 14
 
   static TextStyle b1 = const TextStyle(
       fontFamily: "Mulish", fontWeight: FontWeight.w400, fontSize: 16);
   static TextStyle b2 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w400, fontSize: 14);
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w400,
+      fontSize: 15); // from 14
   static TextStyle b3 = const TextStyle(
       fontFamily: "Mulish", fontWeight: FontWeight.w400, fontSize: 12);
   static TextStyle b4 = const TextStyle(

@@ -26,7 +26,7 @@ class MyApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      title: 'LTFest',
+      title: 'LT Fest',
       routerConfig: router,
       builder: (context, child) {
         if (child == null) return const SizedBox.shrink();
@@ -39,11 +39,11 @@ class MyApp extends ConsumerWidget {
           ),
           child: Listener(
             onPointerDown: (_) {
-              // FocusScopeNode currentFocus = FocusScope.of(context);
-              // if (!currentFocus.hasPrimaryFocus &&
-              //     currentFocus.focusedChild != null) {
-              //   FocusManager.instance.primaryFocus?.unfocus();
-              // }
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus &&
+                  currentFocus.focusedChild != null) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              }
             },
             child: child,
           ),

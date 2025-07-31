@@ -245,8 +245,8 @@ class ApiService {
   Future<News> getNewsById(String id) =>
       _fetchOneWithArray(ApiEndpoints.newsById(id), News.fromJson);
 
-  Future<LTBanner> getBanners() =>
-      _fetchOneWithArray(ApiEndpoints.banners, LTBanner.fromJson);
+  Future<List<LTBanner>> getBanners() =>
+      _fetchCollection(ApiEndpoints.banners, LTBanner.fromJson);
 
   Future<List<News>> getNews() =>
       _fetchCollection(ApiEndpoints.news, News.fromJson);

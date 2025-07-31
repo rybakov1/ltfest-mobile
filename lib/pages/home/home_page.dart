@@ -7,6 +7,7 @@ import 'package:ltfest/data/models/image_data.dart';
 import 'package:ltfest/providers/story_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../components/banner_carousel.dart';
 import '../../data/models/ltstory.dart';
 import '../../data/models/news.dart';
 import '../../data/models/upcoming_events.dart';
@@ -25,7 +26,7 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final upcomingEvents = ref.watch(upcomingEventsProvider);
     final news = ref.watch(newsProvider);
-    final banner = ref.watch(bannerProvider);
+    // final banner = ref.watch(bannerProvider);
     final storiesAsync = ref.watch(storyProvider);
 
     return Scaffold(
@@ -105,7 +106,7 @@ class HomePage extends ConsumerWidget {
                             data: (events) => ListView.builder(
                               scrollDirection: Axis.horizontal,
                               shrinkWrap: true,
-                              itemCount: events.length,
+                              itemCount: events.length > 4 ? 4 : events.length,
                               itemBuilder: (context, index) {
                                 final event = events[index];
                                 return Padding(
@@ -132,35 +133,37 @@ class HomePage extends ConsumerWidget {
                         ),
                         const SizedBox(height: 32),
 
+                        const BannerCarousel(),
                         // --- Баннер ---
-                        banner.when(
-                            data: (bannerData) => InkWell(
-                                  onTap: () {
-                                    if (bannerData.url != null) {
-                                      launchUrl(Uri.parse(bannerData.url!));
-                                    }
-                                  },
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      'http://37.46.132.144:1337${bannerData.image!.url}',
-                                      height: 150,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                            loading: () => _buildBannerLoading(), // Shimmer
-                            error: (error, stack) => Container(
-                                  height: 150,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      color: Palette.gray.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(12)),
-                                  child: const Center(
-                                      child:
-                                          Text('Не удалось загрузить баннер')),
-                                )),
+                        // banner.when(
+                        //     data: (bannerData) => InkWell(
+                        //           onTap: () {
+                        //             if (bannerData.url != null) {
+                        //               launchUrl(Uri.parse(bannerData.url!));
+                        //             }
+                        //           },
+                        //           child: ClipRRect(
+                        //             borderRadius: BorderRadius.circular(12),
+                        //             child: Image.network(
+                        //               'http://37.46.132.144:1337${bannerData.image!.url}',
+                        //               height: 150,
+                        //               width: double.infinity,
+                        //               fit: BoxFit.cover,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //     loading: () => _buildBannerLoading(), // Shimmer
+                        //     error: (error, stack) => Container(
+                        //           height: 150,
+                        //           width: double.infinity,
+                        //           decoration: BoxDecoration(
+                        //               color: Palette.gray.withOpacity(0.2),
+                        //               borderRadius: BorderRadius.circular(12)),
+                        //           child: const Center(
+                        //               child:
+                        //                   Text('Не удалось загрузить баннер')),
+                        //         )),
+
                         const SizedBox(height: 20),
 
                         // --- Последние новости ---

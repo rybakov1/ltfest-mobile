@@ -153,6 +153,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.black,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(4.0),
@@ -160,16 +161,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       height: 43,
                       width: 43,
-                      decoration:
-                          Decor.base.copyWith(color: Palette.primaryLime),
+                      decoration: Decor.base.copyWith(color: Palette.primaryLime),
                       child: IconButton(
                         onPressed: () {
                           if (isSecondStep) {
@@ -178,7 +177,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                             ref.read(authNotifierProvider.notifier).logout();
                           }
                         },
-                        icon: Icon(Icons.arrow_back, color: Palette.black),
+                        icon: Icon(Icons.arrow_back, color: Palette.white),
                       ),
                     ),
                     const Spacer(),
@@ -193,41 +192,38 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                 ),
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  //TODO:
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context)
-                          .viewInsets
-                          .bottom, // Учет высоты клавиатуры
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 24),
-                      decoration: Decor.base,
-                      child: Form(
-                        key: _formKeyStep1,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildStepIndicator(),
-                            const SizedBox(height: 32),
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              transitionBuilder: (child, animation) {
-                                return FadeTransition(
-                                    opacity: animation, child: child);
-                              },
-                              child: _isSecondStep
-                                  ? _buildSecondStepFields()
-                                  : _buildFirstStepFields(),
+                child: Container(
+                  decoration: Decor.base,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          // padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                          child: Form(
+                            key: _formKeyStep1,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildStepIndicator(),
+                                const SizedBox(height: 32),
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 200),
+                                  transitionBuilder: (child, animation) {
+                                    return FadeTransition(opacity: animation, child: child);
+                                  },
+                                  child: _isSecondStep
+                                      ? _buildSecondStepFields()
+                                      : _buildFirstStepFields(),
+                                ),
+                                const SizedBox(height: 100), // Пространство для прокрутки
+                              ],
                             ),
-                            const SizedBox(height: 100),
-                            _buildActionButtons(),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                      _buildActionButtons(),
+                    ],
                   ),
                 ),
               ),
@@ -620,24 +616,28 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     required T? groupValue,
     required ValueChanged<T?> onChanged,
   }) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(title, style: Styles.b2),
-      leading: Radio<T>(
-        value: value,
-        groupValue: groupValue,
-        onChanged: onChanged,
-        // Стилизация под ваш дизайн
-        activeColor: Palette.primaryPink,
-        // Цвет выбранной точки
-        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-          if (states.contains(WidgetState.selected)) {
-            return Palette.primaryPink; // Цвет точки
-          }
-          return Palette.stroke; // Цвет рамки невыбранной кнопки
-        }),
-      ),
+    return InkWell(
       onTap: () => onChanged(value),
+      child: Row(
+        children: [
+          Radio<T>(
+            value: value,
+            groupValue: groupValue,
+            onChanged: onChanged,
+            activeColor: Palette.secondary,
+            fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+              if (states.contains(WidgetState.selected)) {
+                return Palette.secondary;
+              }
+              return Palette.stroke;
+            }),
+          ),
+          const SizedBox(width: 0.0), // Контролируем расстояние между Radio и текстом
+          Expanded(
+            child: Text(title, style: Styles.b2),
+          ),
+        ],
+      ),
     );
   }
 
@@ -785,6 +785,7 @@ class CitySearchField extends StatelessWidget {
             return TextFormField(
               controller: controller,
               focusNode: focusNode,
+              style: Styles.b2.copyWith(color: Palette.black),
               decoration: InputDecoration(
                 hintText: hint,
                 hintStyle: Styles.b2.copyWith(color: Palette.gray),

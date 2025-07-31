@@ -70,14 +70,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Palette.stroke),
                         ),
-                        child: const Center(
-                          child: Text(
-                            "Закрыть",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
-                          ),
+                        child: Center(
+                          child: Text("Закрыть", style: Styles.button1),
                         ),
                       ),
                     ),
@@ -87,6 +81,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                     child: GestureDetector(
                       onTap: () async {
                         final Uri uri = Uri.parse(
+                          // TODO:
                           'https://ltfest.artpro.art/webapp/public/application/af419d70-ec8d-42fb-a4b1-65482dcd3236',
                         );
                         await launchUrl(
@@ -102,14 +97,9 @@ class LaboratoryDetailPage extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
-                          child: Text(
-                            "Положение",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              color: Palette.black,
-                            ),
-                          ),
+                          child: Text("Положение",
+                              style: Styles.button1
+                                  .copyWith(color: Palette.white)),
                         ),
                       ),
                     ),
@@ -191,7 +181,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                 person.description ?? 'Описание отсутствует',
                 style: Styles.b2,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 30),
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
@@ -199,16 +189,10 @@ class LaboratoryDetailPage extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Palette.black),
+                    border: Border.all(color: Palette.stroke),
                   ),
-                  child: const Center(
-                    child: Text(
-                      "Закрыть",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                    ),
+                  child: Center(
+                    child: Text("Закрыть", style: Styles.button1),
                   ),
                 ),
               ),
@@ -293,10 +277,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Text(
-                        "Заявка на обучение",
-                        style: Styles.button1.copyWith(color: Colors.white)
-                      ),
+                      child: Text("Заявка на обучение",
+                          style: Styles.button1.copyWith(color: Colors.white)),
                     ),
                   ),
                 ),
@@ -371,20 +353,20 @@ class LaboratoryDetailPage extends ConsumerWidget {
                     style: Styles.h3,
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text(
-                        laboratory.learningTypes?.isNotEmpty ?? false
-                            ? "от ${(laboratory.learningTypes!.length > 2 ? laboratory.learningTypes![2].price : laboratory.learningTypes!.last.price)} ₽/чел"
-                            : "Цена недоступна",
-                        style: Styles.h4.copyWith(color: Palette.gray),
-                      ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () => _showPriceInfo(context),
-                        child: SvgPicture.asset('assets/icons/info.svg'),
-                      ),
-                    ],
+                  GestureDetector(
+                    onTap: () => _showPriceInfo(context),
+                    child: Row(
+                      children: [
+                        Text(
+                          laboratory.learningTypes?.isNotEmpty ?? false
+                              ? "от ${(laboratory.learningTypes!.length > 2 ? laboratory.learningTypes![2].price : laboratory.learningTypes!.last.price)} ₽/чел"
+                              : "Цена недоступна",
+                          style: Styles.h4.copyWith(color: Palette.gray),
+                        ),
+                        const SizedBox(width: 8),
+                        SvgPicture.asset('assets/icons/info.svg'),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -481,7 +463,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                 .expand(
                                   (entry) => [
                                     SizedBox(
-                                      width: MediaQuery.of(context).size.width/2,
+                                      width:
+                                          MediaQuery.of(context).size.width / 2,
                                       child: InkWell(
                                         onTap: () => _showTeacherInfo(
                                             context, entry.value),
