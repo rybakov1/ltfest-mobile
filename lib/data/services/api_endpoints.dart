@@ -21,7 +21,7 @@ abstract class ApiEndpoints {
       '/api/festivals?filters[id][\$eq]=$id&populate[0]=direction&populate[1]=persons.image&populate[2]=image';
 
   static String laboratoryById(String id) =>
-      '/api/laboratories?filters[id][\$eq]=$id&populate[0]=direction&populate[1]=learning_types&populate[2]=days&populate[3]=image&populate[4]=persons.image';
+      '/api/laboratories?filters[id][\$eq]=$id&populate[0]=direction&populate[1]=learning_types&populate[2]=days&populate[3]=image&populate[4]=persons.image&populate[5]=days.laboratory_day_events';
 
   static String festivalsByDirection(String direction) =>
       '/api/festivals?filters[direction][title][\$eq]=$direction';

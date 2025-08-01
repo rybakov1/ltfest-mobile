@@ -11,12 +11,15 @@ part 'laboratory.g.dart';
 
 @freezed
 abstract class Laboratory with _$Laboratory {
+  const Laboratory._();
+
   const factory Laboratory({
     required int id,
     required String title,
     ImageData? image,
     String? description,
     String? address,
+    String? url,
     required Direction direction,
     List<Person>? persons,
     @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
@@ -25,4 +28,25 @@ abstract class Laboratory with _$Laboratory {
 
   factory Laboratory.fromJson(Map<String, dynamic> json) =>
       _$LaboratoryFromJson(json);
+
+  // НАШ НОВЫЙ ГЕТТЕР
+  DateTime? get firstDayDate {
+    if (days == null || days!.isEmpty) {
+      return null;
+    }
+    // Сортируем дни по дате и берем самую первую
+    final sortedDays = List<LaboratoryDay>.from(days!)
+      ..sort((a, b) => a.date?.compareTo(b.date ?? DateTime(0)) ?? 0);
+    return sortedDays.first.date;
+  }
+
+  DateTime? get lastDayDate {
+    if (days == null || days!.isEmpty) {
+      return null;
+    }
+    // Сортируем дни по дате и берем самую первую
+    final sortedDays = List<LaboratoryDay>.from(days!)
+      ..sort((a, b) => a.date?.compareTo(b.date ?? DateTime(0)) ?? 0);
+    return sortedDays.last.date;
+  }
 }

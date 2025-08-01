@@ -13,7 +13,7 @@ class FestivalDetailPage extends ConsumerWidget {
 
   const FestivalDetailPage({super.key, required this.id});
 
-  void _showPriceInfo(BuildContext context) {
+  void _showPriceInfo(BuildContext context, festival) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Palette.white,
@@ -63,10 +63,7 @@ class FestivalDetailPage extends ConsumerWidget {
                           ),
                         ),
                         child: Center(
-                          child: Text(
-                            "Закрыть",
-                            style: Styles.button1
-                          ),
+                          child: Text("Закрыть", style: Styles.button1),
                         ),
                       ),
                     ),
@@ -74,7 +71,16 @@ class FestivalDetailPage extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () async {
+                        final Uri uri = Uri.parse(
+                          festival.pdfurl!,
+                        );
+                        await launchUrl(
+                          uri,
+                          mode:
+                          LaunchMode.externalApplication,
+                        );
+                      },
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
@@ -251,7 +257,7 @@ class FestivalDetailPage extends ConsumerWidget {
                                       ),
                                       const SizedBox(height: 12),
                                       GestureDetector(
-                                        onTap: () => _showPriceInfo(context),
+                                        onTap: () => _showPriceInfo(context, festival),
                                         child: Row(
                                           children: [
                                             Text(
@@ -315,23 +321,35 @@ class FestivalDetailPage extends ConsumerWidget {
                                         style: Styles.b2,
                                       ),
                                       const SizedBox(height: 16),
-                                      Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 12),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          border: Border.all(
-                                            color: Palette.black,
+                                      InkWell(
+                                        onTap: () async {
+                                          final Uri uri = Uri.parse(
+                                            festival.pdfurl!,
+                                          );
+                                          await launchUrl(
+                                            uri,
+                                            mode:
+                                                LaunchMode.externalApplication,
+                                          );
+                                        },
+                                        child: Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Palette.black,
+                                            ),
                                           ),
-                                        ),
-                                        child: const Center(
-                                          child: Text(
-                                            "Подробнее в положении",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 16,
+                                          child: const Center(
+                                            child: Text(
+                                              "Подробнее в положении",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -497,7 +515,7 @@ class FestivalDetailPage extends ConsumerWidget {
               child: GestureDetector(
                 onTap: () async {
                   final Uri uri = Uri.parse(
-                    'https://ltfest.artpro.art/webapp/public/application/af419d70-ec8d-42fb-a4b1-65482dcd3236',
+                    festivalAsync.value!.entryurl!,
                   );
                   await launchUrl(
                     uri,

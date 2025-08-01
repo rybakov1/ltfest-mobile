@@ -22,6 +22,7 @@ _Festival _$FestivalFromJson(Map<String, dynamic> json) => _Festival(
       address: json['address'] as String?,
       description: json['description'] as String?,
       pdfurl: json['pdfurl'] as String?,
+      entryurl: json['entryurl'] as String?,
       direction: Direction.fromJson(json['direction'] as Map<String, dynamic>),
       persons: (json['persons'] as List<dynamic>?)
           ?.map((e) => Person.fromJson(e as Map<String, dynamic>))
@@ -38,6 +39,7 @@ Map<String, dynamic> _$FestivalToJson(_Festival instance) => <String, dynamic>{
       'address': instance.address,
       'description': instance.description,
       'pdfurl': instance.pdfurl,
+      'entryurl': instance.entryurl,
       'direction': instance.direction,
       'persons': instance.persons,
     };

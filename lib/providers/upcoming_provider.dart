@@ -1,9 +1,32 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ltfest/providers/user_provider.dart';
 
 import '../data/models/upcoming_events.dart';
 import '../data/services/api_service.dart';
+import 'auth_state.dart';
 
-final upcomingEventsProvider = FutureProvider<List<UpcomingEvent>>((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
-  return apiService.fetchUpcomingEvents();
+final upcomingEventsProvider = FutureProvider<List<UpcomingEvent>>((ref) {
+  // 1. "Слушаем" authNotifierProvider
+  final authStateAsync = ref.watch(authNotifierProvider);
+
+  // 2. Делаем запрос ТОЛЬКО когда authStateAsync перейдет в состояние `data`
+  //    и внутри этого `data` будет `Authenticated` или `NeedsRegistration`.
+  return authStateAsync.when(
+    data: (state) {
+      switch (state) {
+      // ЕСЛИ пользователь вошел:
+        case Authenticated() || NeedsRegistration():
+        // ТОЛЬКО ТОГДА делаем запрос к API
+          return ref.read(apiServiceProvider).fetchUpcomingEvents();
+      // ЕСЛИ пользователь НЕ вошел:
+        case _:
+        // НЕ ДЕЛАЕМ ЗАПРОС, просто возвращаем пустой список.
+          return [];
+      }
+    },
+    // Пока идет проверка аутентификации, запроса тоже нет.
+    loading: () => [],
+    // Если при проверке аутентификации произошла ошибка, запроса тоже нет.
+    error: (e, s) => [],
+  );
 });

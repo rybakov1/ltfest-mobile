@@ -25,14 +25,14 @@ class ApiException implements Exception {
 
   factory ApiException.unauthorized() {
     return ApiException(
-      message: 'Unauthorized access',
+      message: 'Пользователь не аутентифицирован для выполнения этого запроса.',
       statusCode: 401,
     );
   }
 
   factory ApiException.notFound(String resource) {
     return ApiException(
-      message: '$resource not found',
+      message: '$resource не найдено.',
       statusCode: 404,
     );
   }

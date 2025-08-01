@@ -21,7 +21,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
     required this.id,
   });
 
-  void _showPriceInfo(BuildContext context) {
+  void _showPriceInfo(BuildContext context, laboratory) {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
     showModalBottomSheet(
@@ -81,8 +81,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                     child: GestureDetector(
                       onTap: () async {
                         final Uri uri = Uri.parse(
-                          // TODO:
-                          'https://ltfest.artpro.art/webapp/public/application/af419d70-ec8d-42fb-a4b1-65482dcd3236',
+                          laboratory.url!,
                         );
                         await launchUrl(
                           uri,
@@ -260,7 +259,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
               child: GestureDetector(
                 onTap: () async {
                   final Uri uri = Uri.parse(
-                    'https://ltfest.artpro.art/webapp/public/application/af419d70-ec8d-42fb-a4b1-65482dcd3236',
+                    laboratoryAsync.value!.url!,
                   );
                   await launchUrl(
                     uri,
@@ -354,7 +353,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   GestureDetector(
-                    onTap: () => _showPriceInfo(context),
+                    onTap: () => _showPriceInfo(context, laboratory),
                     child: Row(
                       children: [
                         Text(
@@ -367,6 +366,28 @@ class LaboratoryDetailPage extends ConsumerWidget {
                         SvgPicture.asset('assets/icons/info.svg'),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      SvgPicture.asset('assets/icons/calendar.svg'),
+                      const SizedBox(width: 12),
+                      Text(
+                        "${DateFormat("dd.MM.yyyy", "ru").format(laboratory.firstDayDate!)} - ${DateFormat("dd.MM.yyyy", "ru").format(laboratory.lastDayDate!)}",
+                        style: Styles.b2.copyWith(color: Palette.gray),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      SvgPicture.asset('assets/icons/map_point.svg'),
+                      const SizedBox(width: 12),
+                      Text(
+                        laboratory.address ?? 'Не указано',
+                        style: Styles.b2,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -381,60 +402,67 @@ class LaboratoryDetailPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () =>
-                              ref.read(tabIndexProvider.notifier).state = 0,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: tabIndex == 0 ? Palette.primaryLime : null,
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Основное",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  color: tabIndex == 0
-                                      ? Palette.white
-                                      : Palette.gray,
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Palette.background,
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () =>
+                                ref.read(tabIndexProvider.notifier).state = 0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color:
+                                    tabIndex == 0 ? Palette.primaryLime : null,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Основное",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    color: tabIndex == 0
+                                        ? Palette.white
+                                        : Palette.gray,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () =>
-                              ref.read(tabIndexProvider.notifier).state = 1,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: tabIndex == 1 ? Palette.primaryLime : null,
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Программа",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  color: tabIndex == 1
-                                      ? Palette.white
-                                      : Palette.gray,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () =>
+                                ref.read(tabIndexProvider.notifier).state = 1,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color:
+                                    tabIndex == 1 ? Palette.primaryLime : null,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Программа",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    color: tabIndex == 1
+                                        ? Palette.white
+                                        : Palette.gray,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 26),
                   if (tabIndex == 0) ...[
@@ -581,18 +609,22 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                                 return ListTile(
                                                   title: Row(
                                                     children: [
-                                                      Text(
-                                                        "${eventIndex + 1}. ${event.title}",
-                                                        style: Styles.b2,
+                                                      Flexible(
+                                                        child: Text(
+                                                          "${eventIndex + 1}. ${event.title}",
+                                                          style: Styles.h5,
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
                                                       ),
                                                       const SizedBox(width: 8),
-                                                      Text(
-                                                        '${event.eventTime?.split(':')[0]}:${event.eventTime?.split(':')[1]}',
-                                                        style: Styles.b3
-                                                            .copyWith(
-                                                                color: Palette
-                                                                    .gray),
-                                                      ),
+                                                      if (event.eventTime !=
+                                                          null)
+                                                        Text(
+                                                          '${event.eventTime?.split(':')[0]}:${event.eventTime?.split(':')[1]}',
+                                                          style: Styles.h5,
+                                                        ),
                                                     ],
                                                   ),
                                                   subtitle: Column(

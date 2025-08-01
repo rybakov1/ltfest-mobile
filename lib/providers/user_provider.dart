@@ -1,8 +1,16 @@
 import 'dart:async';
+import 'package:ltfest/pages/auth/registration_page.dart';
+import 'package:ltfest/pages/fest/fest_page.dart';
+import 'package:ltfest/providers/story_provider.dart';
+import 'package:ltfest/providers/upcoming_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/services/api_service.dart';
 import '../data/services/token_storage.dart';
 import 'auth_state.dart';
+import 'banner_provider.dart';
+import 'festival_provider.dart';
+import 'laboratory_provider.dart';
+import 'news_provider.dart';
 
 part 'user_provider.g.dart';
 
@@ -32,6 +40,19 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
+  void _invalidateDataProviders() {
+    ref.invalidate(newsProvider);
+    ref.invalidate(bannerProvider);
+    ref.invalidate(storyProvider);
+    ref.invalidate(festivalsProvider);
+    ref.invalidate(laboratoriesProvider);
+    ref.invalidate(festivalByIdProvider);
+    ref.invalidate(laboratoryByIdProvider);
+    ref.invalidate(directionsProvider);
+    ref.invalidate(upcomingEventsProvider);
+    ref.invalidate(activitiesProvider);
+  }
+
   Future<void> requestOtp(String phone) async {
     try {
       await _apiService.requestOtp(phone);
@@ -46,6 +67,8 @@ class AuthNotifier extends _$AuthNotifier {
     state = await AsyncValue.guard(() async {
       await _apiService.verifyOtp(phone, otp);
       final user = await _apiService.getMe();
+
+      //  _invalidateDataProviders();
 
       if (user.firstname == user.phone || user.firstname == "Unknown") {
         return AuthState.needsRegistration(user: user);
@@ -88,6 +111,8 @@ class AuthNotifier extends _$AuthNotifier {
         userId: userId!,
       );
 
+      // _invalidateDataProviders();
+
       return AuthState.authenticated(user: updatedUser);
     });
   }
@@ -99,7 +124,7 @@ class AuthNotifier extends _$AuthNotifier {
 
       // ref.invalidate(userSpecificDataProvider);
       // ref.invalidate(cartProvider);
-
+      // _invalidateDataProviders();
       state = const AsyncData(AuthState.unauthenticated());
     } catch (e, st) {
       state = AsyncError(e, st);

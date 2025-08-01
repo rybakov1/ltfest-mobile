@@ -51,7 +51,7 @@ class MorePage extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text("Отмена", style: Styles.button1),
+                      child: Text("Отмена", style: Styles.button1.copyWith(color: Palette.black)),
                     ),
                   ),
                   const SizedBox(width: 8),

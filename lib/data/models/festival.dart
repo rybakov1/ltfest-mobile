@@ -20,6 +20,7 @@ abstract class Festival with _$Festival {
         String? address,
         String? description,
         String? pdfurl,
+        String? entryurl,
         required Direction direction,
         List<Person>? persons,
     }) = _Festival;

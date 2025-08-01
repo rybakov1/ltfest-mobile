@@ -68,7 +68,7 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
                     }
                   },
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                     child: Image.network(
                       imageUrl,
                       height: 150,
@@ -83,10 +83,9 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
               options: CarouselOptions(
                 height: 150,
                 autoPlay: true,
-                autoPlayInterval: const Duration(seconds: 8),
+                autoPlayInterval: const Duration(seconds: 6),
                 enlargeCenterPage: true,
-                viewportFraction: 0.9,
-                aspectRatio: 16 / 9,
+                viewportFraction: 1,
                 onPageChanged: (index, reason) {
                   setState(() {
                     _currentIndex = index;

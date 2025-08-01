@@ -20,6 +20,7 @@ mixin _$Laboratory {
   ImageData? get image;
   String? get description;
   String? get address;
+  String? get url;
   Direction get direction;
   List<Person>? get persons;
   @JsonKey(name: 'learning_types')
@@ -47,6 +48,7 @@ mixin _$Laboratory {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.address, address) || other.address == address) &&
+            (identical(other.url, url) || other.url == url) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             const DeepCollectionEquality().equals(other.persons, persons) &&
@@ -64,6 +66,7 @@ mixin _$Laboratory {
       image,
       description,
       address,
+      url,
       direction,
       const DeepCollectionEquality().hash(persons),
       const DeepCollectionEquality().hash(learningTypes),
@@ -71,7 +74,7 @@ mixin _$Laboratory {
 
   @override
   String toString() {
-    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
+    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, url: $url, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
 }
 
@@ -87,6 +90,7 @@ abstract mixin class $LaboratoryCopyWith<$Res> {
       ImageData? image,
       String? description,
       String? address,
+      String? url,
       Direction direction,
       List<Person>? persons,
       @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
@@ -113,6 +117,7 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
     Object? image = freezed,
     Object? description = freezed,
     Object? address = freezed,
+    Object? url = freezed,
     Object? direction = null,
     Object? persons = freezed,
     Object? learningTypes = freezed,
@@ -138,6 +143,10 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
       address: freezed == address
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      url: freezed == url
+          ? _self.url
+          : url // ignore: cast_nullable_to_non_nullable
               as String?,
       direction: null == direction
           ? _self.direction
@@ -185,20 +194,22 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _Laboratory implements Laboratory {
+class _Laboratory extends Laboratory {
   const _Laboratory(
       {required this.id,
       required this.title,
       this.image,
       this.description,
       this.address,
+      this.url,
       required this.direction,
       final List<Person>? persons,
       @JsonKey(name: 'learning_types') final List<LearningType>? learningTypes,
       final List<LaboratoryDay>? days})
       : _persons = persons,
         _learningTypes = learningTypes,
-        _days = days;
+        _days = days,
+        super._();
   factory _Laboratory.fromJson(Map<String, dynamic> json) =>
       _$LaboratoryFromJson(json);
 
@@ -212,6 +223,8 @@ class _Laboratory implements Laboratory {
   final String? description;
   @override
   final String? address;
+  @override
+  final String? url;
   @override
   final Direction direction;
   final List<Person>? _persons;
@@ -271,6 +284,7 @@ class _Laboratory implements Laboratory {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.address, address) || other.address == address) &&
+            (identical(other.url, url) || other.url == url) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             const DeepCollectionEquality().equals(other._persons, _persons) &&
@@ -288,6 +302,7 @@ class _Laboratory implements Laboratory {
       image,
       description,
       address,
+      url,
       direction,
       const DeepCollectionEquality().hash(_persons),
       const DeepCollectionEquality().hash(_learningTypes),
@@ -295,7 +310,7 @@ class _Laboratory implements Laboratory {
 
   @override
   String toString() {
-    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
+    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, url: $url, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
 }
 
@@ -313,6 +328,7 @@ abstract mixin class _$LaboratoryCopyWith<$Res>
       ImageData? image,
       String? description,
       String? address,
+      String? url,
       Direction direction,
       List<Person>? persons,
       @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
@@ -341,6 +357,7 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
     Object? image = freezed,
     Object? description = freezed,
     Object? address = freezed,
+    Object? url = freezed,
     Object? direction = null,
     Object? persons = freezed,
     Object? learningTypes = freezed,
@@ -366,6 +383,10 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
       address: freezed == address
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      url: freezed == url
+          ? _self.url
+          : url // ignore: cast_nullable_to_non_nullable
               as String?,
       direction: null == direction
           ? _self.direction
