@@ -37,6 +37,7 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
           children: [
             const Text('Не удалось загрузить баннеры'),
             const SizedBox(height: 8),
+            // TODO: error handler
             ElevatedButton(
               onPressed: () => ref.refresh(bannerProvider),
               // Кнопка для повторной загрузки

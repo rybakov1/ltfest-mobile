@@ -71,7 +71,10 @@ class HomePage extends ConsumerWidget {
                                         imageUrl:
                                             'http://37.46.132.144:1337${story.preview!.formats?.thumbnail?.url}',
                                         onTap: () {
-                                          Navigator.of(context, rootNavigator: true).push( // <--- ИЗМЕНЕНИЕ ЗДЕСЬ
+                                          Navigator.of(context,
+                                                  rootNavigator: true)
+                                              .push(
+                                            // <--- ИЗМЕНЕНИЕ ЗДЕСЬ
                                             MaterialPageRoute(
                                               builder: (context) => StoryViewer(
                                                 story: stories[index],
@@ -101,7 +104,7 @@ class HomePage extends ConsumerWidget {
                             'Ближайшие мероприятия', context, ref),
                         const SizedBox(height: 16),
                         SizedBox(
-                          height: 250,
+                          height: 260,
                           child: upcomingEvents.when(
                             data: (events) => ListView.builder(
                               scrollDirection: Axis.horizontal,
@@ -132,40 +135,8 @@ class HomePage extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 32),
-
                         const BannerCarousel(),
-                        // --- Баннер ---
-                        // banner.when(
-                        //     data: (bannerData) => InkWell(
-                        //           onTap: () {
-                        //             if (bannerData.url != null) {
-                        //               launchUrl(Uri.parse(bannerData.url!));
-                        //             }
-                        //           },
-                        //           child: ClipRRect(
-                        //             borderRadius: BorderRadius.circular(12),
-                        //             child: Image.network(
-                        //               'http://37.46.132.144:1337${bannerData.image!.url}',
-                        //               height: 150,
-                        //               width: double.infinity,
-                        //               fit: BoxFit.cover,
-                        //             ),
-                        //           ),
-                        //         ),
-                        //     loading: () => _buildBannerLoading(), // Shimmer
-                        //     error: (error, stack) => Container(
-                        //           height: 150,
-                        //           width: double.infinity,
-                        //           decoration: BoxDecoration(
-                        //               color: Palette.gray.withOpacity(0.2),
-                        //               borderRadius: BorderRadius.circular(12)),
-                        //           child: const Center(
-                        //               child:
-                        //                   Text('Не удалось загрузить баннер')),
-                        //         )),
-
                         const SizedBox(height: 20),
-
                         // --- Последние новости ---
                         _buildSectionHeader('Последние новости', context, ref),
                         const SizedBox(height: 16),
@@ -306,16 +277,9 @@ class HomePage extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 4),
-                        child: Text(
-                          event.direction.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontFamily: "Mulish",
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                            horizontal: 8.0, vertical: 6),
+                        child: Text(event.direction.title,
+                            style: Styles.b3.copyWith(color: Palette.white)),
                       ),
                     ),
                     IconButton(
@@ -332,32 +296,13 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             event.title,
-            style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                fontFamily: "Mulish"),
+            style: Styles.h4,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
-          Text(
-            location,
-            style: TextStyle(
-              color: Palette.gray,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              fontFamily: "Mulish",
-            ),
-          ),
-          Text(
-            event.date,
-            style: TextStyle(
-              color: Palette.gray,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              fontFamily: "Mulish",
-            ),
-          ),
+          Text(location, style: Styles.b2.copyWith(color: Palette.gray)),
+          Text(event.date, style: Styles.b2.copyWith(color: Palette.gray)),
         ],
       ),
     );
@@ -496,7 +441,7 @@ class HomePage extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            DateFormat().add_yMMMd().format(date),
+            DateFormat("yMMMMd", "ru").format(date),
             style: Styles.b3.copyWith(color: Palette.gray),
           ),
         ],
@@ -610,10 +555,10 @@ class StoryViewer extends StatefulWidget {
   });
 
   @override
-  _StoryViewerState createState() => _StoryViewerState();
+  StoryViewerState createState() => StoryViewerState();
 }
 
-class _StoryViewerState extends State<StoryViewer> {
+class StoryViewerState extends State<StoryViewer> {
   final StoryController _storyController = StoryController();
 
   @override
@@ -638,7 +583,7 @@ class _StoryViewerState extends State<StoryViewer> {
     // 1. Получаем список медиа-элементов (без изменений)
     final List<ImageData> mediaItems = widget.story.media!;
     final List<StoryItem> storyItems = mediaItems.map((mediaItem) {
-      final mediaUrl = 'http://37.46.132.144:1337${mediaItem.url!}';
+      final mediaUrl = 'http://37.46.132.144:1337${mediaItem.url}';
       final bool isVideo = mediaItem.mime.startsWith('video/');
 
       if (isVideo) {
@@ -661,7 +606,7 @@ class _StoryViewerState extends State<StoryViewer> {
           url: mediaUrl,
           controller: _storyController,
           caption: const Text(
-            "",//widget.story.title!,
+            "", //widget.story.title!,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 16,
@@ -706,40 +651,23 @@ class _StoryViewerState extends State<StoryViewer> {
             indicatorForegroundColor: Palette.primaryLime,
           ),
 
-          // Слой 2: Кнопка (показывается только если есть ссылка)
           if (hasLink)
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20 + MediaQuery.of(context).padding.bottom), // Отступ снизу
+                padding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20 +
+                        MediaQuery.of(context).padding.bottom), // Отступ снизу
                 width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primaryLime,
-                    foregroundColor: Palette.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
-                  ),
+                child: LTButtons.elevatedButton(
                   onPressed: () {
-                    // Приостанавливаем сторис при нажатии
                     _storyController.pause();
-                    // Открываем ссылку
                     _launchURL(widget.story.url!).then((_) {
-                      // Возобновляем сторис после возвращения в приложение
                       _storyController.play();
                     });
                   },
-                  child: const Text(
-                    'Подробнее',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Mulish',
-                    ),
-                  ),
+                  child: Text('Подробнее', style: Styles.button1),
                 ),
               ),
             ),

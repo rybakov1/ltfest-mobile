@@ -46,7 +46,7 @@ class ApiService {
   Future<void> requestOtp(String phone) async {
     try {
       final response =
-          await _dio.post(ApiEndpoints.sendOtp, data: {'phone': phone});
+          await _dio.post(ApiEndpoints.sendOtp, data: {"phone": phone});
       if (response.statusCode != 200) {
         throw ApiException(
             message:
@@ -63,7 +63,7 @@ class ApiService {
       final response = await _dio.post(ApiEndpoints.verifyOtp, data: {
         'phone': phone,
         'code': code,
-      });
+      }, queryParameters: {'populate': '*'});
 
       if (response.statusCode == 200) {
         final jwt = response.data['jwt'] as String;
@@ -106,10 +106,12 @@ class ApiService {
     required String email,
     required String birthDate,
     required String residence,
-    int? directionId,
-    int? activityId,
+    required int directionId,
+    required int activityId,
     String? collectiveName,
     String? collectiveCity,
+    String? educationPlace,
+    String? masterName,
   }) async {
     try {
       final endpoint = ApiEndpoints.userById(userId);
@@ -124,6 +126,8 @@ class ApiService {
         'activity': activityId,
         'collectiveName': collectiveName,
         'collectiveCity': collectiveCity,
+        'educationPlace': educationPlace,
+        'masterName': masterName,
       };
 
       final response = await _dio.put(endpoint, data: data);

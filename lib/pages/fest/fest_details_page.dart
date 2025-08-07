@@ -77,8 +77,7 @@ class FestivalDetailPage extends ConsumerWidget {
                         );
                         await launchUrl(
                           uri,
-                          mode:
-                          LaunchMode.externalApplication,
+                          mode: LaunchMode.externalApplication,
                         );
                       },
                       child: Container(
@@ -257,7 +256,8 @@ class FestivalDetailPage extends ConsumerWidget {
                                       ),
                                       const SizedBox(height: 12),
                                       GestureDetector(
-                                        onTap: () => _showPriceInfo(context, festival),
+                                        onTap: () =>
+                                            _showPriceInfo(context, festival),
                                         child: Row(
                                           children: [
                                             Text(
@@ -508,33 +508,24 @@ class FestivalDetailPage extends ConsumerWidget {
                 color: Palette.white,
               ),
               padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom,
-                  top: 24,
-                  right: 16,
-                  left: 16),
-              child: GestureDetector(
-                onTap: () async {
-                  final Uri uri = Uri.parse(
-                    festivalAsync.value!.entryurl!,
-                  );
-                  await launchUrl(
-                    uri,
-                    mode: LaunchMode.externalApplication,
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 24.0),
-                  child: Container(
-                    width: double.infinity,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: Palette.primaryLime,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text("Заявка на участие",
-                          style: Styles.button1.copyWith(color: Palette.white)),
-                    ),
+                bottom: MediaQuery.of(context).padding.bottom,
+                top: 24,
+                right: 16,
+                left: 16,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: LTButtons.elevatedButton(
+                  onPressed: () async {
+                    final Uri uri = Uri.parse(festivalAsync.value!.entryurl!);
+                    await launchUrl(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    );
+                  },
+                  child: Text(
+                    "Заявка на участие",
+                    style: Styles.button1.copyWith(color: Palette.white),
                   ),
                 ),
               ),

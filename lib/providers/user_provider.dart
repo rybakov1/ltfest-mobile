@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:ltfest/pages/auth/registration_page.dart';
-import 'package:ltfest/pages/fest/fest_page.dart';
 import 'package:ltfest/providers/story_provider.dart';
 import 'package:ltfest/providers/upcoming_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -78,7 +77,7 @@ class AuthNotifier extends _$AuthNotifier {
     });
   }
 
-  Future<void> completeRegistration({
+  Future<void> updateProfileInfo({
     required String firstName,
     required String lastName,
     required String email,
@@ -88,6 +87,8 @@ class AuthNotifier extends _$AuthNotifier {
     required int activityId,
     String? collectiveName,
     String? collectiveCity,
+    String? masterName,
+    String? educationPlace,
   }) async {
     final currentState = state.value;
     final userId = await _tokenStorage.getUserId();
@@ -108,6 +109,8 @@ class AuthNotifier extends _$AuthNotifier {
         activityId: activityId,
         collectiveName: collectiveName,
         collectiveCity: collectiveCity,
+        masterName: masterName,
+        educationPlace: educationPlace,
         userId: userId!,
       );
 

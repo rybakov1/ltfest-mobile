@@ -212,7 +212,7 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
                       const SizedBox(height: 16),
                       Center(
                         child: Text(
-                          'Отправили код на номер ${widget.phoneNumber}',
+                          'Отправили код на номер ${Utils.phoneFormatter.maskText(widget.phoneNumber)}',
                           style: Styles.b2.copyWith(color: Palette.gray),
                         ),
                       ),
@@ -259,25 +259,11 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
                           ),
                         ),
                       const Spacer(),
-                      SizedBox(
-                        height: 46,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _verifyOtp,
-                          style: ElevatedButton.styleFrom(
-                            disabledBackgroundColor: Palette.background,
-                            disabledForegroundColor: Palette.gray,
-                            backgroundColor: Palette.primaryLime,
-                            foregroundColor: Palette.white,
-                            elevation: 0,
-                            minimumSize: const Size(double.infinity, 50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: _isLoading
-                              ? CircularProgressIndicator(color: Palette.black)
-                              : Text('Продолжить', style: Styles.button1),
-                        ),
+                      LTButtons.elevatedButton(
+                        onPressed: _isLoading ? null : _verifyOtp,
+                        child: _isLoading
+                            ? CircularProgressIndicator(color: Palette.black)
+                            : Text('Продолжить', style: Styles.button1),
                       ),
                     ],
                   ),

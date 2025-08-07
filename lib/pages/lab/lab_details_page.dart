@@ -422,9 +422,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                               child: Center(
                                 child: Text(
                                   "Основное",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
+                                  style: Styles.h5.copyWith(
                                     color: tabIndex == 0
                                         ? Palette.white
                                         : Palette.gray,
@@ -449,9 +447,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                               child: Center(
                                 child: Text(
                                   "Программа",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
+                                  style: Styles.h5.copyWith(
                                     color: tabIndex == 1
                                         ? Palette.white
                                         : Palette.gray,
@@ -588,6 +584,9 @@ class LaboratoryDetailPage extends ConsumerWidget {
                                         dividerColor: Colors.transparent,
                                       ),
                                       child: ExpansionTile(
+                                        iconColor: Palette.primaryLime,
+                                        //const Color(0xFF1C274C)
+                                        collapsedIconColor: Palette.gray,
                                         title: Text(
                                           "День ${dayIndex + 1}",
                                           style: Styles.h4,

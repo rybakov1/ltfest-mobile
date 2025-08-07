@@ -77,7 +77,7 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
                     decoration: Decor.base.copyWith(color: Palette.primaryLime),
                     child: IconButton(
                       onPressed: () => context.pop(),
-                      icon: Icon(Icons.arrow_back, color: Palette.black),
+                      icon: Icon(Icons.arrow_back, color: Palette.white),
                     ),
                   ),
                 ),
@@ -124,38 +124,39 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
             ),
           ),
           // Кнопка сохранения "прилипает" к низу
-          Container(
-            padding: EdgeInsets.only(
-                top: 16,
-                left: 16,
-                right: 16,
-                bottom: MediaQuery.of(context).padding.bottom),
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(8), topLeft: Radius.circular(8)),
-                color: Colors.white),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveSettings,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primaryLime,
-                    foregroundColor: Palette.black,
-                    disabledBackgroundColor:
-                        Palette.primaryLime.withValues(alpha: 0.5),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: Container(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom,
+                top: 24,
+                left: 20,
+                right: 20,
+              ),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(12),
+                    topLeft: Radius.circular(12),
                   ),
+                  color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: LTButtons.elevatedButton(
+                  onPressed: _isLoading ? null : _saveSettings,
                   child: _isLoading
                       ? SizedBox(
                           width: 24,
                           height: 24,
-                          child:
-                              CircularProgressIndicator(color: Palette.black))
-                      : Text('Сохранить', style: Styles.button1),
+                          child: CircularProgressIndicator(
+                            color: Palette.black,
+                          ),
+                        )
+                      : Text(
+                          'Сохранить',
+                          style: Styles.button1,
+                        ),
                 ),
               ),
             ),

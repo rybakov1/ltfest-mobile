@@ -134,28 +134,12 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                             },
                           ),
                           const Spacer(),
-                          SizedBox(
-                            height: 46,
-                            child: ElevatedButton(
-                              onPressed:
-                                  canAuth && !isLoading ? _requestOtp : null,
-                              style: ElevatedButton.styleFrom(
-                                disabledBackgroundColor: Palette.background,
-                                disabledForegroundColor: Palette.gray,
-                                backgroundColor: Palette.primaryLime,
-                                foregroundColor: Palette.white,
-                                elevation: 0,
-                                minimumSize: const Size(double.infinity, 50),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  side: BorderSide.none,
-                                ),
-                              ),
-                              child: isLoading
-                                  ? CircularProgressIndicator(
-                                      color: Palette.black)
-                                  : Text('Получить код', style: Styles.button1),
-                            ),
+                          LTButtons.elevatedButton(
+                            onPressed:
+                                canAuth && !isLoading ? _requestOtp : null,
+                            child: isLoading
+                                ? CircularProgressIndicator(color: Palette.black)
+                                : Text('Получить код', style: Styles.button1),
                           ),
                           const SizedBox(height: 24),
                           Padding(

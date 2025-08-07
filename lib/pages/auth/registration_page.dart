@@ -121,7 +121,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     final authNotifier = ref.read(authNotifierProvider.notifier);
 
     try {
-      await authNotifier.completeRegistration(
+      await authNotifier.updateProfileInfo(
         lastName: _lastNameController.text.trim(),
         firstName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
@@ -161,14 +161,16 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       height: 43,
                       width: 43,
-                      decoration: Decor.base.copyWith(color: Palette.primaryLime),
+                      decoration:
+                          Decor.base.copyWith(color: Palette.primaryLime),
                       child: IconButton(
                         onPressed: () {
                           if (isSecondStep) {
@@ -194,7 +196,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
               Expanded(
                 child: Container(
                   decoration: Decor.base,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Column(
                     children: [
                       Expanded(
@@ -210,13 +213,15 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                 AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 200),
                                   transitionBuilder: (child, animation) {
-                                    return FadeTransition(opacity: animation, child: child);
+                                    return FadeTransition(
+                                        opacity: animation, child: child);
                                   },
                                   child: _isSecondStep
                                       ? _buildSecondStepFields()
                                       : _buildFirstStepFields(),
                                 ),
-                                const SizedBox(height: 100), // Пространство для прокрутки
+                                const SizedBox(height: 100),
+                                // Пространство для прокрутки
                               ],
                             ),
                           ),
@@ -238,23 +243,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     if (_isSecondStep) {
       return Column(
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _submitRegistration,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.primaryLime,
-                foregroundColor: Palette.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: BorderSide.none,
-                ),
-              ),
-              child: _isLoading
-                  ? CircularProgressIndicator(color: Palette.black)
-                  : Text('Зарегистрироваться', style: Styles.button1),
-            ),
+          LTButtons.elevatedButton(
+            onPressed: _isLoading ? null : _submitRegistration,
+            child: _isLoading
+                ? CircularProgressIndicator(color: Palette.black)
+                : Text('Зарегистрироваться', style: Styles.button1),
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -277,22 +270,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       );
     } else {
       // Одна кнопка на первом шаге
-      return SizedBox(
-        width: double.infinity,
-        height: 48,
-        child: ElevatedButton(
+      return LTButtons.elevatedButton(
           onPressed: _handleContinue,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Palette.primaryLime,
-            foregroundColor: Palette.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide.none,
-            ),
-          ),
-          child: Text('Продолжить', style: Styles.button1),
-        ),
-      );
+          child: Text('Продолжить', style: Styles.button1));
     }
   }
 
@@ -582,19 +562,14 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       child: SizedBox(
                         width: double.infinity,
                         height: 48,
-                        child: ElevatedButton(
+                        child: LTButtons.elevatedButton(
                           onPressed: isItemSelected
                               ? () => onConfirm(tempSelectedItem)
                               : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Palette.primaryLime,
-                            disabledBackgroundColor: Palette.stroke,
-                            foregroundColor: Palette.white,
-                            disabledForegroundColor: Palette.gray,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
+                          child: Text(
+                            'Выбрать',
+                            style: Styles.button1,
                           ),
-                          child: Text('Выбрать', style: Styles.button1),
                         ),
                       ),
                     ),
@@ -632,7 +607,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
               return Palette.stroke;
             }),
           ),
-          const SizedBox(width: 0.0), // Контролируем расстояние между Radio и текстом
+          const SizedBox(width: 0.0),
+          // Контролируем расстояние между Radio и текстом
           Expanded(
             child: Text(title, style: Styles.b2),
           ),

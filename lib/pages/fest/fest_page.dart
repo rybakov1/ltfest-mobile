@@ -351,7 +351,9 @@ class _FestivalPageState extends ConsumerState<FestivalPage> {
                               festivalState.filteredFestivals[index];
                           // Разметка карточки остается здесь, как вы и просили
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
+                            padding: EdgeInsets.only(
+                              bottom: index < festivalState.filteredFestivals.length - 1 ? 32.0 : 8,
+                            ),
                             child: _buildEventCard(
                               festival: festival,
                               category: selectedDirection ?? 'Театр',

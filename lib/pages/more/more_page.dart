@@ -43,6 +43,18 @@ class MorePage extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
+                    child: LTButtons.elevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ref.read(authNotifierProvider.notifier).logout();
+                      },
+                      backgroundColor: Palette.error,
+                      foregroundColor: Palette.white,
+                      child: Text("Выйти", style: Styles.button1),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
@@ -51,25 +63,8 @@ class MorePage extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text("Отмена", style: Styles.button1.copyWith(color: Palette.black)),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        ref.read(authNotifierProvider.notifier).logout();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.error,
-                        foregroundColor: Palette.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        elevation: 0,
-                      ),
-                      child: Text("Выйти", style: Styles.button1),
+                      child: Text("Отмена",
+                          style: Styles.button1.copyWith(color: Palette.black)),
                     ),
                   ),
                 ],
@@ -271,37 +266,16 @@ class _ProfileCard extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.primaryLime,
-                      foregroundColor: Palette.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      elevation: 0,
-                    ),
-                    child: Text("Выберите карту", style: Styles.button1),
-                  ),
+                LTButtons.elevatedButton(
+                  onPressed: () {},
+                  child: Text("Выберите карту", style: Styles.button1),
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Palette.secondary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      elevation: 0,
-                    ),
-                    child: Text("Подробнее на сайте", style: Styles.button1),
-                  ),
+                LTButtons.elevatedButton(
+                  onPressed: () {},
+                  foregroundColor: Palette.secondary,
+                  backgroundColor: Palette.white,
+                  child: Text("Подробнее на сайте", style: Styles.button1),
                 ),
               ],
             ),

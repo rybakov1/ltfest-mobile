@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
+class Utils {
+  static final phoneFormatter = MaskTextInputFormatter(
+    mask: '+# (###) ###-##-##',
+    filter: {"#": RegExp(r'[0-9]')},
+    type: MaskAutoCompletionType.lazy,
+  );
+}
 
 class Palette {
   static Color black = const Color.fromRGBO(29, 29, 32, 1);
@@ -59,4 +68,66 @@ class Decor {
     border: Border.all(),
     borderRadius: BorderRadius.circular(12),
   );
+}
+
+class LTButtons {
+  static Widget elevatedButton({
+    required VoidCallback? onPressed,
+    required Widget child,
+    Color? backgroundColor,
+    Color? disabledBackgroundColor,
+    Color? foregroundColor,
+    Color? disabledForegroundColor,
+    BorderRadius? borderRadius,
+    EdgeInsets? padding,
+    Size? minimumSize,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor ?? Palette.primaryLime,
+        disabledBackgroundColor: disabledBackgroundColor ?? Palette.background,
+        foregroundColor: foregroundColor ?? Palette.white,
+        disabledForegroundColor: disabledForegroundColor ?? Palette.gray,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius ?? BorderRadius.circular(8),
+        ),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        minimumSize: minimumSize ?? const Size(double.infinity, 44),
+      ),
+      child: child,
+    );
+  }
+
+  // Пример метода для другой стилизации кнопки (например, вторичная кнопка)
+  static Widget secondaryButton({
+    required VoidCallback? onPressed,
+    required Widget child,
+    Color? backgroundColor,
+    Color? disabledBackgroundColor,
+    Color? foregroundColor,
+    Color? disabledForegroundColor,
+    BorderRadius? borderRadius,
+    EdgeInsets? padding,
+    Size? minimumSize,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor ?? Palette.secondary,
+        disabledBackgroundColor: disabledBackgroundColor ?? Palette.gray,
+        foregroundColor: foregroundColor ?? Palette.black,
+        disabledForegroundColor: disabledForegroundColor ?? Palette.stroke,
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius ?? BorderRadius.circular(8),
+        ),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        minimumSize: minimumSize ?? const Size(100, 48),
+      ),
+      child: child,
+    );
+  }
 }

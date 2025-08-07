@@ -110,11 +110,13 @@ class NewsPage extends ConsumerWidget {
                               style: Styles.b1.copyWith(color: Palette.gray),
                             ),
                             const SizedBox(height: 16),
+
+                            // TODO: error handler
                             ElevatedButton(
                               onPressed: () => ref.refresh(newsProvider),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Palette.primaryLime,
-                                foregroundColor: Palette.black,
+                                foregroundColor: Palette.white,
                               ),
                               child: const Text('Попробовать снова'),
                             ),

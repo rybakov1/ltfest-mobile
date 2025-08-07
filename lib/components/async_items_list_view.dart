@@ -50,6 +50,8 @@ class AsyncItemsListView extends StatelessWidget {
             children: [
               Text('Произошла ошибка', style: TextStyle(color: Palette.black)),
               const SizedBox(height: 16),
+
+              // TODO: error handler
               ElevatedButton(
                 onPressed: onRefresh,
                 child: const Text('Попробовать снова'),

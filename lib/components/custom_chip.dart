@@ -130,17 +130,12 @@ class CustomChip extends ConsumerWidget {
                         child: SizedBox(
                           width: double.infinity,
                           height: 48,
-                          child: ElevatedButton(
+                          child: LTButtons.elevatedButton(
                             onPressed: () => Navigator.pop(context),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Palette.primaryLime,
-                              disabledBackgroundColor: Palette.stroke,
-                              foregroundColor: Palette.white,
-                              disabledForegroundColor: Palette.gray,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
+                            child: Text(
+                              'Сохранить',
+                              style: Styles.button1,
                             ),
-                            child: Text('Сохранить', style: Styles.button1),
                           ),
                         ),
                       ),
