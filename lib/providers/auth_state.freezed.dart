@@ -94,6 +94,8 @@ abstract mixin class $AuthenticatedCopyWith<$Res>
       _$AuthenticatedCopyWithImpl;
   @useResult
   $Res call({User user});
+
+  $UserCopyWith<$Res> get user;
 }
 
 /// @nodoc
@@ -116,6 +118,16 @@ class _$AuthenticatedCopyWithImpl<$Res>
           : user // ignore: cast_nullable_to_non_nullable
               as User,
     ));
+  }
+
+  /// Create a copy of AuthState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res> get user {
+    return $UserCopyWith<$Res>(_self.user, (value) {
+      return _then(_self.copyWith(user: value));
+    });
   }
 }
 
@@ -158,6 +170,8 @@ abstract mixin class $NeedsRegistrationCopyWith<$Res>
       _$NeedsRegistrationCopyWithImpl;
   @useResult
   $Res call({User user});
+
+  $UserCopyWith<$Res> get user;
 }
 
 /// @nodoc
@@ -180,6 +194,16 @@ class _$NeedsRegistrationCopyWithImpl<$Res>
           : user // ignore: cast_nullable_to_non_nullable
               as User,
     ));
+  }
+
+  /// Create a copy of AuthState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res> get user {
+    return $UserCopyWith<$Res>(_self.user, (value) {
+      return _then(_self.copyWith(user: value));
+    });
   }
 }
 

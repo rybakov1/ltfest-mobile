@@ -232,8 +232,10 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/async_items_list_view.dart';
 import 'package:ltfest/components/custom_chip.dart';
+import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/festival.dart';
+import 'package:ltfest/data/models/upcoming_events.dart';
 import 'package:ltfest/providers/direction_provider.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 
@@ -318,8 +320,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage> {
             ),
             SliverFillRemaining(
               child: Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4),
+                margin: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: Palette.white,
                   borderRadius: BorderRadius.circular(12),
@@ -352,7 +353,10 @@ class _FestivalPageState extends ConsumerState<FestivalPage> {
                           // Разметка карточки остается здесь, как вы и просили
                           return Padding(
                             padding: EdgeInsets.only(
-                              bottom: index < festivalState.filteredFestivals.length - 1 ? 32.0 : 8,
+                              bottom: index <
+                                      festivalState.filteredFestivals.length - 1
+                                  ? 32.0
+                                  : 8,
                             ),
                             child: _buildEventCard(
                               festival: festival,
@@ -399,8 +403,14 @@ class _FestivalPageState extends ConsumerState<FestivalPage> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: CustomChipWithName(
-                  selectedDirection: festival.direction.title,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomChipWithName(
+                      selectedDirection: festival.direction.title,
+                    ),
+                    FavoriteButton(item: festival)
+                  ],
                 ),
               ),
             ],

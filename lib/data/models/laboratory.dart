@@ -1,16 +1,18 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ltfest/data/models/person.dart';
 
+import '../../components/favorite_button.dart';
 import 'direction.dart';
 import 'image_data.dart';
 import 'laboratory_day.dart';
 import 'laboratory_learning_type.dart';
 
 part 'laboratory.freezed.dart';
+
 part 'laboratory.g.dart';
 
 @freezed
-abstract class Laboratory with _$Laboratory {
+abstract class Laboratory with _$Laboratory implements Favoritable {
   const Laboratory._();
 
   const factory Laboratory({
@@ -19,7 +21,7 @@ abstract class Laboratory with _$Laboratory {
     ImageData? image,
     String? description,
     String? address,
-    String? url,
+    String? websiteurl,
     required Direction direction,
     List<Person>? persons,
     @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
@@ -49,4 +51,7 @@ abstract class Laboratory with _$Laboratory {
       ..sort((a, b) => a.date?.compareTo(b.date ?? DateTime(0)) ?? 0);
     return sortedDays.last.date;
   }
+
+  int get favId => id;
+  EventType get favType => EventType.laboratory;
 }

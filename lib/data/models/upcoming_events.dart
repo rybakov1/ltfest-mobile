@@ -1,19 +1,22 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../components/favorite_button.dart';
 import 'direction.dart';
 
 part 'upcoming_events.freezed.dart';
 part 'upcoming_events.g.dart';
 
-enum EventType {
-  @JsonValue('festival')
-  festival,
-  @JsonValue('laboratory')
-  laboratory,
-}
+// enum EventType {
+//   @JsonValue('festival')
+//   festival,
+//   @JsonValue('laboratory')
+//   laboratory,
+// }
 
 @freezed
-abstract class UpcomingEvent with _$UpcomingEvent {
+abstract class UpcomingEvent with _$UpcomingEvent implements Favoritable {
+  const UpcomingEvent._(); // <- приватный конструктор
+
   const factory UpcomingEvent({
     required int id,
     required String title,
@@ -26,4 +29,7 @@ abstract class UpcomingEvent with _$UpcomingEvent {
   }) = _UpcomingEvent;
 
   factory UpcomingEvent.fromJson(Map<String, dynamic> json) => _$UpcomingEventFromJson(json);
+
+  int get favId => id;
+  EventType get favType => type;
 }

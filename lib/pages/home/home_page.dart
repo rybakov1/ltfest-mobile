@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/image_data.dart';
 import 'package:ltfest/providers/story_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../components/banner_carousel.dart';
+import '../../components/custom_chip.dart';
+import '../../data/models/festival.dart';
+import '../../data/models/laboratory.dart';
 import '../../data/models/ltstory.dart';
 import '../../data/models/news.dart';
 import '../../data/models/upcoming_events.dart';
+import '../../data/models/user.dart';
+import '../../data/services/api_service.dart';
 import '../../providers/auth_state.dart';
 import '../../providers/banner_provider.dart';
 import '../../providers/news_provider.dart';
@@ -123,7 +129,9 @@ class HomePage extends ConsumerWidget {
                                       }
                                     },
                                     child: _buildEventCard(
-                                        event: event, imageUrl: event.image!),
+                                        event: event,
+                                        imageUrl: event.image!,
+                                        ref: ref),
                                   ),
                                 );
                               },
@@ -227,6 +235,7 @@ class HomePage extends ConsumerWidget {
   Widget _buildEventCard({
     required UpcomingEvent event,
     required String imageUrl,
+    required WidgetRef ref, // Требуется для доступа к провайдерам
   }) {
     final location =
         event.address != null && event.address!.toLowerCase().contains('онлайн')
@@ -265,29 +274,15 @@ class HomePage extends ConsumerWidget {
                       ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.all(8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          color: event.direction.title == "Театр"
-                              ? Palette.primaryLime
-                              : Palette.primaryPink,
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 6),
-                        child: Text(event.direction.title,
-                            style: Styles.b3.copyWith(color: Palette.white)),
-                      ),
+
+                    CustomChipWithName(
+                      selectedDirection: event.direction.title,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.favorite_border),
-                      onPressed: () {
-                        // TODO: Реализовать добавление в избранное
-                      },
-                    ),
+                    FavoriteButton(item: event as Favoritable)
                   ],
                 ),
               ),

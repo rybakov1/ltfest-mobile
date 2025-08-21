@@ -20,7 +20,7 @@ mixin _$Laboratory {
   ImageData? get image;
   String? get description;
   String? get address;
-  String? get url;
+  String? get websiteurl;
   Direction get direction;
   List<Person>? get persons;
   @JsonKey(name: 'learning_types')
@@ -48,7 +48,8 @@ mixin _$Laboratory {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.address, address) || other.address == address) &&
-            (identical(other.url, url) || other.url == url) &&
+            (identical(other.websiteurl, websiteurl) ||
+                other.websiteurl == websiteurl) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             const DeepCollectionEquality().equals(other.persons, persons) &&
@@ -66,7 +67,7 @@ mixin _$Laboratory {
       image,
       description,
       address,
-      url,
+      websiteurl,
       direction,
       const DeepCollectionEquality().hash(persons),
       const DeepCollectionEquality().hash(learningTypes),
@@ -74,7 +75,7 @@ mixin _$Laboratory {
 
   @override
   String toString() {
-    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, url: $url, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
+    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, websiteurl: $websiteurl, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
 }
 
@@ -90,7 +91,7 @@ abstract mixin class $LaboratoryCopyWith<$Res> {
       ImageData? image,
       String? description,
       String? address,
-      String? url,
+      String? websiteurl,
       Direction direction,
       List<Person>? persons,
       @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
@@ -117,7 +118,7 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
     Object? image = freezed,
     Object? description = freezed,
     Object? address = freezed,
-    Object? url = freezed,
+    Object? websiteurl = freezed,
     Object? direction = null,
     Object? persons = freezed,
     Object? learningTypes = freezed,
@@ -144,9 +145,9 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
-      url: freezed == url
-          ? _self.url
-          : url // ignore: cast_nullable_to_non_nullable
+      websiteurl: freezed == websiteurl
+          ? _self.websiteurl
+          : websiteurl // ignore: cast_nullable_to_non_nullable
               as String?,
       direction: null == direction
           ? _self.direction
@@ -201,7 +202,7 @@ class _Laboratory extends Laboratory {
       this.image,
       this.description,
       this.address,
-      this.url,
+      this.websiteurl,
       required this.direction,
       final List<Person>? persons,
       @JsonKey(name: 'learning_types') final List<LearningType>? learningTypes,
@@ -224,7 +225,7 @@ class _Laboratory extends Laboratory {
   @override
   final String? address;
   @override
-  final String? url;
+  final String? websiteurl;
   @override
   final Direction direction;
   final List<Person>? _persons;
@@ -284,7 +285,8 @@ class _Laboratory extends Laboratory {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.address, address) || other.address == address) &&
-            (identical(other.url, url) || other.url == url) &&
+            (identical(other.websiteurl, websiteurl) ||
+                other.websiteurl == websiteurl) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             const DeepCollectionEquality().equals(other._persons, _persons) &&
@@ -302,7 +304,7 @@ class _Laboratory extends Laboratory {
       image,
       description,
       address,
-      url,
+      websiteurl,
       direction,
       const DeepCollectionEquality().hash(_persons),
       const DeepCollectionEquality().hash(_learningTypes),
@@ -310,8 +312,14 @@ class _Laboratory extends Laboratory {
 
   @override
   String toString() {
-    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, url: $url, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
+    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, websiteurl: $websiteurl, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
+
+  @override
+  int get favoriteId => id;
+
+  @override
+  EventType get favoriteType => EventType.laboratory;
 }
 
 /// @nodoc
@@ -328,7 +336,7 @@ abstract mixin class _$LaboratoryCopyWith<$Res>
       ImageData? image,
       String? description,
       String? address,
-      String? url,
+      String? websiteurl,
       Direction direction,
       List<Person>? persons,
       @JsonKey(name: 'learning_types') List<LearningType>? learningTypes,
@@ -357,7 +365,7 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
     Object? image = freezed,
     Object? description = freezed,
     Object? address = freezed,
-    Object? url = freezed,
+    Object? websiteurl = freezed,
     Object? direction = null,
     Object? persons = freezed,
     Object? learningTypes = freezed,
@@ -384,9 +392,9 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
-      url: freezed == url
-          ? _self.url
-          : url // ignore: cast_nullable_to_non_nullable
+      websiteurl: freezed == websiteurl
+          ? _self.websiteurl
+          : websiteurl // ignore: cast_nullable_to_non_nullable
               as String?,
       direction: null == direction
           ? _self.direction

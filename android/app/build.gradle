@@ -1,3 +1,28 @@
+buildscript {
+    ext.kotlin_version = '1.8.22' // или последнюю стабильную версию
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+//
+//allprojects {
+//    repositories {
+//        google()
+//        mavenCentral()
+//    }
+//
+//    // Принудительно задать JVM target для всех подпроектов
+//    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+//        kotlinOptions {
+//            jvmTarget = "1.8"
+//        }
+//    }
+//}
+
 plugins {
     id "com.android.application"
     id "kotlin-android"

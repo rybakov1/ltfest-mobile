@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:ltfest/components/favorite_button.dart';
+import 'package:ltfest/components/share_button.dart';
 import 'package:ltfest/data/models/person.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/constants.dart';
@@ -212,23 +214,23 @@ class FestivalDetailPage extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           child: Column(
                             children: [
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: ClipRRect(
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
                                       borderRadius: const BorderRadius.all(
                                           Radius.circular(12)),
                                       child: Container(
                                         width: 43,
                                         height: 43,
                                         color: const Color.fromRGBO(
-                                            142, 142, 142, 1),
+                                            255, 255, 255, 0.5),
                                         child: IconButton(
                                           icon: Icon(
                                             Icons.arrow_back,
                                             color: Palette.white,
-                                            size: 18,
+                                            size: 24,
                                           ),
                                           onPressed: () {
                                             context.pop();
@@ -236,8 +238,12 @@ class FestivalDetailPage extends ConsumerWidget {
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    const Spacer(),
+                                    ShareButton(link: festival.websiteurl ?? "https://ltfest.ru"),
+                                    const SizedBox(width: 8),
+                                    FavoriteButtonDetails(item: festival),
+                                  ],
+                                ),
                               ),
                               const SizedBox(height: 300),
                               Container(

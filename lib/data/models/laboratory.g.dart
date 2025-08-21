@@ -14,7 +14,7 @@ _Laboratory _$LaboratoryFromJson(Map<String, dynamic> json) => _Laboratory(
           : ImageData.fromJson(json['image'] as Map<String, dynamic>),
       description: json['description'] as String?,
       address: json['address'] as String?,
-      url: json['url'] as String?,
+      websiteurl: json['websiteurl'] as String?,
       direction: Direction.fromJson(json['direction'] as Map<String, dynamic>),
       persons: (json['persons'] as List<dynamic>?)
           ?.map((e) => Person.fromJson(e as Map<String, dynamic>))
@@ -34,7 +34,7 @@ Map<String, dynamic> _$LaboratoryToJson(_Laboratory instance) =>
       'image': instance.image,
       'description': instance.description,
       'address': instance.address,
-      'url': instance.url,
+      'websiteurl': instance.websiteurl,
       'direction': instance.direction,
       'persons': instance.persons,
       'learning_types': instance.learningTypes,

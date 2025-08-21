@@ -63,14 +63,20 @@ class ApiService {
       final response = await _dio.post(ApiEndpoints.verifyOtp, data: {
         'phone': phone,
         'code': code,
-      }, queryParameters: {'populate': '*'});
+      }, queryParameters: {
+        'populate': '*'
+      });
 
       if (response.statusCode == 200) {
-        final jwt = response.data['jwt'] as String;
-        final userData = response.data['user'] as Map<String, dynamic>;
+        final jwt = response.data['jwt'] as String?;
+        final userData = response.data['user'] as Map<String, dynamic>?;
+
+        if (jwt == null || userData == null) {
+          throw ApiException(
+              message: 'Invalid response: Missing jwt or user data');
+        }
 
         await _tokenStorage.saveToken(jwt: jwt);
-
         return User.fromJson(userData);
       } else {
         throw ApiException(
@@ -83,12 +89,45 @@ class ApiService {
     }
   }
 
+  // Future<User> verifyOtp(String phone, String code) async {
+  //   try {
+  //     final response = await _dio.post(ApiEndpoints.verifyOtp, data: {
+  //       'phone': phone,
+  //       'code': code,
+  //     }, queryParameters: {'populate': '*'});
+  //
+  //     if (response.statusCode == 200) {
+  //       final jwt = response.data['jwt'] as String;
+  //       final userData = response.data['user'] as Map<String, dynamic>;
+  //
+  //       await _tokenStorage.saveToken(jwt: jwt);
+  //
+  //       return User.fromJson(userData);
+  //     } else {
+  //       throw ApiException(
+  //           message:
+  //               response.data['error']?['message'] ?? 'Failed to verify OTP',
+  //           statusCode: response.statusCode);
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
   Future<User> getMe() async {
     try {
-      final response =
-          await _dio.get(ApiEndpoints.me, queryParameters: {'populate': '*'});
+      final response = await _dio.get(ApiEndpoints.me);
       if (response.statusCode == 200) {
-        return User.fromJson(response.data);
+        final data = response.data;
+        if (data == null) {
+          throw ApiException(message: 'Invalid response: No data found');
+        }
+        if (data is! Map<String, dynamic>) {
+          throw ApiException(
+              message:
+                  'Invalid response format: Expected a Map, got ${data.runtimeType}');
+        }
+        print('Response data: $data'); // Для отладки
+        return User.fromJson(data);
       } else {
         throw ApiException(
             message: 'Failed to load current user',
@@ -99,6 +138,38 @@ class ApiService {
     }
   }
 
+  // Future<User> getMe() async {
+  //   try {
+  //     final response = await _dio.get(ApiEndpoints.me, queryParameters: {'populate': '*'});
+  //     if (response.statusCode == 200) {
+  //       final data = response.data;
+  //       return User.fromJson(data);
+  //     } else {
+  //       throw ApiException(
+  //           message: 'Failed to load current user',
+  //           statusCode: response.statusCode);
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
+
+  // Future<User> getMe() async {
+  //   try {
+  //     final response =
+  //         await _dio.get(ApiEndpoints.me, queryParameters: {'populate': '*'});
+  //     if (response.statusCode == 200) {
+  //       return User.fromJson(response.data);
+  //     } else {
+  //       throw ApiException(
+  //           message: 'Failed to load current user',
+  //           statusCode: response.statusCode);
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
+
   Future<User> updateProfile({
     required int userId,
     required String firstName,
@@ -106,8 +177,8 @@ class ApiService {
     required String email,
     required String birthDate,
     required String residence,
-    required int directionId,
-    required int activityId,
+    int? directionId,
+    int? activityId,
     String? collectiveName,
     String? collectiveCity,
     String? educationPlace,
@@ -258,19 +329,156 @@ class ApiService {
   Future<List<UpcomingEvent>> fetchUpcomingEvents() =>
       _fetchCollection(ApiEndpoints.upcomingEvents, UpcomingEvent.fromJson);
 
-  Future<void> addFavourite(
-      {required int userId, required int festivalId}) async {
+  // Future<void> addFavourite(
+  //     {required int userId, required int festivalId}) async {
+  //   try {
+  //     final payload = {
+  //       'data': {
+  //         'user': userId,
+  //         'festival': festivalId,
+  //       }
+  //     };
+  //     final response = await _dio.post(ApiEndpoints.favourites, data: payload);
+  //     if (response.statusCode != 200) {
+  //       throw ApiException(message: 'Failed to add favourite');
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
+
+  // Future<void> addFavoriteFestival(int festivalId) async {
+  //   try {
+  //     final response = await _dio.put(ApiEndpoints.me, data: {
+  //       'favourites_festivals': {'connect': [festivalId]},
+  //     });
+  //     if (response.statusCode != 200) {
+  //       throw ApiException(message: 'Failed to add favorite festival');
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
+  //
+  // Future<void> removeFavoriteFestival(int festivalId) async {
+  //   try {
+  //     final response = await _dio.put(ApiEndpoints.me, data: {
+  //       'favourites_festivals': {'disconnect': [festivalId]},
+  //     });
+  //     if (response.statusCode != 200) {
+  //       throw ApiException(message: 'Failed to remove favorite festival');
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
+  //
+  // Future<void> addFavoriteLaboratory(int laboratoryId) async {
+  //   try {
+  //     final response = await _dio.put(ApiEndpoints.me, data: {
+  //       'favourites_laboratories': {'connect': [laboratoryId]},
+  //     });
+  //     if (response.statusCode != 200) {
+  //       throw ApiException(message: 'Failed to add favorite laboratory');
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
+  //
+  // Future<void> removeFavoriteLaboratory(int laboratoryId) async {
+  //   try {
+  //     final response = await _dio.put(ApiEndpoints.me, data: {
+  //       'favourites_laboratories': {'disconnect': [laboratoryId]},
+  //     });
+  //     if (response.statusCode != 200) {
+  //       throw ApiException(message: 'Failed to remove favorite laboratory');
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
+
+  Future<void> addFavoriteFestival(int userId, int festivalId) async {
     try {
-      final payload = {
-        'data': {
-          'user': userId,
-          'festival': festivalId,
-        }
-      };
-      final response = await _dio.post(ApiEndpoints.favourites, data: payload);
-      if (response.statusCode != 200) {
-        throw ApiException(message: 'Failed to add favourite');
+      final response = await _dio.put(
+        ApiEndpoints.userById(userId),
+        data: {
+          'favourites_festivals': {
+            'connect': [festivalId]
+          }
+        },
+      );
+      if (response.statusCode! ~/ 100 != 2) {
+        // Проверяем 2xx
+        throw ApiException(
+            message:
+                'Failed to add favorite festival: ${response.statusMessage}');
       }
+      print('Added favorite festival, response: ${response.data}');
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> removeFavoriteFestival(int userId, int festivalId) async {
+    try {
+      final response = await _dio.put(
+        ApiEndpoints.userById(userId),
+        data: {
+          'favourites_festivals': {
+            'disconnect': [festivalId]
+          }
+        },
+      );
+      if (response.statusCode! ~/ 100 != 2) {
+        throw ApiException(
+            message:
+                'Failed to remove favorite festival: ${response.statusMessage}');
+      }
+      print('Removed favorite festival, response: ${response.data}');
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> addFavoriteLaboratory(int userId, int laboratoryId) async {
+    try {
+      final response = await _dio.put(
+        ApiEndpoints.userById(userId),
+        data: {
+          'favourites_laboratories': {
+            'connect': [laboratoryId]
+          }
+        },
+      );
+      if (response.statusCode! ~/ 100 != 2) {
+        throw ApiException(
+            message:
+                'Failed to add favorite laboratory: ${response.statusMessage}');
+      }
+      print('Added favorite laboratory, response: ${response.data}');
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> removeFavoriteLaboratory(int userId, int laboratoryId) async {
+    try {
+      final response = await _dio.put(
+        ApiEndpoints.userById(userId),
+        data: {
+          'favourites_laboratories': {
+            'disconnect': [laboratoryId]
+          }
+        },
+      );
+      if (response.statusCode! ~/ 100 != 2) {
+        throw ApiException(
+            message:
+                'Failed to remove favorite laboratory: ${response.statusMessage}');
+      }
+      print('Removed favorite laboratory, response: ${response.data}');
     } catch (e) {
       _handleError(e);
     }

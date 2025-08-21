@@ -74,9 +74,9 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       _educationController.text = user.educationPlace ?? '';
       _masterFioController.text = user.masterName ?? '';
       _collectiveNameController.text = user.collectiveName ?? '';
-      _collectiveDirectionController.text = user.direction.title;
+      _collectiveDirectionController.text = user.direction?.title ?? '';
       _collectiveCityController.text = user.collectiveCity ?? '';
-      _collectiveDirectionController.text = user.direction.title ?? '';
+      _collectiveDirectionController.text = user.direction?.title ?? '';
       _selectedDirection = user.direction;
     }
   }
@@ -115,7 +115,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
           birthDate: user.birthdate.toString(),
           residence: _cityController.text.trim(),
           directionId: _selectedDirection!.id,
-          activityId: user.activity.id,
+          activityId: user.activity?.id ?? 0,
           collectiveName: _collectiveNameController.text.trim(),
           collectiveCity: _collectiveCityController.text.trim(),
           educationPlace: _educationController.text.trim(),

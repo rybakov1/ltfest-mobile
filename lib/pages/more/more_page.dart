@@ -108,7 +108,7 @@ class MorePage extends ConsumerWidget {
                     iconPath: 'assets/icons/favourite.svg',
                     title: "Избранное",
                     onTap: () {
-                      // TODO: Добавить навигацию на страницу избранного
+                      context.push(AppRoutes.favorites);
                     },
                   ),
                 ],
@@ -116,7 +116,7 @@ class MorePage extends ConsumerWidget {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                padding: const EdgeInsets.fromLTRB(4, 0, 4, 3),
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 20, horizontal: 12),

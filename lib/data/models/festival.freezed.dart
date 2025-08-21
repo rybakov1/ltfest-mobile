@@ -27,6 +27,7 @@ mixin _$Festival {
   String? get description;
   String? get pdfurl;
   String? get entryurl;
+  String? get websiteurl;
   Direction get direction;
   List<Person>? get persons;
 
@@ -58,6 +59,8 @@ mixin _$Festival {
             (identical(other.pdfurl, pdfurl) || other.pdfurl == pdfurl) &&
             (identical(other.entryurl, entryurl) ||
                 other.entryurl == entryurl) &&
+            (identical(other.websiteurl, websiteurl) ||
+                other.websiteurl == websiteurl) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             const DeepCollectionEquality().equals(other.persons, persons));
@@ -77,12 +80,13 @@ mixin _$Festival {
       description,
       pdfurl,
       entryurl,
+      websiteurl,
       direction,
       const DeepCollectionEquality().hash(persons));
 
   @override
   String toString() {
-    return 'Festival(id: $id, title: $title, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, direction: $direction, persons: $persons)';
+    return 'Festival(id: $id, title: $title, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, websiteurl: $websiteurl, direction: $direction, persons: $persons)';
   }
 }
 
@@ -102,6 +106,7 @@ abstract mixin class $FestivalCopyWith<$Res> {
       String? description,
       String? pdfurl,
       String? entryurl,
+      String? websiteurl,
       Direction direction,
       List<Person>? persons});
 
@@ -131,6 +136,7 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
     Object? description = freezed,
     Object? pdfurl = freezed,
     Object? entryurl = freezed,
+    Object? websiteurl = freezed,
     Object? direction = null,
     Object? persons = freezed,
   }) {
@@ -175,6 +181,10 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
           ? _self.entryurl
           : entryurl // ignore: cast_nullable_to_non_nullable
               as String?,
+      websiteurl: freezed == websiteurl
+          ? _self.websiteurl
+          : websiteurl // ignore: cast_nullable_to_non_nullable
+              as String?,
       direction: null == direction
           ? _self.direction
           : direction // ignore: cast_nullable_to_non_nullable
@@ -213,7 +223,7 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _Festival implements Festival {
+class _Festival extends Festival {
   const _Festival(
       {required this.id,
       required this.title,
@@ -225,9 +235,11 @@ class _Festival implements Festival {
       this.description,
       this.pdfurl,
       this.entryurl,
+      this.websiteurl,
       required this.direction,
       final List<Person>? persons})
-      : _persons = persons;
+      : _persons = persons,
+        super._();
   factory _Festival.fromJson(Map<String, dynamic> json) =>
       _$FestivalFromJson(json);
 
@@ -253,6 +265,8 @@ class _Festival implements Festival {
   final String? pdfurl;
   @override
   final String? entryurl;
+  @override
+  final String? websiteurl;
   @override
   final Direction direction;
   final List<Person>? _persons;
@@ -298,6 +312,8 @@ class _Festival implements Festival {
             (identical(other.pdfurl, pdfurl) || other.pdfurl == pdfurl) &&
             (identical(other.entryurl, entryurl) ||
                 other.entryurl == entryurl) &&
+            (identical(other.websiteurl, websiteurl) ||
+                other.websiteurl == websiteurl) &&
             (identical(other.direction, direction) ||
                 other.direction == direction) &&
             const DeepCollectionEquality().equals(other._persons, _persons));
@@ -317,13 +333,20 @@ class _Festival implements Festival {
       description,
       pdfurl,
       entryurl,
+      websiteurl,
       direction,
       const DeepCollectionEquality().hash(_persons));
 
   @override
   String toString() {
-    return 'Festival(id: $id, title: $title, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, direction: $direction, persons: $persons)';
+    return 'Festival(id: $id, title: $title, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, websiteurl: $websiteurl, direction: $direction, persons: $persons)';
   }
+
+  @override
+  int get favoriteId => id;
+
+  @override
+  EventType get favoriteType => EventType.festival;
 }
 
 /// @nodoc
@@ -344,6 +367,7 @@ abstract mixin class _$FestivalCopyWith<$Res>
       String? description,
       String? pdfurl,
       String? entryurl,
+      String? websiteurl,
       Direction direction,
       List<Person>? persons});
 
@@ -375,6 +399,7 @@ class __$FestivalCopyWithImpl<$Res> implements _$FestivalCopyWith<$Res> {
     Object? description = freezed,
     Object? pdfurl = freezed,
     Object? entryurl = freezed,
+    Object? websiteurl = freezed,
     Object? direction = null,
     Object? persons = freezed,
   }) {
@@ -418,6 +443,10 @@ class __$FestivalCopyWithImpl<$Res> implements _$FestivalCopyWith<$Res> {
       entryurl: freezed == entryurl
           ? _self.entryurl
           : entryurl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      websiteurl: freezed == websiteurl
+          ? _self.websiteurl
+          : websiteurl // ignore: cast_nullable_to_non_nullable
               as String?,
       direction: null == direction
           ? _self.direction

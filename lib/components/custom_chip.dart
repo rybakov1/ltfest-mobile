@@ -196,7 +196,6 @@ class CustomChipWithName extends StatelessWidget {
   final String selectedDirection;
 
   const CustomChipWithName({super.key, required this.selectedDirection});
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -206,13 +205,13 @@ class CustomChipWithName extends StatelessWidget {
             : Palette.primaryLime,
         borderRadius: BorderRadius.circular(8),
       ),
-      padding: const EdgeInsets.only(left: 10, top: 7, bottom: 9, right: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
       child: Wrap(
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
             selectedDirection,
-            style: Styles.b2.copyWith(
+            style: Styles.b3.copyWith(
               color: Palette.white,
             ),
           ),

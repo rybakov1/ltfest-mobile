@@ -153,7 +153,7 @@ class _$UpcomingEventCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _UpcomingEvent implements UpcomingEvent {
+class _UpcomingEvent extends UpcomingEvent {
   const _UpcomingEvent(
       {required this.id,
       required this.title,
@@ -162,7 +162,8 @@ class _UpcomingEvent implements UpcomingEvent {
       this.image,
       this.description,
       this.address,
-      required this.direction});
+      required this.direction})
+      : super._();
   factory _UpcomingEvent.fromJson(Map<String, dynamic> json) =>
       _$UpcomingEventFromJson(json);
 
@@ -224,6 +225,12 @@ class _UpcomingEvent implements UpcomingEvent {
   String toString() {
     return 'UpcomingEvent(id: $id, title: $title, type: $type, date: $date, image: $image, description: $description, address: $address, direction: $direction)';
   }
+
+  @override
+  int get favoriteId => id;
+
+  @override
+  EventType get favoriteType => type;
 }
 
 /// @nodoc

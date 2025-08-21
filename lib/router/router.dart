@@ -17,6 +17,7 @@ import 'package:ltfest/pages/main_screen.dart';
 import 'package:ltfest/pages/more/more_page.dart';
 import 'package:ltfest/pages/home/more_items_page.dart';
 import '../pages/auth/input_code_page.dart';
+import '../pages/more/favorites_page.dart';
 import '../providers/auth_state.dart';
 import '../providers/user_provider.dart';
 
@@ -128,6 +129,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.accountSettings,
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AccountSettingsPage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.favorites,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: FavoritesPage(),
         ),
       ),
       GoRoute(

@@ -233,6 +233,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/async_items_list_view.dart';
 import 'package:ltfest/components/custom_chip.dart';
+import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/laboratory.dart';
@@ -388,8 +389,14 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: CustomChipWithName(
-                  selectedDirection: laboratory.direction.title,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomChipWithName(
+                      selectedDirection: laboratory.direction.title,
+                    ),
+                    FavoriteButton(item: laboratory)
+                  ],
                 ),
               ),
             ],

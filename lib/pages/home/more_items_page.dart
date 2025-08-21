@@ -5,8 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../components/favorite_button.dart';
 import '../../data/models/news.dart';
-import '../../data/models/upcoming_events.dart';
+import '../../data/models/upcoming_events.dart' hide EventType;
 
 class AllItemsPage<T> extends ConsumerWidget {
   final String title;
@@ -22,28 +23,48 @@ class AllItemsPage<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Palette.black,
-      appBar: AppBar(
-        backgroundColor: Palette.black,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Palette.white),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          title,
-          style: Styles.h3.copyWith(color: Palette.white),
-        ),
-        centerTitle: true,
-      ),
       body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(
-            child: Container(
-              decoration: Decor.base,
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top -
-                    kToolbarHeight,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 24 + MediaQuery.of(context).padding.top,
+                bottom: 20,
               ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      title,
+                      style: Styles.h3.copyWith(color: Palette.white),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      height: 43,
+                      width: 43,
+                      decoration:
+                          Decor.base.copyWith(color: Palette.primaryLime),
+                      child: IconButton(
+                        onPressed: () => context.pop(),
+                        icon: Icon(Icons.arrow_back, color: Palette.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverFillRemaining(
+            child: Container(
+              margin: const EdgeInsets.all(4),
+              decoration: Decor.base,
               child: itemsAsync.when(
                 data: (items) => _buildListView(items, context),
                 loading: () => const Padding(
@@ -65,17 +86,16 @@ class AllItemsPage<T> extends ConsumerWidget {
       return Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: Text(
-            'Элементы не найдены',
-            style: TextStyle(color: Palette.black),
-          ),
+          child: Column(children: [
+            Image.asset('assets/icons/states/nothing.png'),
+            Text("Здесь пока ничего нет", style: Styles.b3),
+          ]),
         ),
       );
     }
 
     return ListView.builder(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20.0),
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -83,8 +103,8 @@ class AllItemsPage<T> extends ConsumerWidget {
         return Column(
           children: [
             _buildItem(item, context),
-            if (index < items.length - 1) const SizedBox(height: 16),
-            if (index == items.length - 1) const SizedBox(height: 40),
+            if (index < items.length - 1) const SizedBox(height: 32),
+            if (index == items.length - 1) const SizedBox(height: 32),
           ],
         );
       },
@@ -172,12 +192,7 @@ Widget buildEventCard({
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.favorite_border),
-                    onPressed: () {
-                      // TODO: Реализовать добавление в избранное
-                    },
-                  ),
+                  FavoriteButton(item: event as Favoritable)
                 ],
               ),
             ),

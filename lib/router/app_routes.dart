@@ -10,6 +10,7 @@ class AppRoutes {
   static const String blog = '/blog';
   static const String more = '/more';
   static const String accountSettings = '/more/account-settings';
+  static const String favorites = '/more/favorites';
   static const String appSettings = '/more/app-settings';
   static const String about = '/more/about';
   static const String festDetailsBase = '/fest';

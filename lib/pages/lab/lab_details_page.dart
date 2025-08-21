@@ -1,12 +1,16 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../components/share_button.dart';
 import '../../data/models/laboratory.dart';
 import '../../data/models/person.dart';
 
@@ -259,7 +263,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
               child: GestureDetector(
                 onTap: () async {
                   final Uri uri = Uri.parse(
-                    laboratoryAsync.value!.url!,
+                    laboratoryAsync.value!.websiteurl!, //TODO: not weburl its entryurl
                   );
                   await launchUrl(
                     uri,
@@ -313,29 +317,42 @@ class LaboratoryDetailPage extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: Column(
         children: [
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  child: Container(
-                    width: 43,
-                    height: 43,
-                    color: const Color.fromRGBO(142, 142, 142, 1),
-                    child: IconButton(
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.all(
+                      Radius.circular(12)),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 10.0,
+                      sigmaY: 10.0,
+                    ),
+                    child: Container(
+                      width: 43,
+                      height: 43,
+                      color: const Color.fromRGBO(
+                          255, 255, 255, 0.5),
+                      child: IconButton(
                         icon: Icon(
                           Icons.arrow_back,
                           color: Palette.white,
-                          size: 18,
+                          size: 24,
                         ),
-                        onPressed: () =>
-                            GoRouter.of(context).pop() //context.go('/lab'),
-                        ),
+                        onPressed: () {
+                          context.pop();
+                        },
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                const Spacer(),
+                ShareButton(link: laboratory.websiteurl ?? "https://ltfest.ru"),
+                const SizedBox(width: 8),
+                FavoriteButtonDetails(item: laboratory),
+              ],
+            ),
           ),
           const SizedBox(height: 300),
           Container(
