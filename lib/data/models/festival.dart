@@ -10,8 +10,8 @@ part 'festival.freezed.dart';
 part 'festival.g.dart';
 
 @freezed
-abstract class Festival with _$Festival implements Favoritable {
-  const Festival._(); // <- приватный конструктор
+abstract class Festival with _$Festival  { //implements Favoritable
+  //const Festival._(); // <- приватный конструктор
 
   const factory Festival({
     required int id,
@@ -32,6 +32,6 @@ abstract class Festival with _$Festival implements Favoritable {
   factory Festival.fromJson(Map<String, dynamic> json) =>
       _$FestivalFromJson(json);
 
-  int get favId => id;
-  EventType get favType => EventType.festival;
+  // int get favId => id;
+  // EventType get favType => EventType.festival;
 }

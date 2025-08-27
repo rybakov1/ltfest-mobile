@@ -4,21 +4,18 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/data/models/favorite.dart';
 import 'package:ltfest/data/models/image_data.dart';
 import 'package:ltfest/providers/story_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../components/banner_carousel.dart';
 import '../../components/custom_chip.dart';
-import '../../data/models/festival.dart';
-import '../../data/models/laboratory.dart';
 import '../../data/models/ltstory.dart';
 import '../../data/models/news.dart';
 import '../../data/models/upcoming_events.dart';
-import '../../data/models/user.dart';
-import '../../data/services/api_service.dart';
 import '../../providers/auth_state.dart';
-import '../../providers/banner_provider.dart';
+import '../../providers/favorites_provider.dart';
 import '../../providers/news_provider.dart';
 import '../../providers/upcoming_provider.dart';
 import '../../providers/user_provider.dart';
@@ -282,7 +279,7 @@ class HomePage extends ConsumerWidget {
                     CustomChipWithName(
                       selectedDirection: event.direction.title,
                     ),
-                    FavoriteButton(item: event as Favoritable)
+                    FavoriteButton(id: event.id, eventType: event.type)
                   ],
                 ),
               ),
@@ -359,20 +356,20 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildBannerLoading() {
-    return Shimmer.fromColors(
-      baseColor: Palette.shimmerBase,
-      highlightColor: Palette.shimmerHighlight,
-      child: Container(
-        height: 150,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
-  }
+  // Widget _buildBannerLoading() {
+  //   return Shimmer.fromColors(
+  //     baseColor: Palette.shimmerBase,
+  //     highlightColor: Palette.shimmerHighlight,
+  //     child: Container(
+  //       height: 150,
+  //       width: double.infinity,
+  //       decoration: BoxDecoration(
+  //         color: Colors.black,
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildNewsLoading() {
     return Shimmer.fromColors(

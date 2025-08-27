@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/data/models/favorite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/favorite_button.dart';
 import '../../data/models/news.dart';
-import '../../data/models/upcoming_events.dart' hide EventType;
+import '../../data/models/upcoming_events.dart';
+import '../../providers/favorites_provider.dart';
 
 class AllItemsPage<T> extends ConsumerWidget {
   final String title;
@@ -192,7 +194,7 @@ Widget buildEventCard({
                       ),
                     ),
                   ),
-                  FavoriteButton(item: event as Favoritable)
+                  FavoriteButton(id: event.id, eventType: event.type)
                 ],
               ),
             ),

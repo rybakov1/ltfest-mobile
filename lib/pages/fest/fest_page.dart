@@ -234,10 +234,13 @@ import 'package:ltfest/components/async_items_list_view.dart';
 import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/data/models/favorite.dart';
 import 'package:ltfest/data/models/festival.dart';
 import 'package:ltfest/data/models/upcoming_events.dart';
 import 'package:ltfest/providers/direction_provider.dart';
 import 'package:ltfest/providers/festival_provider.dart';
+
+import '../../providers/favorites_provider.dart';
 
 class FestivalPage extends ConsumerStatefulWidget {
   const FestivalPage({super.key});
@@ -409,7 +412,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage> {
                     CustomChipWithName(
                       selectedDirection: festival.direction.title,
                     ),
-                    FavoriteButton(item: festival)
+                    FavoriteButton(id: festival.id, eventType: EventType.festival),
                   ],
                 ),
               ),

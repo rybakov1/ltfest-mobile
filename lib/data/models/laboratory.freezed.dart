@@ -314,12 +314,6 @@ class _Laboratory extends Laboratory {
   String toString() {
     return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, websiteurl: $websiteurl, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
-
-  @override
-  int get favoriteId => id;
-
-  @override
-  EventType get favoriteType => EventType.laboratory;
 }
 
 /// @nodoc

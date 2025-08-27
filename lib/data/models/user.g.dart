@@ -27,15 +27,6 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
       ltpriority: json['ltpriority'] as String?,
       educationPlace: json['educationPlace'] as String?,
       masterName: json['masterName'] as String?,
-      favouritesFestivals: (json['favourites_festivals'] as List<dynamic>?)
-              ?.map((e) => Festival.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      favouritesLaboratories:
-          (json['favourites_laboratories'] as List<dynamic>?)
-                  ?.map((e) => Laboratory.fromJson(e as Map<String, dynamic>))
-                  .toList() ??
-              const [],
     );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -53,6 +44,4 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
       'ltpriority': instance.ltpriority,
       'educationPlace': instance.educationPlace,
       'masterName': instance.masterName,
-      'favourites_festivals': instance.favouritesFestivals,
-      'favourites_laboratories': instance.favouritesLaboratories,
     };

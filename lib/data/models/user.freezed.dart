@@ -29,10 +29,6 @@ mixin _$User {
   String? get ltpriority;
   String? get educationPlace;
   String? get masterName;
-  @JsonKey(name: 'favourites_festivals')
-  List<Festival>? get favouritesFestivals;
-  @JsonKey(name: 'favourites_laboratories')
-  List<Laboratory>? get favouritesLaboratories;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -73,11 +69,7 @@ mixin _$User {
             (identical(other.educationPlace, educationPlace) ||
                 other.educationPlace == educationPlace) &&
             (identical(other.masterName, masterName) ||
-                other.masterName == masterName) &&
-            const DeepCollectionEquality()
-                .equals(other.favouritesFestivals, favouritesFestivals) &&
-            const DeepCollectionEquality()
-                .equals(other.favouritesLaboratories, favouritesLaboratories));
+                other.masterName == masterName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -97,13 +89,11 @@ mixin _$User {
       collectiveCity,
       ltpriority,
       educationPlace,
-      masterName,
-      const DeepCollectionEquality().hash(favouritesFestivals),
-      const DeepCollectionEquality().hash(favouritesLaboratories));
+      masterName);
 
   @override
   String toString() {
-    return 'User(id: $id, firstname: $firstname, lastname: $lastname, email: $email, birthdate: $birthdate, residence: $residence, phone: $phone, activity: $activity, direction: $direction, collectiveName: $collectiveName, collectiveCity: $collectiveCity, ltpriority: $ltpriority, educationPlace: $educationPlace, masterName: $masterName, favouritesFestivals: $favouritesFestivals, favouritesLaboratories: $favouritesLaboratories)';
+    return 'User(id: $id, firstname: $firstname, lastname: $lastname, email: $email, birthdate: $birthdate, residence: $residence, phone: $phone, activity: $activity, direction: $direction, collectiveName: $collectiveName, collectiveCity: $collectiveCity, ltpriority: $ltpriority, educationPlace: $educationPlace, masterName: $masterName)';
   }
 }
 
@@ -126,11 +116,7 @@ abstract mixin class $UserCopyWith<$Res> {
       String? collectiveCity,
       String? ltpriority,
       String? educationPlace,
-      String? masterName,
-      @JsonKey(name: 'favourites_festivals')
-      List<Festival>? favouritesFestivals,
-      @JsonKey(name: 'favourites_laboratories')
-      List<Laboratory>? favouritesLaboratories});
+      String? masterName});
 
   $ActivityCopyWith<$Res>? get activity;
   $DirectionCopyWith<$Res>? get direction;
@@ -162,8 +148,6 @@ class _$UserCopyWithImpl<$Res> implements $UserCopyWith<$Res> {
     Object? ltpriority = freezed,
     Object? educationPlace = freezed,
     Object? masterName = freezed,
-    Object? favouritesFestivals = freezed,
-    Object? favouritesLaboratories = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -222,14 +206,6 @@ class _$UserCopyWithImpl<$Res> implements $UserCopyWith<$Res> {
           ? _self.masterName
           : masterName // ignore: cast_nullable_to_non_nullable
               as String?,
-      favouritesFestivals: freezed == favouritesFestivals
-          ? _self.favouritesFestivals
-          : favouritesFestivals // ignore: cast_nullable_to_non_nullable
-              as List<Festival>?,
-      favouritesLaboratories: freezed == favouritesLaboratories
-          ? _self.favouritesLaboratories
-          : favouritesLaboratories // ignore: cast_nullable_to_non_nullable
-              as List<Laboratory>?,
     ));
   }
 
@@ -279,13 +255,7 @@ class _User implements User {
       this.collectiveCity,
       this.ltpriority,
       this.educationPlace,
-      this.masterName,
-      @JsonKey(name: 'favourites_festivals')
-      final List<Festival>? favouritesFestivals = const [],
-      @JsonKey(name: 'favourites_laboratories')
-      final List<Laboratory>? favouritesLaboratories = const []})
-      : _favouritesFestivals = favouritesFestivals,
-        _favouritesLaboratories = favouritesLaboratories;
+      this.masterName});
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   @override
@@ -316,29 +286,6 @@ class _User implements User {
   final String? educationPlace;
   @override
   final String? masterName;
-  final List<Festival>? _favouritesFestivals;
-  @override
-  @JsonKey(name: 'favourites_festivals')
-  List<Festival>? get favouritesFestivals {
-    final value = _favouritesFestivals;
-    if (value == null) return null;
-    if (_favouritesFestivals is EqualUnmodifiableListView)
-      return _favouritesFestivals;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
-
-  final List<Laboratory>? _favouritesLaboratories;
-  @override
-  @JsonKey(name: 'favourites_laboratories')
-  List<Laboratory>? get favouritesLaboratories {
-    final value = _favouritesLaboratories;
-    if (value == null) return null;
-    if (_favouritesLaboratories is EqualUnmodifiableListView)
-      return _favouritesLaboratories;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -384,11 +331,7 @@ class _User implements User {
             (identical(other.educationPlace, educationPlace) ||
                 other.educationPlace == educationPlace) &&
             (identical(other.masterName, masterName) ||
-                other.masterName == masterName) &&
-            const DeepCollectionEquality()
-                .equals(other._favouritesFestivals, _favouritesFestivals) &&
-            const DeepCollectionEquality().equals(
-                other._favouritesLaboratories, _favouritesLaboratories));
+                other.masterName == masterName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -408,13 +351,11 @@ class _User implements User {
       collectiveCity,
       ltpriority,
       educationPlace,
-      masterName,
-      const DeepCollectionEquality().hash(_favouritesFestivals),
-      const DeepCollectionEquality().hash(_favouritesLaboratories));
+      masterName);
 
   @override
   String toString() {
-    return 'User(id: $id, firstname: $firstname, lastname: $lastname, email: $email, birthdate: $birthdate, residence: $residence, phone: $phone, activity: $activity, direction: $direction, collectiveName: $collectiveName, collectiveCity: $collectiveCity, ltpriority: $ltpriority, educationPlace: $educationPlace, masterName: $masterName, favouritesFestivals: $favouritesFestivals, favouritesLaboratories: $favouritesLaboratories)';
+    return 'User(id: $id, firstname: $firstname, lastname: $lastname, email: $email, birthdate: $birthdate, residence: $residence, phone: $phone, activity: $activity, direction: $direction, collectiveName: $collectiveName, collectiveCity: $collectiveCity, ltpriority: $ltpriority, educationPlace: $educationPlace, masterName: $masterName)';
   }
 }
 
@@ -438,11 +379,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
       String? collectiveCity,
       String? ltpriority,
       String? educationPlace,
-      String? masterName,
-      @JsonKey(name: 'favourites_festivals')
-      List<Festival>? favouritesFestivals,
-      @JsonKey(name: 'favourites_laboratories')
-      List<Laboratory>? favouritesLaboratories});
+      String? masterName});
 
   @override
   $ActivityCopyWith<$Res>? get activity;
@@ -476,8 +413,6 @@ class __$UserCopyWithImpl<$Res> implements _$UserCopyWith<$Res> {
     Object? ltpriority = freezed,
     Object? educationPlace = freezed,
     Object? masterName = freezed,
-    Object? favouritesFestivals = freezed,
-    Object? favouritesLaboratories = freezed,
   }) {
     return _then(_User(
       id: null == id
@@ -536,14 +471,6 @@ class __$UserCopyWithImpl<$Res> implements _$UserCopyWith<$Res> {
           ? _self.masterName
           : masterName // ignore: cast_nullable_to_non_nullable
               as String?,
-      favouritesFestivals: freezed == favouritesFestivals
-          ? _self._favouritesFestivals
-          : favouritesFestivals // ignore: cast_nullable_to_non_nullable
-              as List<Festival>?,
-      favouritesLaboratories: freezed == favouritesLaboratories
-          ? _self._favouritesLaboratories
-          : favouritesLaboratories // ignore: cast_nullable_to_non_nullable
-              as List<Laboratory>?,
     ));
   }
 

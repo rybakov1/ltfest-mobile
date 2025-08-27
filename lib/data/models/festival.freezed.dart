@@ -223,7 +223,7 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
 
 /// @nodoc
 @JsonSerializable()
-class _Festival extends Festival {
+class _Festival implements Festival {
   const _Festival(
       {required this.id,
       required this.title,
@@ -238,8 +238,7 @@ class _Festival extends Festival {
       this.websiteurl,
       required this.direction,
       final List<Person>? persons})
-      : _persons = persons,
-        super._();
+      : _persons = persons;
   factory _Festival.fromJson(Map<String, dynamic> json) =>
       _$FestivalFromJson(json);
 
@@ -341,12 +340,6 @@ class _Festival extends Festival {
   String toString() {
     return 'Festival(id: $id, title: $title, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, websiteurl: $websiteurl, direction: $direction, persons: $persons)';
   }
-
-  @override
-  int get favoriteId => id;
-
-  @override
-  EventType get favoriteType => EventType.festival;
 }
 
 /// @nodoc

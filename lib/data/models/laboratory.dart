@@ -12,7 +12,7 @@ part 'laboratory.freezed.dart';
 part 'laboratory.g.dart';
 
 @freezed
-abstract class Laboratory with _$Laboratory implements Favoritable {
+abstract class Laboratory with _$Laboratory { // implements Favoritable
   const Laboratory._();
 
   const factory Laboratory({
@@ -52,6 +52,6 @@ abstract class Laboratory with _$Laboratory implements Favoritable {
     return sortedDays.last.date;
   }
 
-  int get favId => id;
-  EventType get favType => EventType.laboratory;
+  // int get favId => id;
+  // EventType get favType => EventType.laboratory;
 }

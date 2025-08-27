@@ -67,38 +67,38 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
     });
   }
 
-  Future<void> _verifyOtp() async {
-    if (_isLoading || _pinController.text.length < 6) return;
-
-    setState(() {
-      _isLoading = true;
-      _hasError = false; // Сбрасываем ошибку перед новой попыткой
-    });
-
-    try {
-      await ref
-          .read(authNotifierProvider.notifier)
-          .verifyOtpAndLogin(widget.phoneNumber, _pinController.text);
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _hasError = true;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Неверный код. Попробуйте еще раз."),
-            backgroundColor: Palette.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
+  // Future<void> _verifyOtp() async {
+  //   if (_isLoading || _pinController.text.length < 6) return;
+  //
+  //   setState(() {
+  //     _isLoading = true;
+  //     _hasError = false; // Сбрасываем ошибку перед новой попыткой
+  //   });
+  //
+  //   try {
+  //     await ref
+  //         .read(authNotifierProvider.notifier)
+  //         .verifyOtpAndLogin(widget.phoneNumber, _pinController.text);
+  //   } catch (e) {
+  //     if (mounted) {
+  //       setState(() {
+  //         _hasError = true;
+  //       });
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: const Text("Неверный код. Попробуйте еще раз."),
+  //           backgroundColor: Palette.error,
+  //         ),
+  //       );
+  //     }
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
 
   Future<void> _resendOtp() async {
     if (_isLoading || _timerSeconds > 0) return;
@@ -143,6 +143,42 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
     final seconds = (_timerSeconds % 60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
+
+  Future<void> _verifyOtp() async {
+    if (_isLoading) return;
+
+    final code = _pinController.text.trim();
+    if (code.length < 6) {
+      setState(() {
+        _hasError = true; // короткий код
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _hasError = false; // очищаем ошибку перед попыткой
+    });
+
+    await ref
+        .read(authNotifierProvider.notifier)
+        .verifyOtpAndLogin(widget.phoneNumber, code);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    // ВАЖНО: проверяем результат проверки кода
+    final authState = ref.read(authNotifierProvider).value;
+    if (authState is Unauthenticated) {
+      setState(() {
+        _hasError = true; // неверный код → показываем текст под Pinput
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -234,9 +270,12 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
                       ),
                       const SizedBox(height: 8),
                       if (_hasError)
-                        Text(
-                          "Неверный код",
-                          style: Styles.b3.copyWith(color: Palette.error),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12.0),
+                          child: Text(
+                            "Неверный код",
+                            style: Styles.b3.copyWith(color: Palette.error),
+                          ),
                         ),
                       const SizedBox(height: 32),
                       if (_timerSeconds > 0)

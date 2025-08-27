@@ -3,9 +3,11 @@ abstract class ApiEndpoints {
   static const String verifyOtp = '/api/otp/verify';
 
   static const String users = '/api/users';
-  static const String me = '/api/users/me?populate[0]=direction&populate[1]=activity&populate[2]=favourites_festivals.image&populate[3]=favourites_festivals.direction&populate[4]=favourites_laboratories.image&populate[6]=favourites_laboratories.direction';
+  static const String me = '/api/users/me?populate[0]=direction&populate[1]=activity';
 
-  static const String favourites = '/api/favourites';
+  static const String favorites = '/api/favorites';
+  static String favoriteById(int id) => '/api/favorites/$id';
+
   static const String activities = '/api/activities';
   static const String directions = '/api/directions';
   static const String festivals = '/api/festivals';

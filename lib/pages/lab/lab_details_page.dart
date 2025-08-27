@@ -6,6 +6,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
+import 'package:ltfest/data/models/favorite.dart';
+import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -350,7 +352,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                 const Spacer(),
                 ShareButton(link: laboratory.websiteurl ?? "https://ltfest.ru"),
                 const SizedBox(width: 8),
-                FavoriteButtonDetails(item: laboratory),
+                FavoriteButtonDetails(id: laboratory.id, eventType: EventType.laboratory),
               ],
             ),
           ),

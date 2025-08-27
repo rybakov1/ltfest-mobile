@@ -30,24 +30,24 @@ class NewsPage extends ConsumerWidget {
                       "Новости",
                       style: Styles.h3.copyWith(color: Palette.white),
                     ),
-                    const SizedBox(height: 30),
-                    TextField(
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Palette.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
-                        ),
-                        hintText: "Поиск по новостям",
-                        hintStyle: Styles.b2,
-                        contentPadding: const EdgeInsets.only(
-                            left: 16, top: 13, bottom: 13),
-                      ),
-                      onChanged: (value) {
-                        // TODO: Реализовать поиск в будущем
-                      },
-                    ),
+                    // const SizedBox(height: 30),
+                    // TextField(
+                    //   decoration: InputDecoration(
+                    //     filled: true,
+                    //     fillColor: Palette.white,
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(8),
+                    //       borderSide: BorderSide.none,
+                    //     ),
+                    //     hintText: "Поиск по новостям",
+                    //     hintStyle: Styles.b2,
+                    //     contentPadding: const EdgeInsets.only(
+                    //         left: 16, top: 13, bottom: 13),
+                    //   ),
+                    //   onChanged: (value) {
+                    //     // TODO: Реализовать поиск в будущем
+                    //   },
+                    // ),
                   ],
                 ),
               ),

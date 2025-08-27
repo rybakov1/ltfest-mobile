@@ -1,139 +1,184 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ltfest/data/models/favorite_festival.dart';
-import 'package:ltfest/data/models/favorite_laboratory.dart';
-import 'package:ltfest/data/models/festival.dart';
-import 'package:ltfest/data/models/laboratory.dart';
-import 'package:ltfest/providers/user_provider.dart'; // Импорт authNotifierProvider
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:ltfest/data/models/favorite.dart';
+import 'package:ltfest/data/services/api_service.dart';
 
-import '../components/favorite_button.dart';
-import '../data/models/upcoming_events.dart' hide EventType;
-import '../data/models/user.dart';
-import '../data/services/api_service.dart';
-import 'auth_state.dart';
+enum EventType { festival, laboratory }
 
-part 'favorites_provider.g.dart';
+// Провайдер для избранных мероприятий
+final favoritesProvider =
+    StateNotifierProvider<FavoritesNotifier, AsyncValue<List<Favorite>>>(
+  (ref) {
+    final apiService = ref.watch(apiServiceProvider);
+    return FavoritesNotifier(apiService);
+  },
+);
 
-@riverpod
-AsyncValue<List<Festival>> favoritesFestivals(Ref ref) {
-  final authState = ref.watch(authNotifierProvider);
-  return authState.when(
-    data: (state) {
-      return switch (state) {
-        Unauthenticated() => const AsyncValue.data([]),
-        Authenticated(:final user) =>
-          AsyncValue.data(user.favouritesFestivals ?? []),
-        NeedsRegistration(:final user) =>
-          AsyncValue.data(user.favouritesFestivals ?? []),
-        // TODO: Handle this case.
-        AuthState() => throw UnimplementedError(),
-      };
-    },
-    loading: () => const AsyncValue.loading(),
-    error: (e, st) => AsyncValue.error(e, st),
-  );
-}
+class FavoritesNotifier extends StateNotifier<AsyncValue<List<Favorite>>> {
+  final ApiService _apiService;
+  int? _userId;
 
-@riverpod
-AsyncValue<List<Laboratory>> favoritesLabs(Ref ref) {
-  final authState = ref.watch(authNotifierProvider);
-  return authState.when(
-    data: (state) {
-      return switch (state) {
-        Unauthenticated() => const AsyncValue.data([]),
-        Authenticated(:final user) =>
-          AsyncValue.data(user.favouritesLaboratories ?? []),
-        NeedsRegistration(:final user) =>
-          AsyncValue.data(user.favouritesLaboratories ?? []),
-        // TODO: Handle this case.
-        AuthState() => throw UnimplementedError(),
-      };
-    },
-    loading: () => const AsyncValue.loading(),
-    error: (e, st) => AsyncValue.error(e, st),
-  );
-}
-
-final favoriteProvider =
-StateNotifierProvider<FavoriteNotifier, Set<String>>((ref) {
-  return FavoriteNotifier(ref);
-});
-
-class FavoriteNotifier extends StateNotifier<Set<String>> {
-  final Ref ref;
-
-  FavoriteNotifier(this.ref) : super(_initialFavorites(ref));
-
-  static Set<String> _initialFavorites(Ref ref) {
-    final authState = ref.read(authNotifierProvider).value;
-    User? user;
-    switch (authState) {
-      case Authenticated(user: final u):
-        user = u;
-      case NeedsRegistration(user: final u):
-        user = u;
-      case Unauthenticated():
-        user = null;
-    }
-
-    if (user == null) return {};
-
-    final festivalKeys = user.favouritesFestivals
-        ?.map((f) => 'festival-${f.id}')
-        .toSet() ??
-        {};
-    final labKeys =
-        user.favouritesLaboratories?.map((l) => 'laboratory-${l.id}').toSet() ??
-            {};
-
-    return {...festivalKeys, ...labKeys};
+  FavoritesNotifier(this._apiService) : super(const AsyncValue.loading()) {
+    _init();
   }
 
-  Future<void> toggle(Favoritable event, BuildContext context) async {
-    final authState = ref.read(authNotifierProvider).value;
-
-    User? user;
-    switch (authState) {
-      case Authenticated(user: final u):
-        user = u;
-      case NeedsRegistration(user: final u):
-        user = u;
-      case Unauthenticated():
-        user = null;
+  Future<void> _init() async {
+    try {
+      final user = await _apiService.getMe();
+      _userId = user.id;
+      await _fetchFavorites();
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
+  }
 
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Нужно войти в систему')),
-      );
+  Future<void> _fetchFavorites() async {
+    if (_userId == null) {
+      state = const AsyncValue.data([]);
       return;
     }
 
-    final api = ref.read(apiServiceProvider);
-    final key = '${event.favoriteType.name}-${event.favoriteId}';
-
-    if (state.contains(key)) {
-      state = {...state}..remove(key);
-
-      if (event.favoriteType == EventType.festival) {
-        await api.removeFavoriteFestival(user.id, event.favoriteId);
-      } else {
-        await api.removeFavoriteLaboratory(user.id, event.favoriteId);
-      }
-    } else {
-      state = {...state, key};
-
-      if (event.favoriteType == EventType.festival) {
-        await api.addFavoriteFestival(user.id, event.favoriteId);
-      } else {
-        await api.addFavoriteLaboratory(user.id, event.favoriteId);
-      }
+    try {
+      state = const AsyncValue.loading();
+      final favorites = await _apiService.fetchFavorites();
+      state = AsyncValue.data(favorites);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
     }
   }
 
-  bool isFavorite(Favoritable event) {
-    final key = '${event.favoriteType.name}-${event.favoriteId}';
-    return state.contains(key);
+  Future<void> addFavorite(EventType eventType, int eventId) async {
+    if (_userId == null) {
+      throw Exception('Пользователь не аутентифицирован');
+    }
+
+    try {
+      await _apiService.addFavorite(eventType.name, eventId);
+      await _fetchFavorites(); // Обновляем список избранного
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+      rethrow; // Пробрасываем ошибку для обработки в UI
+    }
+  }
+
+  Future<void> removeFavorite(EventType eventType, int eventId) async {
+    if (_userId == null) {
+      throw Exception('Пользователь не аутентифицирован');
+    }
+
+    try {
+      await _apiService.removeFavorite(_userId!, eventType.name, eventId);
+      await _fetchFavorites(); // Обновляем список избранного
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+      rethrow; // Пробрасываем ошибку для обработки в UI
+    }
+  }
+
+  bool isFavorite(EventType eventType, int eventId) {
+    if (state is AsyncData<List<Favorite>>) {
+      final favorites = (state as AsyncData<List<Favorite>>).value;
+      return favorites.any(
+        (event) => event.type == eventType.name && event.id == eventId,
+      );
+    }
+    return false;
   }
 }
+
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+//
+// import '../data/models/favorite.dart';
+// import '../data/services/api_service.dart';
+//
+// enum EventType { festival, laboratory }
+//
+// // Провайдер для избранных мероприятий
+// final favoritesProvider =
+//     StateNotifierProvider<FavoritesNotifier, AsyncValue<List<Favorite>>>(
+//   (ref) {
+//     final apiService = ref.watch(apiServiceProvider);
+//     return FavoritesNotifier(apiService);
+//   },
+// );
+//
+// class FavoritesNotifier extends StateNotifier<AsyncValue<List<Favorite>>> {
+//   final ApiService _apiService;
+//   int? _userId;
+//
+//   FavoritesNotifier(this._apiService) : super(const AsyncValue.loading()) {
+//     _init();
+//   }
+//
+//   Future<void> _init() async {
+//     try {
+//       final user = await _apiService.getMe();
+//       _userId = user.id;
+//       await _fetchFavorites();
+//     } catch (e, st) {
+//       state = AsyncValue.error(e, st);
+//     }
+//   }
+//
+//   Future<void> _fetchFavorites() async {
+//     if (_userId == null) {
+//       state = const AsyncValue.data([]);
+//       return;
+//     }
+//
+//     try {
+//       final favorites = await _apiService.fetchFavorites();
+//       state = AsyncValue.data(favorites);
+//     } catch (e, stackTrace) {
+//       state = AsyncValue.error(e, stackTrace);
+//     }
+//   }
+//
+//   Future<void> addFavorite(EventType eventType, int eventId) async {
+//     if (_userId == null) throw Exception('Пользователь не аутентифицирован');
+//
+//     final current = state.asData?.value ?? [];
+//     final optimistic = [
+//       ...current,
+//       Favorite(id: eventId, type: eventType.name, title: '', dateStart: '', dateEnd: ''),
+//     ];
+//
+//     // 👇 Оптимистичное обновление
+//     state = AsyncValue.data(optimistic);
+//
+//     try {
+//       await _apiService.addFavorite(eventType.name, eventId);
+//     } catch (e, st) {
+//       // если ошибка → откат
+//       state = AsyncValue.data(current);
+//       state = AsyncValue.error(e, st);
+//       rethrow;
+//     }
+//   }
+//
+//   Future<void> removeFavorite(EventType eventType, int eventId) async {
+//     if (_userId == null) throw Exception('Пользователь не аутентифицирован');
+//
+//     final current = state.asData?.value ?? [];
+//     final optimistic =
+//     current.where((f) => !(f.type == eventType.name && f.id == eventId)).toList();
+//
+//     // 👇 Оптимистичное обновление
+//     state = AsyncValue.data(optimistic);
+//
+//     try {
+//       await _apiService.removeFavorite(_userId!, eventType.name, eventId);
+//     } catch (e, st) {
+//       // если ошибка → откат
+//       state = AsyncValue.data(current);
+//       state = AsyncValue.error(e, st);
+//       rethrow;
+//     }
+//   }
+//
+//   bool isFavorite(EventType eventType, int eventId) {
+//     final favorites = state.asData?.value ?? [];
+//     return favorites.any(
+//           (event) => event.type == eventType.name && event.id == eventId,
+//     );
+//   }
+// }

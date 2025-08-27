@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/models/ltstory.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../models/favorite.dart';
 import '../models/ltbanner.dart';
 import 'dio_provider.dart';
 import '../models/news.dart';
@@ -215,17 +216,45 @@ class ApiService {
     }
   }
 
+  // Future<List<T>> _fetchCollection<T>(
+  //     String endpoint, T Function(Map<String, dynamic>) fromJson) async {
+  //   try {
+  //     final response =
+  //         await _dio.get(endpoint, queryParameters: {'populate': '*'});
+  //
+  //     if (response.statusCode == 200) {
+  //       final List<dynamic> data = response.data['data'];
+  //       return data
+  //           .map((json) => fromJson(json as Map<String, dynamic>))
+  //           .toList();
+  //     } else {
+  //       throw ApiException(message: 'Failed to load collection $endpoint');
+  //     }
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
+
   Future<List<T>> _fetchCollection<T>(
       String endpoint, T Function(Map<String, dynamic>) fromJson) async {
     try {
       final response =
-          await _dio.get(endpoint, queryParameters: {'populate': '*'});
+      await _dio.get(endpoint, queryParameters: {'populate': '*'});
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['data'];
-        return data
-            .map((json) => fromJson(json as Map<String, dynamic>))
-            .toList();
+        final raw = response.data;
+
+        if (raw is List) {
+          return raw.map((e) => fromJson(e as Map<String, dynamic>)).toList();
+        } else if (raw is Map && raw['data'] is List) {
+          return (raw['data'] as List)
+              .map((e) => fromJson(e as Map<String, dynamic>))
+              .toList();
+        } else {
+          throw ApiException(
+            message: 'Unexpected response format: ${raw.runtimeType}',
+          );
+        }
       } else {
         throw ApiException(message: 'Failed to load collection $endpoint');
       }
@@ -233,6 +262,7 @@ class ApiService {
       _handleError(e);
     }
   }
+
 
   // Future<T> _fetchOne<T>(
   //     String endpoint, T Function(Map<String, dynamic>) fromJson) async {
@@ -329,6 +359,8 @@ class ApiService {
   Future<List<UpcomingEvent>> fetchUpcomingEvents() =>
       _fetchCollection(ApiEndpoints.upcomingEvents, UpcomingEvent.fromJson);
 
+  Future<List<Favorite>> fetchFavorites() =>
+      _fetchCollection(ApiEndpoints.favorites, Favorite.fromJson);
   // Future<void> addFavourite(
   //     {required int userId, required int festivalId}) async {
   //   try {
@@ -398,87 +430,77 @@ class ApiService {
   //     _handleError(e);
   //   }
   // }
+// Добавление фестиваля в избранное
+// Добавление мероприятия в избранное
+  Future<void> addFavorite(String eventType, int eventId) async {
 
-  Future<void> addFavoriteFestival(int userId, int festivalId) async {
+    if (!['festival', 'laboratory'].contains(eventType)) {
+      throw ApiException(message: 'Invalid event_type: $eventType');
+    }
+
     try {
-      final response = await _dio.put(
-        ApiEndpoints.userById(userId),
+      final response = await _dio.post(
+        ApiEndpoints.favorites,
         data: {
-          'favourites_festivals': {
-            'connect': [festivalId]
-          }
+          'event_type': eventType,
+          'event_id': eventId,
         },
       );
-      if (response.statusCode! ~/ 100 != 2) {
-        // Проверяем 2xx
+
+      if (response.statusCode != 200) {
         throw ApiException(
-            message:
-                'Failed to add favorite festival: ${response.statusMessage}');
+          message: 'Failed to add favorite $eventType: ${response.statusMessage}',
+          statusCode: response.statusCode,
+        );
       }
-      print('Added favorite festival, response: ${response.data}');
     } catch (e) {
       _handleError(e);
     }
   }
 
-  Future<void> removeFavoriteFestival(int userId, int festivalId) async {
-    try {
-      final response = await _dio.put(
-        ApiEndpoints.userById(userId),
-        data: {
-          'favourites_festivals': {
-            'disconnect': [festivalId]
-          }
-        },
-      );
-      if (response.statusCode! ~/ 100 != 2) {
-        throw ApiException(
-            message:
-                'Failed to remove favorite festival: ${response.statusMessage}');
-      }
-      print('Removed favorite festival, response: ${response.data}');
-    } catch (e) {
-      _handleError(e);
+// Удаление мероприятия из избранного
+  Future<void> removeFavorite(int userId, String eventType, int eventId) async {
+    if (!['festival', 'laboratory'].contains(eventType)) {
+      throw ApiException(message: 'Invalid event_type: $eventType');
     }
-  }
 
-  Future<void> addFavoriteLaboratory(int userId, int laboratoryId) async {
     try {
-      final response = await _dio.put(
-        ApiEndpoints.userById(userId),
-        data: {
-          'favourites_laboratories': {
-            'connect': [laboratoryId]
-          }
+      // Находим запись в Favorites
+      final response = await _dio.get(
+        ApiEndpoints.favorites,
+        queryParameters: {
+          'filters[users_permissions_user][id][\$eq]': userId,
+          'filters[event_type][\$eq]': eventType,
+          'filters[event_id][\$eq]': eventId,
         },
       );
-      if (response.statusCode! ~/ 100 != 2) {
-        throw ApiException(
-            message:
-                'Failed to add favorite laboratory: ${response.statusMessage}');
-      }
-      print('Added favorite laboratory, response: ${response.data}');
-    } catch (e) {
-      _handleError(e);
-    }
-  }
 
-  Future<void> removeFavoriteLaboratory(int userId, int laboratoryId) async {
-    try {
-      final response = await _dio.put(
-        ApiEndpoints.userById(userId),
-        data: {
-          'favourites_laboratories': {
-            'disconnect': [laboratoryId]
-          }
-        },
-      );
-      if (response.statusCode! ~/ 100 != 2) {
+      if (response.statusCode != 200) {
         throw ApiException(
-            message:
-                'Failed to remove favorite laboratory: ${response.statusMessage}');
+          message: 'Failed to find favorite $eventType: ${response.statusMessage}',
+          statusCode: response.statusCode,
+        );
       }
-      print('Removed favorite laboratory, response: ${response.data}');
+
+      print(response.data);
+
+      final data = response.data as List<dynamic>;
+      if (data.isEmpty) {
+        throw ApiException(message: 'Favorite $eventType not found');
+      }
+
+      final favoriteId = int.parse(data[0]['favoriteId'].toString());
+
+
+      //Удаляем запись
+      final deleteResponse = await _dio.delete(ApiEndpoints.favoriteById(favoriteId));
+
+      if (deleteResponse.statusCode != 200) {
+        throw ApiException(
+          message: 'Failed to remove favorite $eventType: ${deleteResponse.statusMessage}',
+          statusCode: deleteResponse.statusCode,
+        );
+      }
     } catch (e) {
       _handleError(e);
     }

@@ -234,6 +234,8 @@ import 'package:intl/intl.dart';
 import 'package:ltfest/components/async_items_list_view.dart';
 import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/components/favorite_button.dart';
+import 'package:ltfest/data/models/favorite.dart';
+import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/laboratory.dart';
@@ -395,7 +397,7 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                     CustomChipWithName(
                       selectedDirection: laboratory.direction.title,
                     ),
-                    FavoriteButton(item: laboratory)
+                    FavoriteButton(id: laboratory.id, eventType: EventType.laboratory)
                   ],
                 ),
               ),

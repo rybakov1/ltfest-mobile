@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/components/share_button.dart';
+import 'package:ltfest/data/models/favorite.dart';
 import 'package:ltfest/data/models/person.dart';
+import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -204,7 +206,7 @@ class FestivalDetailPage extends ConsumerWidget {
                         ),
                         child: Image.network(
                           'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
-                          height: 393,
+                          height: 390,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
@@ -241,11 +243,11 @@ class FestivalDetailPage extends ConsumerWidget {
                                     const Spacer(),
                                     ShareButton(link: festival.websiteurl ?? "https://ltfest.ru"),
                                     const SizedBox(width: 8),
-                                    FavoriteButtonDetails(item: festival),
+                                      FavoriteButtonDetails(id: festival.id, eventType: EventType.festival),
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 300),
+                              const SizedBox(height: 290),
                               Container(
                                 width: double.infinity,
                                 decoration: Decor.base,
