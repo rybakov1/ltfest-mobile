@@ -135,8 +135,9 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                           ),
                           const Spacer(),
                           LTButtons.elevatedButton(
-                            onPressed:
-                                canAuth && !isLoading ? _requestOtp : null,
+                            disabledForegroundColor: Palette.gray,
+                            foregroundColor: Palette.white,
+                            onPressed: _phoneController.text.isNotEmpty && canAuth && !isLoading ? _requestOtp : null,
                             child: isLoading
                                 ? CircularProgressIndicator(color: Palette.black)
                                 : Text('Получить код', style: Styles.button1),
@@ -154,7 +155,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                                           'Нажимая на кнопку "Получить код", я принимаю условия '),
                                   TextSpan(
                                     text: 'пользовательского соглашения',
-                                    style: TextStyle(color: Palette.secondary),
+                                    style: Styles.b4.copyWith(color: Palette.secondary),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launchUrl(Uri.parse(
@@ -164,7 +165,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                                   const TextSpan(text: ' и '),
                                   TextSpan(
                                     text: 'обработки персональных данных',
-                                    style: TextStyle(color: Palette.secondary),
+                                    style: Styles.b4.copyWith(color: Palette.secondary),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launchUrl(Uri.parse(

@@ -64,6 +64,7 @@ class RegistrationPage extends ConsumerStatefulWidget {
 class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final _formKeyStep1 = GlobalKey<FormState>();
   final _formKeyStep2 = GlobalKey<FormState>();
+  final ScrollController _scrollController = ScrollController();
 
   final _lastNameController = TextEditingController();
   final _firstNameController = TextEditingController();
@@ -92,6 +93,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     _residenceCityController.dispose();
     _collectiveNameController.dispose();
     _collectiveCityController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -153,7 +155,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.black,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(4.0),
@@ -203,6 +205,12 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       Expanded(
                         child: SingleChildScrollView(
                           // padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context)
+                                .viewInsets
+                                .bottom, // Увеличиваем отступ
+                          ),
+                          controller: _scrollController,
                           child: Form(
                             key: _formKeyStep1,
                             child: Column(
@@ -496,6 +504,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
               final bool isItemSelected = tempSelectedItem != null;
               return Padding(
                 padding: EdgeInsets.only(
+                  top: 16,
                   bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
                 ),
                 child: Column(
@@ -503,7 +512,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                   children: [
                     // --- Шапка модального окна ---
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 4, 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -520,42 +529,44 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       ),
                     ),
 
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: asyncValue.when(
-                          loading: () => _buildShimmerList(),
-                          error: (err, st) =>
-                              Center(child: Text('Ошибка: $err')),
-                          data: (items) {
-                            if (items.isEmpty) {
-                              return const Center(
-                                  child: Text("Нет данных для выбора"));
-                            }
-                            // ListView теперь сам по себе, без shrinkWrap, т.к. Flexible дает ему границы
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              // Оставляем shrinkWrap для работы внутри Column + Flexible
-                              itemCount: items.length,
-                              itemBuilder: (context, index) {
-                                final item = items[index];
-                                return _buildRadioListTile<T>(
-                                  title: itemBuilder(item),
-                                  value: item,
-                                  groupValue: tempSelectedItem,
-                                  onChanged: (newValue) {
-                                    setModalState(() {
-                                      tempSelectedItem = newValue;
-                                    });
-                                  },
-                                );
-                              },
-                            );
-                          },
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: asyncValue.when(
+                        loading: () => _buildShimmerList(),
+                        error: (err, st) => Center(child: Text('Ошибка: $err')),
+                        data: (items) {
+                          if (items.isEmpty) {
+                            return const Center(
+                                child: Text("Нет данных для выбора"));
+                          }
+                          // ListView теперь сам по себе, без shrinkWrap, т.к. Flexible дает ему границы
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            // Оставляем shrinkWrap для работы внутри Column + Flexible
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              final item = items[index];
+                              return Column(
+                                children: [
+                                  _buildRadioListTile<T>(
+                                    title: itemBuilder(item),
+                                    value: item,
+                                    groupValue: tempSelectedItem,
+                                    onChanged: (newValue) {
+                                      setModalState(() {
+                                        tempSelectedItem = newValue;
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(height: 20),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
-
+                    //SizedBox(height: 40),
                     // --- Футер модального окна (кнопка) ---
                     Padding(
                       padding: const EdgeInsets.only(left: 16.0, right: 16),
@@ -599,6 +610,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             value: value,
             groupValue: groupValue,
             onChanged: onChanged,
+            visualDensity: VisualDensity.compact,
             activeColor: Palette.secondary,
             fillColor: WidgetStateProperty.resolveWith<Color>((states) {
               if (states.contains(WidgetState.selected)) {
@@ -691,7 +703,7 @@ Widget _buildModalSelectorField({
           isDense: true,
           hintText: hint,
           hintStyle: Styles.b2.copyWith(color: Palette.gray),
-          suffixIcon: const Icon(Icons.chevron_right, size: 24),
+          suffixIcon: Icon(Icons.chevron_right, size: 20, color: Palette.gray),
           contentPadding:
               const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           border: OutlineInputBorder(
@@ -757,12 +769,54 @@ class CitySearchField extends StatelessWidget {
         const SizedBox(height: 6),
         TypeAheadField<String>(
           hideOnUnfocus: false,
+          controller: controller,
+          suggestionsCallback: _getCitySuggestions,
+          itemBuilder: (context, suggestion) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  child: Text(suggestion, style: Styles.b2),
+                ),
+              ],
+            );
+          },
+          onSelected: (suggestion) {
+            controller.text = suggestion;
+            FocusScope.of(context).unfocus();
+          },
+          emptyBuilder: (context) => Container(
+            height: 65,
+            decoration: BoxDecoration(
+                color: Palette.white, borderRadius: BorderRadius.circular(12)),
+            child: Center(
+                child: Text('Мы ничего не нашли',
+                    style: TextStyle(color: Palette.gray))),
+          ),
+          // вот это отвечает за фон подложки
+          decorationBuilder: (context, child) {
+            return Container(
+                decoration: BoxDecoration(
+                  color: Palette.white, // меняешь на свой
+                  border: Border.all(color: Palette.stroke),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: child);
+          },
           builder: (context, controller, focusNode) {
             return TextFormField(
               controller: controller,
               focusNode: focusNode,
               style: Styles.b2.copyWith(color: Palette.black),
               decoration: InputDecoration(
+                suffixIcon: Icon(
+                  Icons.keyboard_arrow_right,
+                  size: 20,
+                  color: Palette.gray,
+                ),
+                fillColor: Palette.white,
                 hintText: hint,
                 hintStyle: Styles.b2.copyWith(color: Palette.gray),
                 labelStyle: Styles.b2.copyWith(color: Palette.gray),
@@ -794,22 +848,6 @@ class CitySearchField extends StatelessWidget {
               },
             );
           },
-          controller: controller,
-          suggestionsCallback: _getCitySuggestions,
-          itemBuilder: (context, suggestion) {
-            return ListTile(title: Text(suggestion));
-          },
-          onSelected: (suggestion) {
-            // ИЗМЕНЕНИЕ 2: После выбора подсказки мы обновляем текст
-            // и ВРУЧНУЮ убираем фокус, чтобы закрыть клавиатуру и список.
-            controller.text = suggestion;
-            FocusScope.of(context).unfocus();
-          },
-          emptyBuilder: (context) => const Padding(
-            padding: EdgeInsets.all(12.0),
-            child:
-                Text('Город не найден', style: TextStyle(color: Colors.grey)),
-          ),
         ),
       ],
     );

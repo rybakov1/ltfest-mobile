@@ -222,7 +222,7 @@ class _ProfileCard extends ConsumerWidget {
                             // });
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
                         PriorityCard(
                           title: 'LT Gold',
                           discount: 'Скидка 10%',
@@ -241,7 +241,7 @@ class _ProfileCard extends ConsumerWidget {
                             // });
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
                         PriorityCard(
                           title: 'LT Platinum',
                           discount: 'Скидка 15%',
@@ -265,17 +265,18 @@ class _ProfileCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
-                LTButtons.elevatedButton(
-                  onPressed: () {},
-                  child: Text("Выберите карту", style: Styles.button1),
-                ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
+                // LTButtons.elevatedButton(
+                //   onPressed: () {},
+                //   child: Text("Выберите карту", style: Styles.button1),
+                // ),
+                // const SizedBox(height: 10),
                 LTButtons.elevatedButton(
                   onPressed: () {},
                   foregroundColor: Palette.secondary,
                   backgroundColor: Palette.white,
-                  child: Text("Подробнее на сайте", style: Styles.button1),
+                  child: Text("Подробнее на сайте",
+                      style: Styles.button1.copyWith(color: Palette.secondary)),
                 ),
               ],
             ),
@@ -313,10 +314,7 @@ class _ProfileCard extends ConsumerWidget {
                               ? "${user.ltpriority}"
                               : "Подробнее",
                           style: user.ltpriority != "Base1"
-                              ? const TextStyle(
-                                  fontFamily: "Unbounded",
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600)
+                              ? Styles.h6
                               : Styles.button1),
                     ],
                   )
@@ -359,8 +357,8 @@ class PriorityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isSelected = value == groupValue;
-    const Color selectedColor = Color(0xFFF9A825); // Оранжевый для выделения
+    // final bool isSelected = value == groupValue;
+    // const Color selectedColor = Color(0xFFF9A825); // Оранжевый для выделения
 
     return InkWell(
       // Делаем всю карточку кликабельной
@@ -372,20 +370,19 @@ class PriorityCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? selectedColor.withOpacity(0.7)
-                : Colors.grey.shade300,
-            width: isSelected ? 2.0 : 1.0,
+            color: Palette.stroke,
+            // isSelected ? selectedColor.withOpacity(0.7) :
+            width: 1.0, // isSelected ? 2.0 :
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: selectedColor.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  )
-                ]
-              : [],
+          // boxShadow: isSelected
+          //     ? [
+          //         BoxShadow(
+          //           color: selectedColor.withOpacity(0.1),
+          //           blurRadius: 8,
+          //           offset: const Offset(0, 4),
+          //         )
+          //       ]
+          //     : [],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,29 +395,23 @@ class PriorityCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Styles.h6,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       discount,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: Styles.b2,
                     ),
                   ],
                 ),
-                Radio<PriorityLevel>(
-                  value: value,
-                  groupValue: groupValue,
-                  onChanged: onChanged,
-                  activeColor: selectedColor,
-                  // Увеличим область нажатия для Radio
-                  materialTapTargetSize: MaterialTapTargetSize.padded,
-                ),
+                // Radio<PriorityLevel>(
+                //   value: value,
+                //   groupValue: groupValue,
+                //   onChanged: onChanged,
+                //   activeColor: selectedColor,
+                //   // Увеличим область нажатия для Radio
+                //   materialTapTargetSize: MaterialTapTargetSize.padded,
+                // ),
               ],
             ),
             const SizedBox(height: 20),
@@ -429,19 +420,15 @@ class PriorityCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 12.0),
                   child: Text(
                     feature,
-                    style: TextStyle(
-                        fontSize: 14, color: Colors.grey[800], height: 1.4),
+                    style: Styles.b2,
                   ),
                 )),
             const SizedBox(height: 8),
             Align(
-              alignment: Alignment.centerRight,
+              alignment: Alignment.center,
               child: Text(
                 price,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Styles.h3,
               ),
             ),
           ],

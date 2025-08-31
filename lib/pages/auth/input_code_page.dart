@@ -224,7 +224,7 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 12.0, top: 32, bottom: 20),
+                padding: const EdgeInsets.only(left: 12.0, top: 20, bottom: 20),
                 child: Container(
                   height: 43,
                   width: 43,

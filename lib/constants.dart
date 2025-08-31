@@ -32,34 +32,72 @@ class Palette {
 }
 
 class Styles {
-  static TextStyle h1 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w600, fontSize: 28);
-  static TextStyle h2 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w600, fontSize: 23);
-  static TextStyle h3 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w700, fontSize: 18);
-  static TextStyle h4 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w700, fontSize: 16);
-  static TextStyle h5 = const TextStyle(
+  static TextStyle h1 = TextStyle(
       fontFamily: "Mulish",
       fontWeight: FontWeight.w600,
-      fontSize: 15); // from 14
+      fontSize: 28,
+      color: Palette.black);
+  static TextStyle h2 = TextStyle(
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w600,
+      fontSize: 23,
+      color: Palette.black);
 
-  static TextStyle b1 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w400, fontSize: 16);
-  static TextStyle b2 = const TextStyle(
+  static TextStyle h3 = TextStyle(
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w700,
+      fontSize: 18,
+      color: Palette.black);
+
+  static TextStyle h4 = TextStyle(
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w700,
+      fontSize: 16,
+      color: Palette.black);
+
+  static TextStyle h5 = TextStyle(
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w600,
+      fontSize: 15,
+      color: Palette.black); // from 14
+
+  static TextStyle h6 = TextStyle(
+      fontFamily: "Unbounded",
+      fontWeight: FontWeight.w600,
+      fontSize: 24,
+      color: Palette.black); // from 14
+
+  static TextStyle b1 = TextStyle(
       fontFamily: "Mulish",
       fontWeight: FontWeight.w400,
-      fontSize: 15); // from 14
-  static TextStyle b3 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w400, fontSize: 12);
-  static TextStyle b4 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w400, fontSize: 10);
+      fontSize: 16,
+      color: Palette.black);
+  static TextStyle b2 = TextStyle(
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w400,
+      fontSize: 15,
+      color: Palette.black); // from 14
+  static TextStyle b3 = TextStyle(
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w400,
+      fontSize: 12,
+      color: Palette.black);
+  static TextStyle b4 = TextStyle(
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w400,
+      fontSize: 10,
+      color: Palette.black);
 
   static TextStyle button1 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w500, fontSize: 16);
-  static TextStyle button2 = const TextStyle(
-      fontFamily: "Mulish", fontWeight: FontWeight.w500, fontSize: 14);
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w500,
+      fontSize: 16);
+
+  static TextStyle button2 = TextStyle(
+      fontFamily: "Mulish",
+      fontWeight: FontWeight.w500,
+      fontSize: 14,
+      color: Palette.black);
 }
 
 class Decor {

@@ -6,11 +6,13 @@ import 'package:ltfest/router/router.dart';
 
 // 11.08 build
 void main() {
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.black, // Цвет фона статус-бара (можно изменить)
-    statusBarIconBrightness: Brightness.light, // Белые иконки для Android
-    statusBarBrightness: Brightness.dark, // Белые иконки для iOS
-  ));
+  // SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+  //   statusBarColor: Colors.white, // Цвет фона статус-бара (можно изменить)
+  //   statusBarIconBrightness: Brightness.light, // Белые иконки для Android
+  //   statusBarBrightness: Brightness.dark, // Белые иконки для iOS
+  // ));
+
+  // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -26,14 +28,9 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      theme: ThemeData.dark().copyWith(
         appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Colors.black, // Цвет фона статус-бара
-            statusBarIconBrightness: Brightness.light, // Белые иконки для Android
-            statusBarBrightness: Brightness.dark, // Белые иконки для iOS
-          ),
+          systemOverlayStyle: SystemUiOverlayStyle.light, // белые иконки
         ),
       ),
       locale: const Locale('ru'),
@@ -47,27 +44,44 @@ class MyApp extends ConsumerWidget {
       ],
       title: 'LT Fest',
       routerConfig: router,
-      builder: (context, child) {
-        if (child == null) return const SizedBox.shrink();
+        builder: (context, child) {
+          if (child == null) return const SizedBox.shrink();
 
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: const TextScaler.linear(
-              1.0,
-            ), // Игнор системный масштаб и "Жирный текст"
-          ),
-          child: Listener(
-            onPointerDown: (_) {
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus &&
-                  currentFocus.focusedChild != null) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(1.0),
+            ),
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent, // важно!
+              onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
-              }
-            },
-            child: child,
-          ),
-        );
-      },
+              },
+              child: child,
+            ),
+          );
+        }
+
+      // builder: (context, child) {
+      //   if (child == null) return const SizedBox.shrink();
+      //
+      //   return MediaQuery(
+      //     data: MediaQuery.of(context).copyWith(
+      //       textScaler: const TextScaler.linear(
+      //         1.0,
+      //       ), // Игнор системный масштаб и "Жирный текст"
+      //     ),
+      //     child: Listener(
+      //       onPointerDown: (_) {
+      //         FocusScopeNode currentFocus = FocusScope.of(context);
+      //         if (!currentFocus.hasPrimaryFocus &&
+      //             currentFocus.focusedChild != null) {
+      //           FocusManager.instance.primaryFocus?.unfocus();
+      //         }
+      //       },
+      //       child: child,
+      //     ),
+      //   );
+      // },
     );
   }
 }

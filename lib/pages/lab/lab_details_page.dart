@@ -19,13 +19,40 @@ import '../../data/models/person.dart';
 final tabIndexProvider = StateProvider<int>((ref) => 0);
 final learningTypeIndexProvider = StateProvider<int>((ref) => 0);
 
-class LaboratoryDetailPage extends ConsumerWidget {
+class LaboratoryDetailPage extends ConsumerStatefulWidget {
   final String id;
 
   const LaboratoryDetailPage({
     super.key,
     required this.id,
   });
+
+  @override
+  ConsumerState<LaboratoryDetailPage> createState() =>
+      _LaboratoryDetailPageState();
+}
+
+class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showHeader = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 120 && !_showHeader) {
+        setState(() => _showHeader = true);
+      } else if (_scrollController.offset <= 120 && _showHeader) {
+        setState(() => _showHeader = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _showPriceInfo(BuildContext context, laboratory) {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
@@ -209,8 +236,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final laboratoryAsync = ref.watch(laboratoryByIdProvider(id));
+  Widget build(BuildContext context) {
+    final laboratoryAsync = ref.watch(laboratoryByIdProvider(widget.id));
 
     return Scaffold(
       backgroundColor: Palette.black,
@@ -219,6 +246,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
           laboratoryAsync.when(
             data: (laboratory) {
               return SingleChildScrollView(
+                controller: _scrollController,
                 child: Column(
                   children: [
                     Stack(
@@ -265,7 +293,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
               child: GestureDetector(
                 onTap: () async {
                   final Uri uri = Uri.parse(
-                    laboratoryAsync.value!.websiteurl!, //TODO: not weburl its entryurl
+                    laboratoryAsync
+                        .value!.websiteurl!, //TODO: not weburl its entryurl
                   );
                   await launchUrl(
                     uri,
@@ -289,6 +318,90 @@ class LaboratoryDetailPage extends ConsumerWidget {
                 ),
               ),
             ),
+          ),
+          laboratoryAsync.when(
+            data: (laboratory) => AnimatedOpacity(
+              opacity: _showHeader ? 1 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Container(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + 16,
+                    left: 16,
+                    right: 16,
+                    bottom: 20),
+                height: 210,
+                decoration: BoxDecoration(
+                  color: Palette.black,
+                  borderRadius: const BorderRadius.only(
+                    bottomRight: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
+                          child: Container(
+                            width: 43,
+                            height: 43,
+                            color: const Color.fromRGBO(255, 255, 255, 0.5),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_back,
+                                color: Palette.white,
+                                size: 24,
+                              ),
+                              onPressed: () {
+                                context.pop();
+                              },
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        ShareButton(
+                            link: laboratory.websiteurl ?? "https://ltfest.ru"),
+                        const SizedBox(width: 8),
+                        FavoriteButtonDetails(
+                          id: laboratory.id,
+                          eventType: EventType.festival,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      laboratory.title,
+                      style: Styles.h3.copyWith(color: Palette.white),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () => _showPriceInfo(context, laboratory),
+                      child: Row(
+                        children: [
+                          Text(
+                            laboratory.learningTypes?.isNotEmpty ?? false
+                                ? "от ${(laboratory.learningTypes!.length > 2 ? laboratory.learningTypes![2].price : laboratory.learningTypes!.last.price)} ₽/чел"
+                                : "Цена недоступна",
+                            style: Styles.h4.copyWith(color: Palette.white),
+                          ),
+                          const SizedBox(width: 8),
+                          SvgPicture.asset('assets/icons/info.svg',
+                              color: Palette.white),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
           ),
         ],
       ),
@@ -324,8 +437,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
             child: Row(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.all(
-                      Radius.circular(12)),
+                  borderRadius: const BorderRadius.all(Radius.circular(12)),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(
                       sigmaX: 10.0,
@@ -334,8 +446,7 @@ class LaboratoryDetailPage extends ConsumerWidget {
                     child: Container(
                       width: 43,
                       height: 43,
-                      color: const Color.fromRGBO(
-                          255, 255, 255, 0.5),
+                      color: const Color.fromRGBO(255, 255, 255, 0.5),
                       child: IconButton(
                         icon: Icon(
                           Icons.arrow_back,
@@ -352,7 +463,8 @@ class LaboratoryDetailPage extends ConsumerWidget {
                 const Spacer(),
                 ShareButton(link: laboratory.websiteurl ?? "https://ltfest.ru"),
                 const SizedBox(width: 8),
-                FavoriteButtonDetails(id: laboratory.id, eventType: EventType.laboratory),
+                FavoriteButtonDetails(
+                    id: laboratory.id, eventType: EventType.laboratory),
               ],
             ),
           ),

@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/providers/auth_state.dart';
 import 'package:ltfest/providers/user_provider.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../data/models/direction.dart';
@@ -845,12 +844,12 @@ Widget _buildReadOnlySection(dynamic user) {
         const SizedBox(height: 16),
         _buildReadOnlyField(
             'ФИО', '${user?.lastname ?? ''}'.trim()), //${user?.firstname ?? ''}
-        const Divider(),
+         Divider(color: Palette.stroke),
         _buildReadOnlyField('Номер телефона', formatPhoneNumber(user?.phone)),
-        const Divider(),
+        Divider(color: Palette.stroke),
         _buildReadOnlyField('Дата рождения',
             DateFormat('dd.MM.yyyy', 'ru').format(user?.birthdate)),
-        const Divider(),
+        Divider(color: Palette.stroke),
         _buildReadOnlyField('Сфера деятельности',
             user?.activity?.title.toString() ?? 'Не указана'),
       ],

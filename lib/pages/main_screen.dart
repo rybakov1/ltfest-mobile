@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
@@ -48,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.child,
+      body:  widget.child,
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(bottom: 16, top: 16),
         color: Palette.white,

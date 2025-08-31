@@ -292,6 +292,7 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                     const SizedBox(height: 30),
                     TextField(
                       controller: _searchController,
+                      style: Styles.b2,
                       onChanged: (query) {
                         ref
                             .read(laboratoriesProvider.notifier)
@@ -397,7 +398,8 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                     CustomChipWithName(
                       selectedDirection: laboratory.direction.title,
                     ),
-                    FavoriteButton(id: laboratory.id, eventType: EventType.laboratory)
+                    FavoriteButton(
+                        id: laboratory.id, eventType: EventType.laboratory)
                   ],
                 ),
               ),

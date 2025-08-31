@@ -298,6 +298,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage> {
                         style: Styles.h3.copyWith(color: Palette.white)),
                     const SizedBox(height: 30),
                     TextField(
+                      style: Styles.b2,
                       controller: _searchController,
                       onChanged: (query) {
                         ref

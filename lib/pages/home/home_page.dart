@@ -4,14 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/constants.dart';
-import 'package:ltfest/data/models/favorite.dart';
-import 'package:ltfest/data/models/image_data.dart';
 import 'package:ltfest/providers/story_provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../components/banner_carousel.dart';
 import '../../components/custom_chip.dart';
-import '../../data/models/ltstory.dart';
+import '../../components/story_viewer.dart';
 import '../../data/models/news.dart';
 import '../../data/models/upcoming_events.dart';
 import '../../providers/auth_state.dart';
@@ -20,7 +17,6 @@ import '../../providers/news_provider.dart';
 import '../../providers/upcoming_provider.dart';
 import '../../providers/user_provider.dart';
 import 'more_items_page.dart';
-import 'package:story_view/story_view.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -29,7 +25,6 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final upcomingEvents = ref.watch(upcomingEventsProvider);
     final news = ref.watch(newsProvider);
-    // final banner = ref.watch(bannerProvider);
     final storiesAsync = ref.watch(storyProvider);
 
     return Scaffold(
@@ -65,29 +60,26 @@ class HomePage extends ConsumerWidget {
                                     ),
                                   )
                                 : ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: stories.length,
-                                    itemBuilder: (context, index) {
-                                      final story = stories[index];
-                                      return _buildStoryPreview(
-                                        context: context,
-                                        imageUrl:
-                                            'http://37.46.132.144:1337${story.preview!.formats?.thumbnail?.url}',
-                                        onTap: () {
-                                          Navigator.of(context,
-                                                  rootNavigator: true)
-                                              .push(
-                                            // <--- ИЗМЕНЕНИЕ ЗДЕСЬ
-                                            MaterialPageRoute(
-                                              builder: (context) => StoryViewer(
-                                                story: stories[index],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: stories.length,
+                              itemBuilder: (context, index) {
+                                final story = stories[index];
+                                return _buildStoryPreview(
+                                  context: context,
+                                  imageUrl: 'http://37.46.132.144:1337${story.preview!.formats?.thumbnail?.url}',
+                                  onTap: () {
+                                    Navigator.of(context, rootNavigator: true).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => StoryViewer(
+                                          stories: stories, // Pass the full list of stories
+                                          initialIndex: index, // Pass the index of the tapped story
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                             loading: () => _buildStoriesLoading(), // Shimmer
                             error: (error, stack) => Center(
                               child: Text(
@@ -275,7 +267,6 @@ class HomePage extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     CustomChipWithName(
                       selectedDirection: event.direction.title,
                     ),
@@ -446,14 +437,7 @@ class HomePage extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontFamily: "Mulish",
-          ),
-        ),
+        Text(title, style: Styles.h3),
         GestureDetector(
           onTap: () {
             if (title == 'Ближайшие мероприятия') {
@@ -534,137 +518,6 @@ class _HomeHeader extends ConsumerWidget {
         }
         return const SizedBox(height: 57);
       },
-    );
-  }
-}
-
-class StoryViewer extends StatefulWidget {
-  final LTStory story;
-
-  const StoryViewer({
-    super.key,
-    required this.story,
-  });
-
-  @override
-  StoryViewerState createState() => StoryViewerState();
-}
-
-class StoryViewerState extends State<StoryViewer> {
-  final StoryController _storyController = StoryController();
-
-  @override
-  void dispose() {
-    _storyController.dispose();
-    super.dispose();
-  }
-
-  // Функция для открытия ссылки
-  Future<void> _launchURL(String urlString) async {
-    final Uri uri = Uri.parse(urlString);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      // Показываем ошибку, если не удалось открыть ссылку
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Не удалось открыть ссылку: $urlString')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // 1. Получаем список медиа-элементов (без изменений)
-    final List<ImageData> mediaItems = widget.story.media!;
-    final List<StoryItem> storyItems = mediaItems.map((mediaItem) {
-      final mediaUrl = 'http://37.46.132.144:1337${mediaItem.url}';
-      final bool isVideo = mediaItem.mime.startsWith('video/');
-
-      if (isVideo) {
-        return StoryItem.pageVideo(
-          mediaUrl,
-          controller: _storyController,
-          caption: const Text(
-            "", //widget.story.title!,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-              backgroundColor: Colors.black54,
-              fontFamily: 'Mulish',
-            ),
-          ),
-        );
-      } else {
-        return StoryItem.pageImage(
-          url: mediaUrl,
-          controller: _storyController,
-          caption: const Text(
-            "", //widget.story.title!,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-              backgroundColor: Colors.black54,
-              fontFamily: 'Mulish',
-            ),
-          ),
-          duration: const Duration(seconds: 5),
-        );
-      }
-    }).toList();
-
-    // 2. Проверяем, есть ли ссылка для этой группы сторис
-    final bool hasLink =
-        widget.story.url != null && widget.story.url!.isNotEmpty;
-
-    // 3. Оборачиваем все в Stack, чтобы разместить кнопку поверх сторис
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Слой 1: Сам плеер сторис
-          StoryView(
-            storyItems: storyItems,
-            controller: _storyController,
-            onComplete: () {
-              Navigator.pop(context);
-            },
-            onStoryShow: (storyItem, index) {
-              print(
-                  "Показывается сторис №$index из группы '${widget.story.title}'");
-            },
-            onVerticalSwipeComplete: (direction) {
-              if (direction == Direction.down) {
-                Navigator.pop(context);
-              }
-            },
-            progressPosition: ProgressPosition.top,
-            repeat: false,
-            inline: false,
-            indicatorColor: Palette.gray,
-            indicatorForegroundColor: Palette.primaryLime,
-          ),
-
-          if (hasLink)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 20 +
-                        MediaQuery.of(context).padding.bottom), // Отступ снизу
-                width: double.infinity,
-                child: LTButtons.elevatedButton(
-                  onPressed: () {
-                    _storyController.pause();
-                    _launchURL(widget.story.url!).then((_) {
-                      _storyController.play();
-                    });
-                  },
-                  child: Text('Подробнее', style: Styles.button1),
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }

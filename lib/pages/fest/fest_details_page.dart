@@ -5,17 +5,42 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/components/share_button.dart';
-import 'package:ltfest/data/models/favorite.dart';
 import 'package:ltfest/data/models/person.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class FestivalDetailPage extends ConsumerWidget {
+class FestivalDetailPage extends ConsumerStatefulWidget {
   final String id;
 
   const FestivalDetailPage({super.key, required this.id});
+
+  @override
+  ConsumerState<FestivalDetailPage> createState() => _FestivalDetailPageState();
+}
+
+class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showHeader = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 120 && !_showHeader) {
+        setState(() => _showHeader = true);
+      } else if (_scrollController.offset <= 120 && _showHeader) {
+        setState(() => _showHeader = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _showPriceInfo(BuildContext context, festival) {
     showModalBottomSheet(
@@ -186,8 +211,8 @@ class FestivalDetailPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final festivalAsync = ref.watch(festivalByIdProvider(id));
+  Widget build(BuildContext context) {
+    final festivalAsync = ref.watch(festivalByIdProvider(widget.id));
 
     return Scaffold(
       backgroundColor: Palette.black,
@@ -195,6 +220,7 @@ class FestivalDetailPage extends ConsumerWidget {
         children: [
           festivalAsync.when(
             data: (festival) => SingleChildScrollView(
+              controller: _scrollController,
               child: Column(
                 children: [
                   Stack(
@@ -241,9 +267,13 @@ class FestivalDetailPage extends ConsumerWidget {
                                       ),
                                     ),
                                     const Spacer(),
-                                    ShareButton(link: festival.websiteurl ?? "https://ltfest.ru"),
+                                    ShareButton(
+                                        link: festival.websiteurl ??
+                                            "https://ltfest.ru"),
                                     const SizedBox(width: 8),
-                                      FavoriteButtonDetails(id: festival.id, eventType: EventType.festival),
+                                    FavoriteButtonDetails(
+                                        id: festival.id,
+                                        eventType: EventType.festival),
                                   ],
                                 ),
                               ),
@@ -341,24 +371,19 @@ class FestivalDetailPage extends ConsumerWidget {
                                           );
                                         },
                                         child: Container(
+                                          height: 43,
                                           width: double.infinity,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12),
                                           decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                             border: Border.all(
-                                              color: Palette.black,
+                                              color: Palette.stroke,
                                             ),
                                           ),
-                                          child: const Center(
-                                            child: Text(
-                                              "Подробнее в положении",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 16,
-                                              ),
-                                            ),
+                                          child: Center(
+                                            child: Text("Подробнее в положении",
+                                                style: Styles.button1.copyWith(
+                                                    color: Palette.black)),
                                           ),
                                         ),
                                       ),
@@ -538,6 +563,88 @@ class FestivalDetailPage extends ConsumerWidget {
                 ),
               ),
             ),
+          ),
+          festivalAsync.when(
+            data: (festival) => AnimatedOpacity(
+              opacity: _showHeader ? 1 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Container(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + 16,
+                    left: 16,
+                    right: 16,
+                    bottom: 20),
+                height: 210,
+                decoration: BoxDecoration(
+                  color: Palette.black,
+                  borderRadius: const BorderRadius.only(
+                    bottomRight: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
+                          child: Container(
+                            width: 43,
+                            height: 43,
+                            color: const Color.fromRGBO(255, 255, 255, 0.5),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_back,
+                                color: Palette.white,
+                                size: 24,
+                              ),
+                              onPressed: () {
+                                context.pop();
+                              },
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        ShareButton(
+                            link: festival.websiteurl ?? "https://ltfest.ru"),
+                        const SizedBox(width: 8),
+                        FavoriteButtonDetails(
+                          id: festival.id,
+                          eventType: EventType.festival,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      festival.title,
+                      style: Styles.h3.copyWith(color: Palette.white),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () => _showPriceInfo(context, festival),
+                      child: Row(
+                        children: [
+                          Text(
+                            "от ${festival.price} ₽/чел",
+                            style: Styles.h4.copyWith(color: Palette.white),
+                          ),
+                          const SizedBox(width: 8),
+                          SvgPicture.asset('assets/icons/info.svg',
+                              color: Palette.stroke),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
           ),
         ],
       ),
