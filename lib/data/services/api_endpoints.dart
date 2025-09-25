@@ -16,20 +16,17 @@ abstract class ApiEndpoints {
   static const String news = '/api/news';
   static const String banners = '/api/banners';
   static const String stories = '/api/stories';
+  static const String products = '/api/products';
 
+  static String productById(String id) =>  '/api/products?filters[id][\$eq]=$id';
   static String newsById(String id) => '/api/news?filters[id][\$eq]=$id';
-
   static String festivalById(String id) =>
       '/api/festivals?filters[id][\$eq]=$id&populate[0]=direction&populate[1]=persons.image&populate[2]=image';
-
   static String laboratoryById(String id) =>
       '/api/laboratories?filters[id][\$eq]=$id&populate[0]=direction&populate[1]=learning_types&populate[2]=days&populate[3]=image&populate[4]=persons.image&populate[5]=days.laboratory_day_events';
-
   static String festivalsByDirection(String direction) =>
       '/api/festivals?filters[direction][title][\$eq]=$direction';
-
   static String laboratoriesByDirection(String direction) =>
       '/api/laboratories?filters[direction][title][\$eq]=$direction';
-
   static String userById(int id) => '/api/users/$id';
 }

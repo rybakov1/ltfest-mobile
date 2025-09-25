@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/models/laboratory.dart';
 import 'package:ltfest/data/services/api_service.dart';
 import 'package:ltfest/providers/direction_provider.dart';

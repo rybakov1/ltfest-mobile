@@ -8,6 +8,7 @@ class AsyncItemsListView extends StatelessWidget {
   final List<dynamic> items; // Отфильтрованный список
   final Widget Function(BuildContext context, int index) itemBuilder;
   final VoidCallback onRefresh;
+  final ScrollController? scrollController;
 
   const AsyncItemsListView({
     super.key,
@@ -15,6 +16,7 @@ class AsyncItemsListView extends StatelessWidget {
     required this.items,
     required this.itemBuilder,
     required this.onRefresh,
+    this.scrollController,
   });
 
   @override
@@ -34,9 +36,10 @@ class AsyncItemsListView extends StatelessWidget {
         }
         // Успешная загрузка и есть данные для отображения
         return ListView.builder(
-          shrinkWrap: true,
+          //shrinkWrap: true,
+          controller: scrollController,
           physics: const ClampingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 12),
           itemCount: items.length,
           itemBuilder: itemBuilder,
         );

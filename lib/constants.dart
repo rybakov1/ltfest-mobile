@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class Utils {
@@ -7,6 +8,15 @@ class Utils {
     filter: {"#": RegExp(r'[0-9]')},
     type: MaskAutoCompletionType.lazy,
   );
+
+  static String formatMoney(int amount) {
+    final formatter = NumberFormat.currency(
+      locale: 'ru_RU',
+      symbol: '₽',
+      decimalDigits: 0,
+    );
+    return formatter.format(amount).replaceAll(',', ' ');
+  }
 }
 
 class Palette {
@@ -33,77 +43,92 @@ class Palette {
 
 class Styles {
   static TextStyle h1 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w600,
-      fontSize: 28,
-      color: Palette.black);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w600,
+    fontSize: 28,
+    color: Palette.black,
+  );
+
   static TextStyle h2 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w600,
-      fontSize: 23,
-      color: Palette.black);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w600,
+    fontSize: 23,
+    color: Palette.black,
+  );
 
   static TextStyle h3 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w700,
-      fontSize: 18,
-      color: Palette.black);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w700,
+    fontSize: 18,
+    color: Palette.black,
+  );
 
   static TextStyle h4 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w700,
-      fontSize: 16,
-      color: Palette.black);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w700,
+    fontSize: 16,
+    color: Palette.black,
+  );
 
   static TextStyle h5 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w600,
-      fontSize: 15,
-      color: Palette.black); // from 14
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w600,
+    fontSize: 15,
+    color: Palette.black,
+  ); // from 14
 
   static TextStyle h6 = TextStyle(
-      fontFamily: "Unbounded",
-      fontWeight: FontWeight.w600,
-      fontSize: 24,
-      color: Palette.black); // from 14
+    fontFamily: "Unbounded",
+    fontWeight: FontWeight.w600,
+    fontSize: 24,
+    color: Palette.black,
+  ); // from 14
 
   static TextStyle b1 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w400,
-      fontSize: 16,
-      color: Palette.black);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w400,
+    fontSize: 16,
+    color: Palette.black,
+  );
+
   static TextStyle b2 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w400,
-      fontSize: 15,
-      color: Palette.black); // from 14
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w400,
+    fontSize: 15,
+    color: Palette.black,
+  ); // from 14
+
   static TextStyle b3 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w400,
-      fontSize: 12,
-      color: Palette.black);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w400,
+    fontSize: 12,
+    color: Palette.black,
+  );
+
   static TextStyle b4 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w400,
-      fontSize: 10,
-      color: Palette.black);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w400,
+    fontSize: 10,
+    color: Palette.black,
+  );
 
   static TextStyle button1 = const TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w500,
-      fontSize: 16);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w500,
+    fontSize: 16,
+  );
 
   static TextStyle button2 = TextStyle(
-      fontFamily: "Mulish",
-      fontWeight: FontWeight.w500,
-      fontSize: 14,
-      color: Palette.black);
+    fontFamily: "Mulish",
+    fontWeight: FontWeight.w500,
+    fontSize: 14,
+    color: Palette.black,
+  );
 }
 
 class Decor {
   static BoxDecoration base = BoxDecoration(
-    color: Colors.white,
-    border: Border.all(),
+    color: Palette.white,
     borderRadius: BorderRadius.circular(12),
   );
 }
@@ -139,7 +164,6 @@ class LTButtons {
     );
   }
 
-  // Пример метода для другой стилизации кнопки (например, вторичная кнопка)
   static Widget secondaryButton({
     required VoidCallback? onPressed,
     required Widget child,

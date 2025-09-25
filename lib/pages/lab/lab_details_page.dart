@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
-import 'package:ltfest/data/models/favorite.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
@@ -240,7 +239,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
     final laboratoryAsync = ref.watch(laboratoryByIdProvider(widget.id));
 
     return Scaffold(
-      backgroundColor: Palette.black,
+      backgroundColor: Palette.background,
       body: Stack(
         children: [
           laboratoryAsync.when(
@@ -252,15 +251,17 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                     Stack(
                       children: [
                         ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(12),
-                              bottomRight: Radius.circular(12),
-                            ),
-                            child: Image.network(
-                                'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}',
-                                height: 393,
-                                width: double.infinity,
-                                fit: BoxFit.cover)),
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
+                          child: Image.network(
+                            'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}',
+                            height: 340,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                         SafeArea(child: content(context, ref, laboratory)),
                       ],
                     ),
@@ -276,6 +277,88 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
           Positioned(
             left: 0,
             right: 0,
+            top: 0,
+            child: laboratoryAsync.when(
+              data: (laboratory) => AnimatedOpacity(
+                opacity: _showHeader ? 1 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: Container(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + 16,
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Palette.background,
+                    borderRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(12),
+                      bottomLeft: Radius.circular(12),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(12)),
+                            child: Container(
+                              width: 43,
+                              height: 43,
+                              color: Palette.primaryLime,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: Palette.white,
+                                  size: 24,
+                                ),
+                                onPressed: () {
+                                  context.pop();
+                                },
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          ShareButton(
+                              link:
+                                  laboratory.websiteurl ?? "https://ltfest.ru",
+                              color: Palette.primaryLime),
+                          const SizedBox(width: 8),
+                          FavoriteButtonDetails(
+                            id: laboratory.id,
+                            eventType: EventType.laboratory,
+                            color: Palette.primaryLime,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        laboratory.title,
+                        style: Styles.h3.copyWith(color: Palette.black),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание",
+                        style: Styles.b2.copyWith(color: Palette.gray),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (error, stack) => const SizedBox.shrink(),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
             bottom: 0,
             child: Container(
               decoration: BoxDecoration(
@@ -286,10 +369,11 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                 color: Palette.white,
               ),
               padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom,
-                  top: 24,
-                  right: 16,
-                  left: 16),
+                bottom: MediaQuery.of(context).padding.bottom,
+                top: 24,
+                right: 16,
+                left: 16,
+              ),
               child: GestureDetector(
                 onTap: () async {
                   final Uri uri = Uri.parse(
@@ -311,97 +395,13 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Text("Заявка на обучение",
+                      child: Text("Оплатить",
                           style: Styles.button1.copyWith(color: Colors.white)),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          laboratoryAsync.when(
-            data: (laboratory) => AnimatedOpacity(
-              opacity: _showHeader ? 1 : 0,
-              duration: const Duration(milliseconds: 200),
-              child: Container(
-                padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + 16,
-                    left: 16,
-                    right: 16,
-                    bottom: 20),
-                height: 210,
-                decoration: BoxDecoration(
-                  color: Palette.black,
-                  borderRadius: const BorderRadius.only(
-                    bottomRight: Radius.circular(12),
-                    bottomLeft: Radius.circular(12),
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(12)),
-                          child: Container(
-                            width: 43,
-                            height: 43,
-                            color: const Color.fromRGBO(255, 255, 255, 0.5),
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.arrow_back,
-                                color: Palette.white,
-                                size: 24,
-                              ),
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        ShareButton(
-                            link: laboratory.websiteurl ?? "https://ltfest.ru"),
-                        const SizedBox(width: 8),
-                        FavoriteButtonDetails(
-                          id: laboratory.id,
-                          eventType: EventType.festival,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      laboratory.title,
-                      style: Styles.h3.copyWith(color: Palette.white),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: () => _showPriceInfo(context, laboratory),
-                      child: Row(
-                        children: [
-                          Text(
-                            laboratory.learningTypes?.isNotEmpty ?? false
-                                ? "от ${(laboratory.learningTypes!.length > 2 ? laboratory.learningTypes![2].price : laboratory.learningTypes!.last.price)} ₽/чел"
-                                : "Цена недоступна",
-                            style: Styles.h4.copyWith(color: Palette.white),
-                          ),
-                          const SizedBox(width: 8),
-                          SvgPicture.asset('assets/icons/info.svg',
-                              color: Palette.white),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
           ),
         ],
       ),
@@ -419,21 +419,12 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
       });
     }
 
-    String formatMoney(int amount) {
-      final formatter = NumberFormat.currency(
-        locale: 'ru_RU',
-        symbol: '₽',
-        decimalDigits: 0,
-      );
-      return formatter.format(amount).replaceAll(',', ' ');
-    }
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.only(left: 12.0, right: 12, top: 16),
             child: Row(
               children: [
                 ClipRRect(
@@ -461,14 +452,18 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                   ),
                 ),
                 const Spacer(),
-                ShareButton(link: laboratory.websiteurl ?? "https://ltfest.ru"),
+                ShareButton(
+                    link: laboratory.websiteurl ?? "https://ltfest.ru",
+                    color: const Color.fromRGBO(255, 255, 255, 0.5)),
                 const SizedBox(width: 8),
                 FavoriteButtonDetails(
-                    id: laboratory.id, eventType: EventType.laboratory),
+                    id: laboratory.id,
+                    eventType: EventType.laboratory,
+                    color: const Color.fromRGBO(255, 255, 255, 0.5)),
               ],
             ),
           ),
-          const SizedBox(height: 300),
+          SizedBox(height: 205 + MediaQuery.of(context).padding.top),
           Container(
             width: double.infinity,
             decoration: Decor.base,
@@ -482,14 +477,19 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                     laboratory.title,
                     style: Styles.h3,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
+                  Text(
+                    "ОписаниеОписаниеОписаниеОписаниеОписаниеОписание",
+                    style: Styles.b2.copyWith(color: Palette.gray),
+                  ),
+                  const SizedBox(height: 8),
                   GestureDetector(
                     onTap: () => _showPriceInfo(context, laboratory),
                     child: Row(
                       children: [
                         Text(
                           laboratory.learningTypes?.isNotEmpty ?? false
-                              ? "от ${(laboratory.learningTypes!.length > 2 ? laboratory.learningTypes![2].price : laboratory.learningTypes!.last.price)} ₽/чел"
+                              ? "от ${(laboratory.learningTypes!.length > 2 ? Utils.formatMoney(laboratory.learningTypes![2].price) : Utils.formatMoney(laboratory.learningTypes!.last.price))}/чел"
                               : "Цена недоступна",
                           style: Styles.h4.copyWith(color: Palette.gray),
                         ),
@@ -498,18 +498,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      SvgPicture.asset('assets/icons/calendar.svg'),
-                      const SizedBox(width: 12),
-                      Text(
-                        "${DateFormat("dd.MM.yyyy", "ru").format(laboratory.firstDayDate!)} - ${DateFormat("dd.MM.yyyy", "ru").format(laboratory.lastDayDate!)}",
-                        style: Styles.b2.copyWith(color: Palette.gray),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   Row(
                     children: [
                       SvgPicture.asset('assets/icons/map_point.svg'),
@@ -517,6 +506,17 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                       Text(
                         laboratory.address ?? 'Не указано',
                         style: Styles.b2,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      SvgPicture.asset('assets/icons/calendar.svg'),
+                      const SizedBox(width: 12),
+                      Text(
+                        "${DateFormat("dd", "ru").format(laboratory.firstDayDate!)} - ${DateFormat("dd", "ru").format(laboratory.lastDayDate!)} ${DateFormat("MMMM yyyy", "ru").format(laboratory.firstDayDate!)}",
+                        style: Styles.b2.copyWith(color: Palette.black),
                       ),
                     ],
                   ),
@@ -591,7 +591,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 24),
                   if (tabIndex == 0) ...[
                     Text(
                       "Описание",
@@ -604,8 +604,8 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      "Преподаватели",
-                      style: Styles.h4,
+                      "Ведущий лаборатории",
+                      style: Styles.h3,
                     ),
                     const SizedBox(height: 16),
                     laboratory.persons?.isNotEmpty ?? false
@@ -828,7 +828,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                                               .copyWith(color: Palette.gray),
                                         ),
                                         Text(
-                                          formatMoney(laboratory
+                                          Utils.formatMoney(laboratory
                                               .learningTypes![i].price),
                                           style: Styles.b3,
                                         ),
@@ -922,6 +922,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // TODO: icons
                       SvgPicture.asset('assets/icons/calendar.svg', width: 16),
                       const SizedBox(width: 16),
                       Expanded(

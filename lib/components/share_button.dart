@@ -4,10 +4,12 @@ import 'package:share_plus/share_plus.dart';
 
 class ShareButton extends StatelessWidget {
   final String link;
+  final Color color;
 
   const ShareButton({
     super.key,
     required this.link,
+    required this.color,
   });
 
   @override
@@ -20,7 +22,7 @@ class ShareButton extends StatelessWidget {
           height: 43,
           width: 43,
           decoration: BoxDecoration(
-            color: const Color.fromRGBO(255, 255, 255, 0.5),
+            color: color,
             borderRadius: BorderRadius.circular(12),
           ),
           child: IconButton(

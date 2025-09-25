@@ -108,7 +108,7 @@ class MorePage extends ConsumerWidget {
                     iconPath: 'assets/icons/favourite.svg',
                     title: "Избранное",
                     onTap: () {
-                      context.push(AppRoutes.favorites);
+                      context.push("${AppRoutes.more}/${AppRoutes.favorites}");
                     },
                   ),
                 ],
@@ -127,21 +127,21 @@ class MorePage extends ConsumerWidget {
                         iconPath: 'assets/icons/person.svg',
                         title: "Настройки аккаунта",
                         onTap: () {
-                          context.push(AppRoutes.accountSettings);
+                          context.push("${AppRoutes.more}/${AppRoutes.user}");
                         },
                       ),
                       _MenuTile(
                         iconPath: 'assets/icons/settings.svg',
                         title: "Настройки приложения",
                         onTap: () {
-                          context.push(AppRoutes.appSettings);
+                          context.push("${AppRoutes.more}/${AppRoutes.settings}");
                         },
                       ),
                       _MenuTile(
                         iconPath: 'assets/icons/info.svg',
                         title: "О приложении",
                         onTap: () {
-                          context.push(AppRoutes.about);
+                          context.push("${AppRoutes.more}/${AppRoutes.about}");
                         },
                       ),
                       const Spacer(),
@@ -171,6 +171,11 @@ class _ProfileCard extends ConsumerWidget {
   _ProfileCard();
 
   PriorityLevel? _selectedPriority;
+
+  Future<void> _launchUrl(String urlString) async {
+    final uri = Uri.parse(urlString);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
 
   void _showLTPriorityPopup(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
@@ -272,7 +277,9 @@ class _ProfileCard extends ConsumerWidget {
                 // ),
                 // const SizedBox(height: 10),
                 LTButtons.elevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _launchUrl('https://ltfest.ru/priority');
+                  },
                   foregroundColor: Palette.secondary,
                   backgroundColor: Palette.white,
                   child: Text("Подробнее на сайте",
@@ -359,6 +366,8 @@ class PriorityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // final bool isSelected = value == groupValue;
     // const Color selectedColor = Color(0xFFF9A825); // Оранжевый для выделения
+
+
 
     return InkWell(
       // Делаем всю карточку кликабельной

@@ -1,40 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/constants.dart';
-import 'package:ltfest/providers/story_provider.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:ltfest/pages/shop/presenter/shop_widget.dart';
+import 'package:ltfest/router/app_routes.dart';
 import '../../components/banner_carousel.dart';
-import '../../components/custom_chip.dart';
-import '../../components/story_viewer.dart';
-import '../../data/models/news.dart';
-import '../../data/models/upcoming_events.dart';
-import '../../providers/auth_state.dart';
-import '../../providers/favorites_provider.dart';
-import '../../providers/news_provider.dart';
-import '../../providers/upcoming_provider.dart';
-import '../../providers/user_provider.dart';
-import 'more_items_page.dart';
+import '../../components/news_widget.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final upcomingEvents = ref.watch(upcomingEventsProvider);
-    final news = ref.watch(newsProvider);
-    final storiesAsync = ref.watch(storyProvider);
-
     return Scaffold(
-      backgroundColor: Palette.black,
+      backgroundColor: Palette.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _HomeHeader(),
+              header(),
               Padding(
                 padding: const EdgeInsets.all(4),
                 child: Container(
@@ -45,126 +30,148 @@ class HomePage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // --- Сторисы ---
-                        SizedBox(
-                          height: 96,
-                          child: storiesAsync.when(
-                            data: (stories) => stories.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      'Нет доступных сторис',
-                                      style: TextStyle(
-                                        color: Palette.gray,
-                                        fontFamily: 'Mulish',
-                                      ),
-                                    ),
-                                  )
-                                : ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: stories.length,
-                              itemBuilder: (context, index) {
-                                final story = stories[index];
-                                return _buildStoryPreview(
-                                  context: context,
-                                  imageUrl: 'http://37.46.132.144:1337${story.preview!.formats?.thumbnail?.url}',
-                                  onTap: () {
-                                    Navigator.of(context, rootNavigator: true).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => StoryViewer(
-                                          stories: stories, // Pass the full list of stories
-                                          initialIndex: index, // Pass the index of the tapped story
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                            loading: () => _buildStoriesLoading(), // Shimmer
-                            error: (error, stack) => Center(
-                              child: Text(
-                                'Ошибка загрузки сторис: $error',
-                                style: TextStyle(
-                                  color: Palette.gray,
-                                  fontFamily: 'Mulish',
-                                ),
+                        //StoryWidget(),
+                        //SizedBox(height: 32),
+                        //UpcomingEventsWidget(),
+                        //SizedBox(height: 32),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildCategoryButton(
+                                color: Palette.primaryLime,
+                                imagePath: 'assets/images/teatr.png',
+                                label: 'Театр',
+                                size: 90,
+                                offset: 30,
+                                onTap: () => context
+                                    .push("${AppRoutes.festivals}/Театр"),
                               ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-
-                        // --- Ближайшие мероприятия ---
-                        _buildSectionHeader(
-                            'Ближайшие мероприятия', context, ref),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          height: 260,
-                          child: upcomingEvents.when(
-                            data: (events) => ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              shrinkWrap: true,
-                              itemCount: events.length > 4 ? 4 : events.length,
-                              itemBuilder: (context, index) {
-                                final event = events[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 12),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      if (event.type == EventType.festival) {
-                                        context.push('/fest/${event.id}');
-                                      } else {
-                                        context.push('/lab/${event.id}');
-                                      }
-                                    },
-                                    child: _buildEventCard(
-                                        event: event,
-                                        imageUrl: event.image!,
-                                        ref: ref),
-                                  ),
-                                );
-                              },
+                            const SizedBox(width: 24),
+                            Expanded(
+                              child: _buildCategoryButton(
+                                color: Palette.primaryPink,
+                                imagePath: 'assets/images/dance.png',
+                                label: 'Танцы',
+                                size: 80,
+                                offset: 20,
+                                onTap: () => context
+                                    .push("${AppRoutes.festivals}/Танцы"),
+                              ),
                             ),
-                            loading: () => _buildEventsLoading(), // Shimmer
-                            error: (error, stack) => Center(
-                              child: Text('Ошибка: $error'),
-                            ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(height: 32),
-                        const BannerCarousel(),
-                        const SizedBox(height: 20),
-                        // --- Последние новости ---
-                        _buildSectionHeader('Последние новости', context, ref),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         SizedBox(
-                          height: 250,
-                          child: news.when(
-                            data: (news) => ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              shrinkWrap: true,
-                              itemCount: news.length,
-                              itemBuilder: (context, index) {
-                                final article = news[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 12),
-                                  child: GestureDetector(
-                                    onTap: () {},
-                                    child: _buildNewsCard(
-                                      title: article.title,
-                                      date: article.date,
-                                      imageUrl: article.image!.url,
+                          height: 194,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: _buildCategoryButton(
+                                        imagePath: 'assets/images/lab_logo.png',
+                                        color: Palette.gray,
+                                        size: 90,
+                                        offset: 20,
+                                        label: 'Лаборатории',
+                                        isGradient: true,
+                                        onTap: () => context
+                                            .push(AppRoutes.laboratories),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                            loading: () => _buildNewsLoading(), // Shimmer
-                            error: (error, stack) => Center(
-                              child: Text('Ошибка: $error'),
-                            ),
+                                    const SizedBox(height: 24),
+                                    Expanded(
+                                      child: _buildCategoryButton(
+                                        imagePath:
+                                            'assets/images/concierge.png',
+                                        color: Palette.gray,
+                                        size: 75,
+                                        offset: 15,
+                                        label: 'LT Консьерж',
+                                        isGradient: true,
+                                        onTap: () {},
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                child: _buildServiceCard(
+                                  imagePath: 'assets/images/lt_coin.png',
+                                  label: 'LT Coin',
+                                  onTap: () {},
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          height: 89,
+                          child: GridView.count(
+                            scrollDirection: Axis.horizontal,
+                            crossAxisCount: 1,
+                            children: [
+                              _buildServiceCard(
+                                imagePath: 'assets/images/lt_winner.png',
+                                label: 'LT Winner',
+                                isSmall: true,
+                                onTap: () {},
+                              ),
+                              _buildServiceCard(
+                                imagePath: 'assets/images/lt_pay.png',
+                                label: 'LT Pay',
+                                isSmall: true,
+                                onTap: () {},
+                              ),
+                              _buildServiceCard(
+                                imagePath: 'assets/images/lt_travel.png',
+                                label: 'LT Travel',
+                                isSmall: true,
+                                onTap: () {},
+                              ),
+                              _buildServiceCard(
+                                imagePath: 'assets/images/lt_priority.png',
+                                label: 'LT Priority',
+                                isSmall: true,
+                                onTap: () {},
+                              ),
+                              _buildServiceCard(
+                                imagePath: 'assets/images/lt_camp.png',
+                                label: 'LT Camp',
+                                isSmall: true,
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        const BannerCarousel(),
+                        const SizedBox(height: 24),
+                        const NewsWidget(),
+                        const SizedBox(height: 24),
+                        // Text("LT Shop", style: Styles.h3), // TODO: LT SHOP
+                        // const SizedBox(height: 24),
+                        const ShopWidget(),
+                        // Container(
+                        //   height: 180,
+                        //   width: double.infinity,
+                        //   decoration: BoxDecoration(
+                        //     borderRadius: BorderRadius.circular(8),
+                        //     color: Palette.background,
+                        //   ),
+                        //   child: Center(
+                        //     child: Text(
+                        //       "Скоро",
+                        //       style: Styles.h4,
+                        //     ),
+                        //   ),
+                        // )
                       ],
                     ),
                   ),
@@ -177,347 +184,157 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildStoryPreview({
-    required BuildContext context,
-    required String imageUrl,
+  Widget _buildServiceCard({
+    required String imagePath,
+    required String label,
     required VoidCallback onTap,
+    bool isSmall = false,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 3.0),
-      child: GestureDetector(
+    if (isSmall) {
+      return GestureDetector(
         onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(width: 1.5, color: Palette.primaryLime),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: imageUrl.startsWith('http')
-                  ? Image.network(
-                      imageUrl,
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Image.asset(
-                        'assets/images/ex.png',
-                        width: 90,
-                        height: 90,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : Image.asset(
-                      imageUrl,
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                    ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 68,
+              width: 67,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromRGBO(240, 242, 245, 1),
+                    Color.fromRGBO(231, 234, 237, 1),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.asset(imagePath, fit: BoxFit.cover),
+              ),
+            ),
+            Text(label, style: Styles.h5),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromRGBO(240, 242, 245, 1),
+                    Color.fromRGBO(231, 234, 237, 1),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
-        ),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Styles.h5,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildEventCard({
-    required UpcomingEvent event,
-    required String imageUrl,
-    required WidgetRef ref, // Требуется для доступа к провайдерам
+  Widget _buildCategoryButton({
+    required Color color,
+    required String imagePath,
+    required String label,
+    required double size,
+    required double offset,
+    required VoidCallback onTap,
+    bool isGradient = false,
   }) {
-    final location =
-        event.address != null && event.address!.toLowerCase().contains('онлайн')
-            ? event.address!
-            : event.address ?? 'Онлайн';
-
-    return SizedBox(
-      width: 270,
+    return GestureDetector(
+      onTap: onTap,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
             children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: imageUrl.isNotEmpty
-                    ? Image.network(
-                        "http://37.46.132.144:1337$imageUrl",
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.asset(
-                          'assets/images/ex.png',
-                          height: 150,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Image.asset(
-                        'assets/images/ex.png',
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+              Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: isGradient ? null : color,
+                  gradient: isGradient
+                      ? const LinearGradient(
+                          colors: [
+                            Color.fromRGBO(240, 242, 245, 1),
+                            Color.fromRGBO(231, 234, 237, 1),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(18),
+                ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomChipWithName(
-                      selectedDirection: event.direction.title,
-                    ),
-                    FavoriteButton(id: event.id, eventType: event.type)
-                  ],
+              Positioned(
+                top: -offset,
+                child: Image.asset(
+                  imagePath,
+                  height: size,
+                  fit: BoxFit.cover,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            event.title,
-            style: Styles.h4,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          Text(location, style: Styles.b2.copyWith(color: Palette.gray)),
-          Text(event.date, style: Styles.b2.copyWith(color: Palette.gray)),
+          Text(label, style: Styles.h5)
         ],
       ),
     );
   }
 
-  Widget _buildStoriesLoading() {
-    return Shimmer.fromColors(
-      baseColor: Palette.shimmerBase,
-      highlightColor: Palette.shimmerHighlight,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 5, // Отображаем 5 заглушек
-        itemBuilder: (_, __) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3.0),
-          child: Container(
-            width: 96,
-            height: 96,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEventsLoading() {
-    return Shimmer.fromColors(
-      baseColor: Palette.shimmerBase,
-      highlightColor: Palette.shimmerHighlight,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 2,
-        itemBuilder: (_, __) => Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: SizedBox(
-            width: 270,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(height: 16, width: 220, color: Colors.black),
-                const SizedBox(height: 8),
-                Container(height: 12, width: 150, color: Colors.black),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Widget _buildBannerLoading() {
-  //   return Shimmer.fromColors(
-  //     baseColor: Palette.shimmerBase,
-  //     highlightColor: Palette.shimmerHighlight,
-  //     child: Container(
-  //       height: 150,
-  //       width: double.infinity,
-  //       decoration: BoxDecoration(
-  //         color: Colors.black,
-  //         borderRadius: BorderRadius.circular(12),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  Widget _buildNewsLoading() {
-    return Shimmer.fromColors(
-      baseColor: Palette.shimmerBase,
-      highlightColor: Palette.shimmerHighlight,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 3,
-        itemBuilder: (_, __) => Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: SizedBox(
-            width: 166,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 170,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(height: 14, width: 140, color: Colors.black),
-                const SizedBox(height: 8),
-                Container(height: 10, width: 100, color: Colors.black),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNewsCard({
-    required String title,
-    required DateTime date,
-    required String imageUrl,
-  }) {
-    return SizedBox(
-      width: 166,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget header() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            child: Image.network(
-              "http://37.46.132.144:1337$imageUrl",
-              height: 170,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+          const Icon(Icons.menu, size: 24),
+          const Spacer(),
+          Column(
+            children: [
+              Image.asset(
+                'assets/images/logo_black.png',
+                height: 24,
+              ),
+              Text(
+                "Всероссийское фестивальное движение",
+                style: Styles.b3,
+              )
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: Styles.b2,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            DateFormat("yMMMMd", "ru").format(date),
-            style: Styles.b3.copyWith(color: Palette.gray),
-          ),
+          const Spacer(),
+          const SizedBox(width: 24)
         ],
       ),
-    );
-  }
-
-  Widget _buildSectionHeader(
-      String title, BuildContext context, WidgetRef ref) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: Styles.h3),
-        GestureDetector(
-          onTap: () {
-            if (title == 'Ближайшие мероприятия') {
-              context.pushNamed('all-items', extra: {
-                'title': 'Ближайшие мероприятия',
-                'itemsAsync': ref.watch(upcomingEventsProvider),
-                'itemBuilder': (UpcomingEvent event) =>
-                    buildEventCard(event: event, context: context)
-              });
-            } else if (title == 'Последние новости') {
-              context.pushNamed('all-items', extra: {
-                'title': 'Ближайшие мероприятия',
-                'itemsAsync': ref.watch(newsProvider),
-                'itemBuilder': (News news) => buildNewsCard(news: news)
-              });
-            }
-          },
-          child: Text(
-            'Все',
-            style: Styles.button2.copyWith(color: Palette.secondary),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HomeHeader extends ConsumerWidget {
-  const _HomeHeader();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authNotifierProvider);
-
-    return authState.when(
-      loading: () => Shimmer.fromColors(
-          baseColor: Palette.shimmerBase,
-          highlightColor: Palette.shimmerHighlight,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16.0),
-            child: Container(
-              width: 200,
-              height: 28,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.black,
-              ),
-            ),
-          )),
-      error: (err, stack) => SizedBox(
-          height: 57,
-          child: Center(
-              child: Text('Ошибка',
-                  style: Styles.h3.copyWith(color: Palette.white)))),
-      data: (data) {
-        if (data is Authenticated) {
-          final user = data.user;
-          final displayName = user.lastname?.trim() ?? 'Пользователь';
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16.0),
-            child: SizedBox(
-              height: 57,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Text(
-                      displayName,
-                      style: Styles.h3.copyWith(color: Palette.white),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-        return const SizedBox(height: 57);
-      },
     );
   }
 }

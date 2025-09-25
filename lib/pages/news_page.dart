@@ -12,7 +12,7 @@ class NewsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final newsAsync = ref.watch(newsProvider);
+    final newsAsync = ref.watch(newsNotifierProvider);
 
     return Scaffold(
       backgroundColor: Palette.black,
@@ -113,7 +113,7 @@ class NewsPage extends ConsumerWidget {
 
                             // TODO: error handler
                             ElevatedButton(
-                              onPressed: () => ref.refresh(newsProvider),
+                              onPressed: () => ref.refresh(newsNotifierProvider),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Palette.primaryLime,
                                 foregroundColor: Palette.white,

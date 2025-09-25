@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/pages/more/about_app_page.dart';
 import 'package:ltfest/pages/more/account_settings_page.dart';
 import 'package:ltfest/pages/more/app_settings_page.dart';
+import 'package:ltfest/pages/shop/presenter/shop_details_page.dart';
+import 'package:ltfest/pages/shop/presenter/shop_page.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:ltfest/pages/auth/login_page.dart';
 import 'package:ltfest/pages/auth/registration_page.dart';
@@ -40,7 +42,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       switch (data) {
         case Authenticated():
           final isGoingToAuthRoute = currentLocation == AppRoutes.login ||
-              currentLocation == AppRoutes.inputCode ||
+              currentLocation == AppRoutes.verification ||
               currentLocation == AppRoutes.registration;
           if (isGoingToAuthRoute) {
             return AppRoutes.home;
@@ -53,7 +55,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return null;
         case Unauthenticated():
           final isGoingToAuthFlow = currentLocation == AppRoutes.login ||
-              currentLocation == AppRoutes.inputCode;
+              currentLocation == AppRoutes.verification;
           if (!isGoingToAuthFlow) {
             return AppRoutes.login;
           }
@@ -80,7 +82,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: AppRoutes.inputCode,
+        path: AppRoutes.verification,
         pageBuilder: (context, state) {
           final phone = state.extra as String?;
           return NoTransitionPage(
@@ -100,19 +102,22 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: AppRoutes.fest,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: FestivalPage(),
-            ),
+            path: '${AppRoutes.festivals}/:category',
+            pageBuilder: (context, state) {
+              final categoryName =
+                  state.pathParameters['category'] ?? 'Неизвестно';
+              return NoTransitionPage(
+                  child: FestivalPage(category: categoryName));
+            },
           ),
           GoRoute(
-            path: AppRoutes.lab,
+            path: AppRoutes.laboratories,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: LaboratoryPage(),
             ),
           ),
           GoRoute(
-            path: AppRoutes.blog,
+            path: AppRoutes.news,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: NewsPage(),
             ),
@@ -126,7 +131,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
-        path: AppRoutes.accountSettings,
+        path: "${AppRoutes.more}/${AppRoutes.user}",
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AccountSettingsPage(),
         ),
@@ -138,28 +143,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: AppRoutes.appSettings,
+        path: "${AppRoutes.more}/${AppRoutes.settings}",
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AppSettingsPage(),
         ),
       ),
       GoRoute(
-        path: AppRoutes.about,
+        path: "${AppRoutes.more}/${AppRoutes.about}",
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AboutAppPage(),
         ),
       ),
       GoRoute(
-        path: '${AppRoutes.festDetailsBase}/:id',
+        path: '${AppRoutes.festivals}/:category/:id',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
+          final category = state.pathParameters['category']!;
           return NoTransitionPage(
-            child: FestivalDetailPage(id: id),
+            child: FestivalDetailPage(id: id, category: category),
           );
         },
       ),
       GoRoute(
-        path: '${AppRoutes.labDetailsBase}/:id',
+        path: '${AppRoutes.laboratories}/:id',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
           return NoTransitionPage(
@@ -168,8 +174,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: AppRoutes.allItems,
-        name: AppRoutes.allItemsName,
+        path: AppRoutes.shop,
+        pageBuilder: (context, state) {
+          return const NoTransitionPage(child: ShopPage());
+        },
+      ),
+      GoRoute(
+        path: '${AppRoutes.shop}/:id',
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return NoTransitionPage(
+            child: ShopDetailsPage(id: id),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.all,
+        name: AppRoutes.allName,
         pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>;
           return NoTransitionPage(

@@ -74,7 +74,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
 
       if (mounted) {
         // Успешно запросили код, переходим на следующую страницу
-        context.push(AppRoutes.inputCode, extra: phone);
+        context.push(AppRoutes.verification, extra: phone);
       }
     } catch (e) {
       if (mounted) {

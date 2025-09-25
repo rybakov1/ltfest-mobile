@@ -4,6 +4,7 @@ import 'package:ltfest/data/models/ltstory.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/favorite.dart';
 import '../models/ltbanner.dart';
+import '../models/product.dart';
 import 'dio_provider.dart';
 import '../models/news.dart';
 import '../models/upcoming_events.dart';
@@ -239,7 +240,7 @@ class ApiService {
       String endpoint, T Function(Map<String, dynamic>) fromJson) async {
     try {
       final response =
-      await _dio.get(endpoint, queryParameters: {'populate': '*'});
+          await _dio.get(endpoint, queryParameters: {'populate': '*'});
 
       if (response.statusCode == 200) {
         final raw = response.data;
@@ -262,7 +263,6 @@ class ApiService {
       _handleError(e);
     }
   }
-
 
   // Future<T> _fetchOne<T>(
   //     String endpoint, T Function(Map<String, dynamic>) fromJson) async {
@@ -356,11 +356,18 @@ class ApiService {
   Future<List<News>> getNews() =>
       _fetchCollection(ApiEndpoints.news, News.fromJson);
 
+  Future<Product> getProductById(String id) =>
+      _fetchOneWithArray(ApiEndpoints.productById(id), Product.fromJson);
+
+  Future<List<Product>> getProducts() =>
+      _fetchCollection(ApiEndpoints.products, Product.fromJson);
+
   Future<List<UpcomingEvent>> fetchUpcomingEvents() =>
       _fetchCollection(ApiEndpoints.upcomingEvents, UpcomingEvent.fromJson);
 
   Future<List<Favorite>> fetchFavorites() =>
       _fetchCollection(ApiEndpoints.favorites, Favorite.fromJson);
+
   // Future<void> addFavourite(
   //     {required int userId, required int festivalId}) async {
   //   try {
@@ -433,7 +440,6 @@ class ApiService {
 // Добавление фестиваля в избранное
 // Добавление мероприятия в избранное
   Future<void> addFavorite(String eventType, int eventId) async {
-
     if (!['festival', 'laboratory'].contains(eventType)) {
       throw ApiException(message: 'Invalid event_type: $eventType');
     }
@@ -449,7 +455,8 @@ class ApiService {
 
       if (response.statusCode != 200) {
         throw ApiException(
-          message: 'Failed to add favorite $eventType: ${response.statusMessage}',
+          message:
+              'Failed to add favorite $eventType: ${response.statusMessage}',
           statusCode: response.statusCode,
         );
       }
@@ -475,29 +482,35 @@ class ApiService {
         },
       );
 
+      print("$eventType/$eventId/$userId/$response");
+
       if (response.statusCode != 200) {
         throw ApiException(
-          message: 'Failed to find favorite $eventType: ${response.statusMessage}',
+          message:
+              'Failed to find favorite $eventType: ${response.statusMessage}',
           statusCode: response.statusCode,
         );
       }
 
-      print(response.data);
+      print("api response: ${response.data}");
 
       final data = response.data as List<dynamic>;
       if (data.isEmpty) {
         throw ApiException(message: 'Favorite $eventType not found');
       }
 
+      print (data[0].toString());
       final favoriteId = int.parse(data[0]['favoriteId'].toString());
-
+      print(favoriteId);
 
       //Удаляем запись
-      final deleteResponse = await _dio.delete(ApiEndpoints.favoriteById(favoriteId));
+      final deleteResponse =
+          await _dio.delete(ApiEndpoints.favoriteById(favoriteId));
 
       if (deleteResponse.statusCode != 200) {
         throw ApiException(
-          message: 'Failed to remove favorite $eventType: ${deleteResponse.statusMessage}',
+          message:
+              'Failed to remove favorite $eventType: ${deleteResponse.statusMessage}',
           statusCode: deleteResponse.statusCode,
         );
       }

@@ -21,6 +21,8 @@ class FavoriteButton extends ConsumerWidget {
               (event) => event.type == eventType.name && event.id == id,
         );
 
+        print("$isFavorite / $id / ${eventType.name}");
+
         return ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: BackdropFilter(
@@ -29,7 +31,7 @@ class FavoriteButton extends ConsumerWidget {
               height: 32,
               width: 32,
               decoration: BoxDecoration(
-                color: Color(0x8E8A8A80),
+                color: const Color(0x8E8A8A80),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: IconButton(
@@ -81,12 +83,12 @@ class FavoriteButton extends ConsumerWidget {
               height: 32,
               width: 32,
               decoration: BoxDecoration(
-                color: Color(0x8E8A8A80),
+                color: const Color(0x8E8A8A80),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                constraints: BoxConstraints(),
+                constraints: const BoxConstraints(),
                 icon: Icon(
                   size: 24,
                   Icons.error_outline,
@@ -111,8 +113,9 @@ class FavoriteButton extends ConsumerWidget {
 class FavoriteButtonDetails extends ConsumerWidget {
   final int id;
   final EventType eventType;
+  final Color color;
 
-  const FavoriteButtonDetails({super.key, required this.id, required this.eventType});
+  const FavoriteButtonDetails({super.key, required this.id, required this.eventType, required this.color});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -123,6 +126,7 @@ class FavoriteButtonDetails extends ConsumerWidget {
         final isFavorite = value.any(
               (event) => event.type == eventType.name && event.id == id,
         );
+        print("$isFavorite / $id / ${eventType.name}");
 
         return ClipRRect(
           borderRadius: BorderRadius.circular(12),
@@ -132,12 +136,12 @@ class FavoriteButtonDetails extends ConsumerWidget {
               height: 43,
               width: 43,
               decoration: BoxDecoration(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
+                color: color,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                constraints: BoxConstraints(),
+                constraints: const BoxConstraints(),
                 icon: Icon(
                   size: 24,
                   isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -148,14 +152,14 @@ class FavoriteButtonDetails extends ConsumerWidget {
                   try {
                     if (isFavorite) {
                       await notifier.removeFavorite(eventType, id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Удалено из избранного')),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(content: Text('Удалено из избранного')),
+                      // );
                     } else {
                       await notifier.addFavorite(eventType, id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Добавлено в избранное')),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(content: Text('Добавлено в избранное')),
+                      // );
                     }
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -184,12 +188,12 @@ class FavoriteButtonDetails extends ConsumerWidget {
               height: 43,
               width: 43,
               decoration: BoxDecoration(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
+                color: const Color.fromRGBO(255, 255, 255, 0.5),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                constraints: BoxConstraints(),
+                constraints: const BoxConstraints(),
                 icon: Icon(
                   size: 24,
                   Icons.error_outline,

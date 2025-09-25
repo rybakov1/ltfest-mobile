@@ -154,14 +154,12 @@ class CustomChip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Consumer(
       builder: (context, ref, child) {
-        // "Слушаем" провайдер, он может быть null
         final selectedDirection = ref.watch(selectedDirectionProvider);
 
-        // Определяем текст и цвет для отображения
-        final String displayText = selectedDirection ?? 'Все направления';
+        final String displayText = selectedDirection ?? 'Все';
         final Color displayColor = selectedDirection == 'Танцы'
             ? Palette.primaryPink
-            : (selectedDirection == null ? Palette.gray : Palette.primaryLime);
+            : (selectedDirection == null ? Palette.secondary : Palette.primaryLime);
 
         return GestureDetector(
           onTap: () => _showDirectionPicker(context, ref),
