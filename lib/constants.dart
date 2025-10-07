@@ -154,7 +154,7 @@ class LTButtons {
         disabledForegroundColor: disabledForegroundColor ?? Palette.gray,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: borderRadius ?? BorderRadius.circular(8),
+          borderRadius: borderRadius ?? BorderRadius.circular(12),
         ),
         padding:
             padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -188,6 +188,35 @@ class LTButtons {
         padding:
             padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         minimumSize: minimumSize ?? const Size(100, 48),
+      ),
+      child: child,
+    );
+  }
+
+  static Widget outlinedButton({
+    required VoidCallback? onPressed,
+    required Widget child,
+    Color? backgroundColor,
+    Color? disabledBackgroundColor,
+    Color? foregroundColor,
+    Color? disabledForegroundColor,
+    BorderRadius? borderRadius,
+    EdgeInsets? padding,
+    Size? minimumSize,
+  }) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: backgroundColor ?? Palette.white,
+        disabledBackgroundColor: disabledBackgroundColor ?? Palette.background,
+        foregroundColor: foregroundColor ?? Palette.black,
+        disabledForegroundColor: disabledForegroundColor ?? Palette.gray,
+        elevation: 0,
+        side: BorderSide(color: Palette.stroke),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        minimumSize: minimumSize ?? const Size(double.infinity, 44),
       ),
       child: child,
     );

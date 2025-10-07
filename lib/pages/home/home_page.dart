@@ -93,7 +93,7 @@ class HomePage extends ConsumerWidget {
                                         offset: 15,
                                         label: 'LT Консьерж',
                                         isGradient: true,
-                                        onTap: () {},
+                                        onTap: () => context.push(AppRoutes.ltConcierge),
                                       ),
                                     ),
                                   ],
@@ -104,7 +104,7 @@ class HomePage extends ConsumerWidget {
                                 child: _buildServiceCard(
                                   imagePath: 'assets/images/lt_coin.png',
                                   label: 'LT Coin',
-                                  onTap: () {},
+                                  onTap: () => context.push(AppRoutes.ltCoin),
                                 ),
                               ),
                             ],
@@ -121,13 +121,13 @@ class HomePage extends ConsumerWidget {
                                 imagePath: 'assets/images/lt_winner.png',
                                 label: 'LT Winner',
                                 isSmall: true,
-                                onTap: () {},
+                                onTap: () => context.push(AppRoutes.ltWinner),
                               ),
                               _buildServiceCard(
                                 imagePath: 'assets/images/lt_pay.png',
                                 label: 'LT Pay',
                                 isSmall: true,
-                                onTap: () {},
+                                onTap: () => context.push(AppRoutes.ltPay),
                               ),
                               _buildServiceCard(
                                 imagePath: 'assets/images/lt_travel.png',
@@ -155,23 +155,7 @@ class HomePage extends ConsumerWidget {
                         const SizedBox(height: 24),
                         const NewsWidget(),
                         const SizedBox(height: 24),
-                        // Text("LT Shop", style: Styles.h3), // TODO: LT SHOP
-                        // const SizedBox(height: 24),
                         const ShopWidget(),
-                        // Container(
-                        //   height: 180,
-                        //   width: double.infinity,
-                        //   decoration: BoxDecoration(
-                        //     borderRadius: BorderRadius.circular(8),
-                        //     color: Palette.background,
-                        //   ),
-                        //   child: Center(
-                        //     child: Text(
-                        //       "Скоро",
-                        //       style: Styles.h4,
-                        //     ),
-                        //   ),
-                        // )
                       ],
                     ),
                   ),

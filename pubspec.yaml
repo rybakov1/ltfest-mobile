@@ -33,6 +33,7 @@ dependencies:
   dio_smart_retry: ^7.0.1
   carousel_slider: ^5.1.1
   share_plus: ^11.1.0
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:

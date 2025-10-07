@@ -96,7 +96,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Palette.black,
+      backgroundColor: Palette.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(4.0),
@@ -105,7 +105,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Image.asset(
-                  'assets/images/logo.png',
+                  'assets/images/logo_black.png',
                   height: 50,
                 ),
               ),

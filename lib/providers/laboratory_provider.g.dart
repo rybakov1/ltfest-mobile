@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'shop_provider.dart';
+part of 'laboratory_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$productsNotifierHash() => r'c6438128faf45c4c28888733b7e8eeef0b257040';
+String _$laboratoriesNotifierHash() =>
+    r'd884c67b7d8d3954334a13a9fdbd481026edd529';
 
-/// See also [ProductsNotifier].
-@ProviderFor(ProductsNotifier)
-final productsNotifierProvider =
-    AsyncNotifierProvider<ProductsNotifier, List<Product>>.internal(
-  ProductsNotifier.new,
-  name: r'productsNotifierProvider',
+/// See also [LaboratoriesNotifier].
+@ProviderFor(LaboratoriesNotifier)
+final laboratoriesNotifierProvider =
+    AsyncNotifierProvider<LaboratoriesNotifier, LaboratoriesState>.internal(
+  LaboratoriesNotifier.new,
+  name: r'laboratoriesNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$productsNotifierHash,
+      : _$laboratoriesNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$ProductsNotifier = AsyncNotifier<List<Product>>;
+typedef _$LaboratoriesNotifier = AsyncNotifier<LaboratoriesState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

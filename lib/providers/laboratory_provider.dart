@@ -4,6 +4,7 @@ import 'package:ltfest/data/services/api_service.dart';
 import 'package:ltfest/providers/direction_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+part 'laboratory_provider.g.dart';
 // 1. Модель состояния
 class LaboratoriesState {
   final List<Laboratory> allLaboratories;

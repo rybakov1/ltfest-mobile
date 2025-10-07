@@ -1,14 +1,12 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ltfest/data/models/person.dart';
 
-import '../../components/favorite_button.dart';
 import 'direction.dart';
 import 'image_data.dart';
 import 'laboratory_day.dart';
 import 'laboratory_learning_type.dart';
 
 part 'laboratory.freezed.dart';
-
 part 'laboratory.g.dart';
 
 @freezed

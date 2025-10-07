@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ltfest/router/app_routes.dart';
 
 import '../constants.dart';
 
@@ -29,19 +30,19 @@ class _MainScreenState extends State<MainScreen> {
   void _onTap(BuildContext context, int index) {
     switch (index) {
       case 0:
-        context.go('/home');
+        context.go(AppRoutes.home);
         break;
       case 1:
-        context.go('/fest');
+        context.go(AppRoutes.festivals);
         break;
       case 2:
-        context.go('/lab');
+        context.go(AppRoutes.laboratories);
         break;
       case 3:
-        context.go('/blog');
+        context.go(AppRoutes.news);
         break;
       case 4:
-        context.go('/more');
+        context.go(AppRoutes.more);
         break;
     }
   }

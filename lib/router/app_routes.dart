@@ -16,5 +16,16 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String about = '/about';
 
+  static const String ltCoin = '/coin';
+  static const String ltWinner = '/winner';
+  static const String ltPay = '/pay';
+  static const String ltConcierge = '/concierge';
+  static const String ltPriority = '/priority';
+  static const String ltTravel = '/travel';
+
   static const String shop = '/shop';
+  static const String cart = '/cart';
+  static const String order = '/order';
+
+  static const String splash = '/splash';
 }

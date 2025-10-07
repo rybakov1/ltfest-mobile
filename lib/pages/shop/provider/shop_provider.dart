@@ -1,6 +1,7 @@
+import 'package:ltfest/data/models/product/product.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../data/models/product.dart';
+import '../../../data/models/product/product_details.dart';
 import '../../../data/services/api_service.dart';
 
 part 'shop_provider.g.dart';
@@ -10,10 +11,11 @@ class ProductsNotifier extends _$ProductsNotifier {
   @override
   Future<List<Product>> build() async {
     final apiService = ref.read(apiServiceProvider);
-    return await apiService.getProducts();
+    return await apiService.getProductsForCatalog();
   }
 }
 
 final productByIdProvider = FutureProvider.family<Product, String>((ref, id) {
-  return ref.read(apiServiceProvider).getProductById(id);
+  final apiService = ref.watch(apiServiceProvider);
+  return apiService.getProductDetailsById(id);
 });

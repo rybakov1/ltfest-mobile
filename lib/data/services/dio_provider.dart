@@ -8,6 +8,50 @@ import 'token_storage.dart';
 
 part 'dio_provider.g.dart';
 
+class AuthInterceptor extends Interceptor {
+  // Мы передаем Ref, чтобы иметь доступ к TokenStorage
+  final Ref _ref;
+
+  AuthInterceptor(this._ref);
+
+  @override
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    // Читаем провайдер прямо перед запросом - это гарантирует свежесть
+    final token = await _ref.read(tokenStorageProvider).getJwt();
+
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
+
+    print('Request: ${options.method} ${options.uri}');
+    if (options.headers['Authorization'] != null) {
+      print('Authorization header sent.');
+    } else {
+      print('Authorization header NOT sent.');
+    }
+
+    return super.onRequest(options, handler);
+  }
+
+  @override
+  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+    print('Error: ${err.message}, Response: ${err.response?.data}, Status: ${err.response?.statusCode}');
+
+    if (err.response?.statusCode == 401) {
+      // Очищаем токен, если он невалиден
+      await _ref.read(tokenStorageProvider).clearToken();
+    }
+
+    return super.onError(err, handler);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    print('Response: ${response.statusCode}'); // Убрал data для краткости лога
+    super.onResponse(response, handler);
+  }
+}
+
 @riverpod
 Dio dio(Ref ref) {
   final dio = Dio(
@@ -36,31 +80,7 @@ Dio dio(Ref ref) {
     ],
   ));
 
-  dio.interceptors.add(InterceptorsWrapper(
-    onRequest: (options, handler) async {
-      final token = await ref.read(tokenStorageProvider).getJwt();
+  dio.interceptors.add(AuthInterceptor(ref));
 
-      if (token != null) {
-        options.headers['Authorization'] = 'Bearer $token';
-      }
-
-      print('Request: ${options.method} ${options.uri}');
-      return handler.next(options);
-    },
-    onResponse: (response, handler) {
-      print('Response: ${response.statusCode} ${response.data}');
-      return handler.next(response);
-    },
-    onError: (DioException e, handler) async {
-      print(
-          'Error: ${e.message}, Response: ${e.response?.data}, Status: ${e.response?.statusCode}');
-
-      if (e.response?.statusCode == 401) {
-        await ref.read(tokenStorageProvider).clearToken();
-      }
-
-      return handler.next(e);
-    },
-  ));
   return dio;
 }

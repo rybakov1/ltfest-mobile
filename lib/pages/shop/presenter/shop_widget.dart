@@ -59,37 +59,52 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                 final product = productList[index];
                 String sizes = "";
 
-                for (var i = 0; i < product.productSizes!.length; i++) {
-                  sizes += "${product.productSizes![i].title!} ";
+                for (int i = 0; i < product.variations.length; i++) {
+                  sizes += product.variations[i].productSize.title;
                 }
 
                 return GestureDetector(
-                  onTap: () => context.push('${AppRoutes.shop}/${product.id}'),
+                  onTap: () =>
+                      context.push('${AppRoutes.shop}/${product.id}'),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Stack(
                         children: [
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              'http://37.46.132.144:1337${product.images![0].url}',
-                              height: 160,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                'http://37.46.132.144:1337${product.variations[0].images[0].url}',
+                                height: 160,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, progress) {
+                                  return progress == null
+                                      ? child
+                                      : const Center(
+                                          child: CircularProgressIndicator());
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 160,
+                                    color: Colors.grey[200],
+                                    child: const Icon(Icons.broken_image,
+                                        color: Colors.grey),
+                                  );
+                                },
+                              )),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Text(
                         Utils.formatMoney(
-                          product.price!.toInt(),
+                          product.variations[0].price.toInt(),
                         ),
                         style: Styles.h5,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        product.title!,
+                        product.name,
                         style: Styles.b2.copyWith(
                           color: Palette.gray,
                         ),
@@ -106,9 +121,13 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
               },
             );
           },
-          error: (_, st) {
-            print(st);
-            return Text("This is error, $st");
+          error: (error, stacktrace) {
+            print("===================");
+            print("This is error, $error");
+            print("===================");
+            print("This is stacktrace, $stacktrace");
+            print("===================");
+            return Text("This is error, $stacktrace");
           },
           loading: () {
             return Text("loading.......");

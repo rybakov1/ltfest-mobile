@@ -67,39 +67,6 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
     });
   }
 
-  // Future<void> _verifyOtp() async {
-  //   if (_isLoading || _pinController.text.length < 6) return;
-  //
-  //   setState(() {
-  //     _isLoading = true;
-  //     _hasError = false; // Сбрасываем ошибку перед новой попыткой
-  //   });
-  //
-  //   try {
-  //     await ref
-  //         .read(authNotifierProvider.notifier)
-  //         .verifyOtpAndLogin(widget.phoneNumber, _pinController.text);
-  //   } catch (e) {
-  //     if (mounted) {
-  //       setState(() {
-  //         _hasError = true;
-  //       });
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: const Text("Неверный код. Попробуйте еще раз."),
-  //           backgroundColor: Palette.error,
-  //         ),
-  //       );
-  //     }
-  //   } finally {
-  //     if (mounted) {
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     }
-  //   }
-  // }
-
   Future<void> _resendOtp() async {
     if (_isLoading || _timerSeconds > 0) return;
 
@@ -216,7 +183,7 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
     );
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Palette.black,
+      backgroundColor: Palette.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(4.0),

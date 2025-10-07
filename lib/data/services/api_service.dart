@@ -1,10 +1,14 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/models/ltstory.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../pages/cart/models/cart.dart';
 import '../models/favorite.dart';
 import '../models/ltbanner.dart';
-import '../models/product.dart';
+import '../models/product/product.dart';
+import '../models/product/product_details.dart';
+import '../models/product/product_in_stock.dart';
 import 'dio_provider.dart';
 import '../models/news.dart';
 import '../models/upcoming_events.dart';
@@ -18,8 +22,6 @@ import 'api_exception.dart';
 import 'token_storage.dart';
 
 part 'api_service.g.dart';
-
-// Кодогенерация: dart run build_runner build --delete-conflicting-outputs
 
 @riverpod
 ApiService apiService(Ref ref) {
@@ -38,10 +40,10 @@ class ApiService {
 
   Never _handleError(Object e) {
     if (e is DioException) {
-      print(e.error);
+      debugPrint(e.stackTrace.toString());
       throw ApiException.fromDioError(e);
     }
-    print(e.toString());
+    debugPrint(e.toString());
     throw ApiException(message: e.toString());
   }
 
@@ -62,115 +64,42 @@ class ApiService {
 
   Future<User> verifyOtp(String phone, String code) async {
     try {
-      final response = await _dio.post(ApiEndpoints.verifyOtp, data: {
-        'phone': phone,
-        'code': code,
-      }, queryParameters: {
-        'populate': '*'
-      });
+      final response = await _dio.post(
+        ApiEndpoints.verifyOtp,
+        data: {'phone': phone, 'code': code},
+        queryParameters: {'populate': '*'},
+      );
 
       if (response.statusCode == 200) {
         final jwt = response.data['jwt'] as String?;
         final userData = response.data['user'] as Map<String, dynamic>?;
-
         if (jwt == null || userData == null) {
           throw ApiException(
               message: 'Invalid response: Missing jwt or user data');
         }
-
         await _tokenStorage.saveToken(jwt: jwt);
         return User.fromJson(userData);
       } else {
         throw ApiException(
             message:
-                response.data['error']?['message'] ?? 'Failed to verify OTP',
-            statusCode: response.statusCode);
+                response.data['error']?['message'] ?? 'Failed to verify OTP');
       }
     } catch (e) {
       _handleError(e);
     }
   }
 
-  // Future<User> verifyOtp(String phone, String code) async {
-  //   try {
-  //     final response = await _dio.post(ApiEndpoints.verifyOtp, data: {
-  //       'phone': phone,
-  //       'code': code,
-  //     }, queryParameters: {'populate': '*'});
-  //
-  //     if (response.statusCode == 200) {
-  //       final jwt = response.data['jwt'] as String;
-  //       final userData = response.data['user'] as Map<String, dynamic>;
-  //
-  //       await _tokenStorage.saveToken(jwt: jwt);
-  //
-  //       return User.fromJson(userData);
-  //     } else {
-  //       throw ApiException(
-  //           message:
-  //               response.data['error']?['message'] ?? 'Failed to verify OTP',
-  //           statusCode: response.statusCode);
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
   Future<User> getMe() async {
     try {
-      final response = await _dio.get(ApiEndpoints.me);
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data == null) {
-          throw ApiException(message: 'Invalid response: No data found');
-        }
-        if (data is! Map<String, dynamic>) {
-          throw ApiException(
-              message:
-                  'Invalid response format: Expected a Map, got ${data.runtimeType}');
-        }
-        print('Response data: $data'); // Для отладки
-        return User.fromJson(data);
-      } else {
-        throw ApiException(
-            message: 'Failed to load current user',
-            statusCode: response.statusCode);
-      }
+      final response = await _dio.get(ApiEndpoints.me, queryParameters: {
+        'populate[0]': 'direction',
+        'populate[1]': 'activity',
+      });
+      return User.fromJson(response.data);
     } catch (e) {
       _handleError(e);
     }
   }
-
-  // Future<User> getMe() async {
-  //   try {
-  //     final response = await _dio.get(ApiEndpoints.me, queryParameters: {'populate': '*'});
-  //     if (response.statusCode == 200) {
-  //       final data = response.data;
-  //       return User.fromJson(data);
-  //     } else {
-  //       throw ApiException(
-  //           message: 'Failed to load current user',
-  //           statusCode: response.statusCode);
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
-
-  // Future<User> getMe() async {
-  //   try {
-  //     final response =
-  //         await _dio.get(ApiEndpoints.me, queryParameters: {'populate': '*'});
-  //     if (response.statusCode == 200) {
-  //       return User.fromJson(response.data);
-  //     } else {
-  //       throw ApiException(
-  //           message: 'Failed to load current user',
-  //           statusCode: response.statusCode);
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
 
   Future<User> updateProfile({
     required int userId,
@@ -217,100 +146,26 @@ class ApiService {
     }
   }
 
-  // Future<List<T>> _fetchCollection<T>(
-  //     String endpoint, T Function(Map<String, dynamic>) fromJson) async {
-  //   try {
-  //     final response =
-  //         await _dio.get(endpoint, queryParameters: {'populate': '*'});
-  //
-  //     if (response.statusCode == 200) {
-  //       final List<dynamic> data = response.data['data'];
-  //       return data
-  //           .map((json) => fromJson(json as Map<String, dynamic>))
-  //           .toList();
-  //     } else {
-  //       throw ApiException(message: 'Failed to load collection $endpoint');
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
-
   Future<List<T>> _fetchCollection<T>(
       String endpoint, T Function(Map<String, dynamic>) fromJson) async {
     try {
       final response =
           await _dio.get(endpoint, queryParameters: {'populate': '*'});
-
-      if (response.statusCode == 200) {
-        final raw = response.data;
-
-        if (raw is List) {
-          return raw.map((e) => fromJson(e as Map<String, dynamic>)).toList();
-        } else if (raw is Map && raw['data'] is List) {
-          return (raw['data'] as List)
-              .map((e) => fromJson(e as Map<String, dynamic>))
-              .toList();
-        } else {
-          throw ApiException(
-            message: 'Unexpected response format: ${raw.runtimeType}',
-          );
-        }
-      } else {
-        throw ApiException(message: 'Failed to load collection $endpoint');
-      }
+      final List<dynamic> data = response.data['data'];
+      return data
+          .map((json) => fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       _handleError(e);
     }
   }
 
-  // Future<T> _fetchOne<T>(
-  //     String endpoint, T Function(Map<String, dynamic>) fromJson) async {
-  //   try {
-  //     final response = await _dio.get(endpoint, queryParameters: {'populate': '*'});
-  //     if (response.statusCode == 200) {
-  //       final data = response.data['data'] as Map<String, dynamic>;
-  //       return fromJson(data);
-  //     } else {
-  //       throw ApiException(message: 'Failed to load item $endpoint');
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
-
-  Future<T> _fetchOneWithArrayWithoutPopulate<T>(
-      String endpoint, T Function(Map<String, dynamic>) fromJson) async {
+  Future<T> _fetchOne<T>(
+      String endpoint, T Function(Map<String, dynamic>) fromJson,
+      {Map<String, dynamic>? query}) async {
     try {
-      final response = await _dio.get(endpoint);
-
-      if (response.statusCode == 200) {
-        final List<dynamic> dataList = response.data['data'];
-        final Map<String, dynamic> festivalData = dataList[0];
-
-        return fromJson(festivalData);
-      } else {
-        throw ApiException(message: 'Failed to load item $endpoint');
-      }
-    } catch (e) {
-      _handleError(e);
-    }
-  }
-
-  Future<T> _fetchOneWithArray<T>(
-      String endpoint, T Function(Map<String, dynamic>) fromJson) async {
-    try {
-      final response =
-          await _dio.get(endpoint, queryParameters: {'populate': '*'});
-
-      if (response.statusCode == 200) {
-        final List<dynamic> dataList = response.data['data'];
-        final Map<String, dynamic> festivalData = dataList[0];
-
-        return fromJson(festivalData);
-      } else {
-        throw ApiException(message: 'Failed to load item $endpoint');
-      }
+      final response = await _dio.get(endpoint, queryParameters: query);
+      return fromJson(response.data['data'] as Map<String, dynamic>);
     } catch (e) {
       _handleError(e);
     }
@@ -328,27 +183,8 @@ class ApiService {
   Future<List<LTStory>> getLTStories() =>
       _fetchCollection(ApiEndpoints.stories, LTStory.fromJson);
 
-  Future<Festival> getFestivalById(String id) =>
-      _fetchOneWithArrayWithoutPopulate(
-          ApiEndpoints.festivalById(id), Festival.fromJson);
-
   Future<List<Laboratory>> getLaboratories() =>
       _fetchCollection(ApiEndpoints.laboratories, Laboratory.fromJson);
-
-  Future<Laboratory> getLaboratoryById(String id) =>
-      _fetchOneWithArrayWithoutPopulate(
-          ApiEndpoints.laboratoryById(id), Laboratory.fromJson);
-
-  Future<List<Laboratory>> getLaboratoriesByDirection(String direction) =>
-      _fetchCollection(
-          ApiEndpoints.laboratoriesByDirection(direction), Laboratory.fromJson);
-
-  Future<List<Festival>> getFestivalsByDirection(String direction) =>
-      _fetchCollection(
-          ApiEndpoints.festivalsByDirection(direction), Festival.fromJson);
-
-  Future<News> getNewsById(String id) =>
-      _fetchOneWithArray(ApiEndpoints.newsById(id), News.fromJson);
 
   Future<List<LTBanner>> getBanners() =>
       _fetchCollection(ApiEndpoints.banners, LTBanner.fromJson);
@@ -356,89 +192,108 @@ class ApiService {
   Future<List<News>> getNews() =>
       _fetchCollection(ApiEndpoints.news, News.fromJson);
 
-  Future<Product> getProductById(String id) =>
-      _fetchOneWithArray(ApiEndpoints.productById(id), Product.fromJson);
-
-  Future<List<Product>> getProducts() =>
-      _fetchCollection(ApiEndpoints.products, Product.fromJson);
-
   Future<List<UpcomingEvent>> fetchUpcomingEvents() =>
       _fetchCollection(ApiEndpoints.upcomingEvents, UpcomingEvent.fromJson);
 
   Future<List<Favorite>> fetchFavorites() =>
       _fetchCollection(ApiEndpoints.favorites, Favorite.fromJson);
 
-  // Future<void> addFavourite(
-  //     {required int userId, required int festivalId}) async {
-  //   try {
-  //     final payload = {
-  //       'data': {
-  //         'user': userId,
-  //         'festival': festivalId,
-  //       }
-  //     };
-  //     final response = await _dio.post(ApiEndpoints.favourites, data: payload);
-  //     if (response.statusCode != 200) {
-  //       throw ApiException(message: 'Failed to add favourite');
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
+  Future<Festival> getFestivalById(String id) async {
+    try {
+      // FIX: Add the populate parameters back in using queryParameters
+      final response = await _dio.get(
+        ApiEndpoints.festivals, // Use the base endpoint for lists
+        queryParameters: {
+          'filters[id][\$eq]': id,
+          'populate[0]': 'direction',
+          'populate[1]': 'persons.image',
+          'populate[2]': 'image',
+        },
+      );
 
-  // Future<void> addFavoriteFestival(int festivalId) async {
-  //   try {
-  //     final response = await _dio.put(ApiEndpoints.me, data: {
-  //       'favourites_festivals': {'connect': [festivalId]},
-  //     });
-  //     if (response.statusCode != 200) {
-  //       throw ApiException(message: 'Failed to add favorite festival');
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
-  //
-  // Future<void> removeFavoriteFestival(int festivalId) async {
-  //   try {
-  //     final response = await _dio.put(ApiEndpoints.me, data: {
-  //       'favourites_festivals': {'disconnect': [festivalId]},
-  //     });
-  //     if (response.statusCode != 200) {
-  //       throw ApiException(message: 'Failed to remove favorite festival');
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
-  //
-  // Future<void> addFavoriteLaboratory(int laboratoryId) async {
-  //   try {
-  //     final response = await _dio.put(ApiEndpoints.me, data: {
-  //       'favourites_laboratories': {'connect': [laboratoryId]},
-  //     });
-  //     if (response.statusCode != 200) {
-  //       throw ApiException(message: 'Failed to add favorite laboratory');
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
-  //
-  // Future<void> removeFavoriteLaboratory(int laboratoryId) async {
-  //   try {
-  //     final response = await _dio.put(ApiEndpoints.me, data: {
-  //       'favourites_laboratories': {'disconnect': [laboratoryId]},
-  //     });
-  //     if (response.statusCode != 200) {
-  //       throw ApiException(message: 'Failed to remove favorite laboratory');
-  //     }
-  //   } catch (e) {
-  //     _handleError(e);
-  //   }
-  // }
-// Добавление фестиваля в избранное
-// Добавление мероприятия в избранное
+      final List<dynamic> dataList = response.data['data'];
+      if (dataList.isEmpty) {
+        throw ApiException(message: 'Festival with id $id not found');
+      }
+      return Festival.fromJson(dataList.first as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<Laboratory> getLaboratoryById(String id) async {
+    try {
+      // FIX: Add the populate parameters back in using queryParameters
+      final response = await _dio.get(
+        ApiEndpoints.laboratories, // Use the base endpoint for lists
+        queryParameters: {
+          'filters[id][\$eq]': id,
+          'populate[0]': 'direction',
+          'populate[1]': 'learning_types',
+          'populate[2]': 'days',
+          'populate[3]': 'image',
+          'populate[4]': 'persons.image',
+          'populate[5]': 'days.laboratory_day_events',
+        },
+      );
+
+      final List<dynamic> dataList = response.data['data'];
+      if (dataList.isEmpty) {
+        throw ApiException(message: 'Laboratory with id $id not found');
+      }
+      return Laboratory.fromJson(dataList.first as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<News> getNewsById(String id) async {
+    try {
+      final response = await _dio.get(
+        ApiEndpoints.news, // Use the base endpoint for lists
+        queryParameters: {
+          'filters[id][\$eq]': id,
+          'populate': '*', // Or list specific fields if you know them
+        },
+      );
+
+      final List<dynamic> dataList = response.data['data'];
+      if (dataList.isEmpty) {
+        throw ApiException(message: 'News with id $id not found');
+      }
+      return News.fromJson(dataList.first as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<List<Laboratory>> getLaboratoriesByDirection(String direction) async {
+    try {
+      final response = await _dio.get(ApiEndpoints.laboratories,
+          queryParameters: {
+            'filters[direction][title][\$eq]': direction,
+            'populate': '*'
+          });
+      final List<dynamic> data = response.data['data'];
+      return data.map((json) => Laboratory.fromJson(json)).toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<List<Festival>> getFestivalsByDirection(String direction) async {
+    try {
+      final response = await _dio.get(ApiEndpoints.festivals, queryParameters: {
+        'filters[direction][title][\$eq]': direction,
+        'populate': '*'
+      });
+      final List<dynamic> data = response.data['data'];
+      return data.map((json) => Festival.fromJson(json)).toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
   Future<void> addFavorite(String eventType, int eventId) async {
     if (!['festival', 'laboratory'].contains(eventType)) {
       throw ApiException(message: 'Invalid event_type: $eventType');
@@ -499,7 +354,7 @@ class ApiService {
         throw ApiException(message: 'Favorite $eventType not found');
       }
 
-      print (data[0].toString());
+      print(data[0].toString());
       final favoriteId = int.parse(data[0]['favoriteId'].toString());
       print(favoriteId);
 
@@ -514,6 +369,109 @@ class ApiService {
           statusCode: deleteResponse.statusCode,
         );
       }
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // --- SHOP & CART ---
+
+  Future<List<ProductInStock>> getAllVariations() async {
+    try {
+      final response = await _dio.get(ApiEndpoints.productInStocks,
+          queryParameters: {'populate': '*'});
+      final List<dynamic> data = response.data['data'];
+      return data
+          .map((json) => ProductInStock.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<List<Product>> getProductsForCatalog() async {
+    try {
+      final response = await _dio.get(
+        ApiEndpoints.products,
+        queryParameters: {
+          'populate[0]': 'product_in_stocks',
+          'populate[1]': 'product_in_stocks.product_color',
+          'populate[2]': 'product_in_stocks.product_size',
+          'populate[3]': 'product_in_stocks.images',
+          'populate[4]': 'product_materials',
+        },
+      );
+      final List<dynamic> data = response.data['data'];
+      return data.map((json) => Product.fromJson(json as Map<String, dynamic>)).toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<Product> getProductDetailsById(String id) async {
+    try {
+      final response = await _dio.get(
+        // Используем общий эндпоинт, чтобы добавить фильтры и populate
+        ApiEndpoints.products,
+        queryParameters: {
+          'filters[id][\$eq]': id,
+          'populate[0]': 'product_in_stocks',
+          'populate[1]': 'product_in_stocks.product_color',
+          'populate[2]': 'product_in_stocks.product_size',
+          'populate[3]': 'product_in_stocks.images',
+          'populate[4]': 'product_materials',
+        },
+      );
+
+      final List<dynamic> dataList = response.data['data'];
+      if (dataList.isEmpty) {
+        throw ApiException(message: 'Product with id $id not found');
+      }
+      // Парсим первый (и единственный) элемент из полученного массива
+      return Product.fromJson(dataList.first as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  /// Получает корзину текущего пользователя.
+  Future<Cart> getMyCart() async {
+    try {
+      return _fetchOne(ApiEndpoints.myCart, Cart.fromJson,
+          query: {'populate': '*'});
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  /// Добавляет товар (вариацию) в корзину.
+  Future<void> addToCart(
+      {required int productInStockId, int quantity = 1}) async {
+    try {
+      await _dio.post(ApiEndpoints.cartItems, data: {
+        'data': {'product_in_stock': productInStockId, 'quantity': quantity}
+      });
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  /// Обновляет количество товара в корзине.
+  Future<void> updateCartItemQuantity(
+      {required int cartItemId, required int newQuantity}) async {
+    try {
+      await _dio.put('${ApiEndpoints.cartItems}/$cartItemId', data: {
+        'data': {'quantity': newQuantity}
+      });
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  /// Удаляет товар из корзины.
+  Future<void> removeCartItem({required int cartItemId}) async {
+    try {
+      await _dio.delete('${ApiEndpoints.cartItems}/$cartItemId');
     } catch (e) {
       _handleError(e);
     }

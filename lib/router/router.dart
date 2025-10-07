@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/pages/more/about_app_page.dart';
 import 'package:ltfest/pages/more/account_settings_page.dart';
 import 'package:ltfest/pages/more/app_settings_page.dart';
+import 'package:ltfest/pages/order/order_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_details_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_page.dart';
 import 'package:ltfest/router/app_routes.dart';
@@ -17,9 +18,15 @@ import 'package:ltfest/pages/lab/lab_details_page.dart';
 import 'package:ltfest/pages/lab/lab_page.dart';
 import 'package:ltfest/pages/main_screen.dart';
 import 'package:ltfest/pages/more/more_page.dart';
+import 'package:ltfest/pages/more/lt_coin_page.dart';
+import 'package:ltfest/pages/more/lt_winner_page.dart';
+import 'package:ltfest/pages/more/lt_pay_page.dart';
+import 'package:ltfest/pages/more/lt_concierge_page.dart';
 import 'package:ltfest/pages/home/more_items_page.dart';
 import '../pages/auth/input_code_page.dart';
+import '../pages/cart/cart_page.dart';
 import '../pages/more/favorites_page.dart';
+import '../pages/splash_page.dart';
 import '../providers/auth_state.dart';
 import '../providers/user_provider.dart';
 
@@ -34,34 +41,42 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(authNotifierProvider);
       final currentLocation = state.uri.path;
 
-      if (authState.isLoading || authState.isReloading) {
-        return null;
+      if ((authState.isLoading || authState.isReloading) &&
+          currentLocation != AppRoutes.splash) {
+        return AppRoutes.splash;
       }
 
-      final data = authState.value;
-      switch (data) {
-        case Authenticated():
-          final isGoingToAuthRoute = currentLocation == AppRoutes.login ||
-              currentLocation == AppRoutes.verification ||
-              currentLocation == AppRoutes.registration;
-          if (isGoingToAuthRoute) {
-            return AppRoutes.home;
-          }
-          return null;
-        case NeedsRegistration():
-          if (currentLocation != AppRoutes.registration) {
-            return AppRoutes.registration;
-          }
-          return null;
-        case Unauthenticated():
-          final isGoingToAuthFlow = currentLocation == AppRoutes.login ||
-              currentLocation == AppRoutes.verification;
-          if (!isGoingToAuthFlow) {
+      if (authState.hasError && currentLocation != AppRoutes.login) {
+        return AppRoutes.login;
+      }
+
+      if (authState.hasValue) {
+        final data = authState.value;
+        switch (data) {
+          case Authenticated():
+            final isGoingToAuthRoute = currentLocation == AppRoutes.login ||
+                currentLocation == AppRoutes.verification ||
+                currentLocation == AppRoutes.registration ||
+                currentLocation == AppRoutes.splash; // Важно добавить сплэш
+            if (isGoingToAuthRoute) {
+              return AppRoutes.home;
+            }
+            return null;
+          case NeedsRegistration():
+            if (currentLocation != AppRoutes.registration) {
+              return AppRoutes.registration;
+            }
+            return null;
+          case Unauthenticated():
+            final isGoingToAuthFlow = currentLocation == AppRoutes.login ||
+                currentLocation == AppRoutes.verification;
+            if (!isGoingToAuthFlow) {
+              return AppRoutes.login;
+            }
+            return null;
+          case null:
             return AppRoutes.login;
-          }
-          return null;
-        case null:
-          return AppRoutes.login;
+        }
       }
       return null;
     },
@@ -69,6 +84,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       body: Center(child: Text('Страница не найдена: ${state.uri}')),
     ),
     routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: SplashPage(),
+        ),
+      ),
       GoRoute(
         path: AppRoutes.login,
         pageBuilder: (context, state) => const NoTransitionPage(
@@ -174,6 +195,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: AppRoutes.cart,
+        pageBuilder: (context, state) {
+          return const NoTransitionPage(child: CartPage());
+        },
+      ),
+      GoRoute(
         path: AppRoutes.shop,
         pageBuilder: (context, state) {
           return const NoTransitionPage(child: ShopPage());
@@ -200,6 +227,48 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           );
         },
+      ),
+      GoRoute(
+        path: AppRoutes.ltCoin,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: LtCoinPage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.ltWinner,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: LtWinnerPage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.ltPay,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: LtPayPage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.ltConcierge,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: LtConciergePage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.ltPriority,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: LtConciergePage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.ltTravel,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: LtConciergePage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.order,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: OrderPage(),
+        ),
       ),
     ],
   );
