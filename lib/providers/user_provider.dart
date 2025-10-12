@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../data/models/user.dart';
 import '../data/services/api_service.dart';
 import '../data/services/token_storage.dart';
 import 'auth_state.dart';
@@ -117,3 +118,21 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 }
+
+final userProvider = Provider<User?>(
+  (ref) {
+    final authState = ref.watch(authNotifierProvider);
+    return authState.when(
+      data: (state) {
+        return state.map(
+          authenticated: (authenticatedState) => authenticatedState.user,
+          needsRegistration: (needsRegistrationState) =>
+              needsRegistrationState.user,
+          unauthenticated: (_) => null,
+        );
+      },
+      loading: () => null,
+      error: (_, __) => null,
+    );
+  },
+);

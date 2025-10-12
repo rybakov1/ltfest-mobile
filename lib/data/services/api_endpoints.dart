@@ -30,4 +30,10 @@ abstract class ApiEndpoints {
       '/api/festivals?filters[direction][title][\$eq]=$direction';
   static String laboratoriesByDirection(String direction) =>
       '/api/laboratories?filters[direction][title][\$eq]=$direction';
+
+
+  static const String paymentsInit = '/api/payments/init';
+  static const String paymentsState = '/api/payments/state';
+  static const String paymentsConfirm = '/api/payments/confirm';
+  static const String baseStrapiUrl = 'http://37.46.132.144:1337';
 }

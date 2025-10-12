@@ -34,6 +34,8 @@ dependencies:
   carousel_slider: ^5.1.1
   share_plus: ^11.1.0
   collection: ^1.19.1
+  flutter_custom_tabs: ^2.4.0  # Для WebView
+  app_links: ^6.4.1  # Для Deeplink
 
 dev_dependencies:
   flutter_test:

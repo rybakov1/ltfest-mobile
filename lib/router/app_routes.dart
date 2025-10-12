@@ -26,6 +26,11 @@ class AppRoutes {
   static const String shop = '/shop';
   static const String cart = '/cart';
   static const String order = '/order';
+  static const String payment = '/payment';
 
   static const String splash = '/splash';
+
+  static const String paymentInit = '/payment/init';
+  static const String paymentSuccess = '/success/:id';
+  static const String paymentFailure = '/fail/:id';
 }

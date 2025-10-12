@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../pages/cart/models/cart.dart';
 import '../models/favorite.dart';
 import '../models/ltbanner.dart';
+import '../models/payment.dart';
 import '../models/product/product.dart';
 import '../models/product/product_details.dart';
 import '../models/product/product_in_stock.dart';
@@ -402,7 +403,9 @@ class ApiService {
         },
       );
       final List<dynamic> data = response.data['data'];
-      return data.map((json) => Product.fromJson(json as Map<String, dynamic>)).toList();
+      return data
+          .map((json) => Product.fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       _handleError(e);
     }
@@ -460,9 +463,8 @@ class ApiService {
   Future<void> updateCartItemQuantity(
       {required int cartItemId, required int newQuantity}) async {
     try {
-      await _dio.put('${ApiEndpoints.cartItems}/$cartItemId', data: {
-        'data': {'quantity': newQuantity}
-      });
+      await _dio.put('${ApiEndpoints.cartItems}/$cartItemId',
+          data: {'quantity': newQuantity});
     } catch (e) {
       _handleError(e);
     }
@@ -472,6 +474,56 @@ class ApiService {
   Future<void> removeCartItem({required int cartItemId}) async {
     try {
       await _dio.delete('${ApiEndpoints.cartItems}/$cartItemId');
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<PaymentInitResponse> initPayment({
+    required int amount,
+    required String orderId,
+    required String successUrl,
+    required String failUrl,
+    String description = 'Оплата',
+    String? customerEmail,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.paymentsInit,
+        data: {
+          'amount': amount,
+          'orderId': orderId,
+          'successUrl': successUrl,
+          'failUrl': failUrl,
+          'description': description,
+          'customerEmail': customerEmail,
+        },
+      );
+      return PaymentInitResponse.fromJson(response.data);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<PaymentStateResponse> getPaymentState(String paymentId) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.paymentsState,
+        data: {'paymentId': paymentId},
+      );
+      return PaymentStateResponse.fromJson(response.data);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<PaymentStateResponse> confirmPayment(String paymentId) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.paymentsConfirm,
+        data: {'paymentId': paymentId},
+      );
+      return PaymentStateResponse.fromJson(response.data);
     } catch (e) {
       _handleError(e);
     }

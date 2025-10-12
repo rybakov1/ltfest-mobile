@@ -26,6 +26,10 @@ import 'package:ltfest/pages/home/more_items_page.dart';
 import '../pages/auth/input_code_page.dart';
 import '../pages/cart/cart_page.dart';
 import '../pages/more/favorites_page.dart';
+import '../pages/payment/payment_failure_screen.dart';
+import '../pages/payment/payment_init_screen.dart';
+import '../pages/payment/payment_provider.dart';
+import '../pages/payment/payment_success_screen.dart';
 import '../pages/splash_page.dart';
 import '../providers/auth_state.dart';
 import '../providers/user_provider.dart';
@@ -269,6 +273,59 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => const NoTransitionPage(
           child: OrderPage(),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentInit,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          return PaymentInitScreen(paymentData: data);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.paymentSuccess,
+        redirect: (BuildContext context, GoRouterState state) {
+          var paymentIdFromUrl = state.pathParameters['id'];
+          if (paymentIdFromUrl == '{PaymentId}') {
+            final ref = ProviderScope.containerOf(context, listen: false);
+            final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
+
+            if (savedId != null && savedId.isNotEmpty) {
+              debugPrint('GoRouter redirect: replacing {PaymentId} with $savedId');
+              return '/success/$savedId';
+            }
+          }
+          return null;
+        },
+        builder: (context, state) {
+          // Сюда мы попадем уже ПОСЛЕ redirect, с правильным ID
+          final correctPaymentId = state.pathParameters['id']!;
+          debugPrint(
+              'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
+          return PaymentSuccessScreen(paymentId: correctPaymentId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.paymentFailure,
+        redirect: (BuildContext context, GoRouterState state) {
+          var paymentIdFromUrl = state.pathParameters['id'];
+          if (paymentIdFromUrl == '{PaymentId}') {
+            final ref = ProviderScope.containerOf(context, listen: false);
+            final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
+
+            if (savedId != null && savedId.isNotEmpty) {
+              debugPrint('GoRouter redirect: replacing {PaymentId} with $savedId');
+              return '/success/$savedId';
+            }
+          }
+          return null;
+        },
+        builder: (context, state) {
+          // Сюда мы попадем уже ПОСЛЕ redirect, с правильным ID
+          final correctPaymentId = state.pathParameters['id']!;
+          debugPrint(
+              'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
+          return PaymentFailureScreen(paymentId: correctPaymentId);
+        },
       ),
     ],
   );
