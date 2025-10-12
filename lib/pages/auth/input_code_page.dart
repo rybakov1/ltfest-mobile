@@ -151,10 +151,16 @@ class _InputCodePageState extends ConsumerState<InputCodePage> {
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<AuthState>>(authNotifierProvider, (previous, next) {
       final authState = next.value;
-      if (authState is NeedsRegistration) {
-        context.push(AppRoutes.registration);
-      } else if (authState is Authenticated) {
-        context.go(AppRoutes.home);
+      final currentLocation = GoRouterState.of(context).uri.path; // Добавьте это для проверки текущего пути
+
+      if (authState is NeedsRegistration && currentLocation != AppRoutes.registration) {
+        if (mounted) {
+          context.replace(AppRoutes.registration); // replace вместо push, чтобы очистить verification
+        }
+      } else if (authState is Authenticated && currentLocation != AppRoutes.home) {
+        if (mounted) {
+          context.go(AppRoutes.home);
+        }
       }
     });
 

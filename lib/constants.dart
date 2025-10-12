@@ -25,19 +25,15 @@ class Palette {
   static Color stroke = const Color.fromRGBO(222, 222, 224, 1);
   static Color background = const Color.fromRGBO(248, 248, 248, 1);
   static Color white = Colors.white;
-
   static Color primaryLime = const Color(0xFFBAD712);
   static Color primaryYellow = const Color(0xFFE2FF39);
   static Color primaryPink = const Color(0xFFFC3674);
   static Color secondary = const Color.fromRGBO(255, 133, 98, 1);
   static Color primary2Gradient = const Color.fromRGBO(255, 146, 178, 1);
-
   static Color error = const Color(0xFFEC3437);
   static Color success = const Color(0xFF48A74C);
-
   static Color shimmerBase = const Color(0xFFF0F2F5);
   static Color shimmerHighlight = const Color(0xFFE7EAED);
-
   static Color grayTimer = const Color.fromRGBO(157, 157, 157, 1);
 }
 

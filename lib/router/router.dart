@@ -39,15 +39,22 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.listen(authNotifierProvider, (_, __) => listenable.value++);
 
   return GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: AppRoutes.splash,
     refreshListenable: listenable,
     redirect: (BuildContext context, GoRouterState state) {
       final authState = ref.read(authNotifierProvider);
       final currentLocation = state.uri.path;
 
-      if ((authState.isLoading || authState.isReloading) &&
-          currentLocation != AppRoutes.splash) {
-        return AppRoutes.splash;
+      final isAuthRoute = currentLocation == AppRoutes.login ||
+          currentLocation == AppRoutes.verification ||
+          currentLocation == AppRoutes.registration ||
+          currentLocation == AppRoutes.splash;
+
+      if (authState.isLoading || authState.isReloading) {
+        if (!isAuthRoute && currentLocation != AppRoutes.splash) {
+          return AppRoutes.splash;
+        }
+        return null;
       }
 
       if (authState.hasError && currentLocation != AppRoutes.login) {
@@ -61,7 +68,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             final isGoingToAuthRoute = currentLocation == AppRoutes.login ||
                 currentLocation == AppRoutes.verification ||
                 currentLocation == AppRoutes.registration ||
-                currentLocation == AppRoutes.splash; // Важно добавить сплэш
+                currentLocation == AppRoutes.splash;
             if (isGoingToAuthRoute) {
               return AppRoutes.home;
             }
@@ -73,7 +80,9 @@ final routerProvider = Provider<GoRouter>((ref) {
             return null;
           case Unauthenticated():
             final isGoingToAuthFlow = currentLocation == AppRoutes.login ||
-                currentLocation == AppRoutes.verification;
+                currentLocation == AppRoutes.verification ||
+                currentLocation == AppRoutes.registration ||
+                currentLocation == AppRoutes.splash;
             if (!isGoingToAuthFlow) {
               return AppRoutes.login;
             }
@@ -290,14 +299,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
 
             if (savedId != null && savedId.isNotEmpty) {
-              debugPrint('GoRouter redirect: replacing {PaymentId} with $savedId');
+              debugPrint(
+                  'GoRouter redirect: replacing {PaymentId} with $savedId');
               return '/success/$savedId';
             }
           }
           return null;
         },
         builder: (context, state) {
-          // Сюда мы попадем уже ПОСЛЕ redirect, с правильным ID
           final correctPaymentId = state.pathParameters['id']!;
           debugPrint(
               'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
@@ -313,14 +322,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
 
             if (savedId != null && savedId.isNotEmpty) {
-              debugPrint('GoRouter redirect: replacing {PaymentId} with $savedId');
+              debugPrint(
+                  'GoRouter redirect: replacing {PaymentId} with $savedId');
               return '/success/$savedId';
             }
           }
           return null;
         },
         builder: (context, state) {
-          // Сюда мы попадем уже ПОСЛЕ redirect, с правильным ID
           final correctPaymentId = state.pathParameters['id']!;
           debugPrint(
               'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
