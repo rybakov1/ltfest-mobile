@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/router/router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+
 
 // 11.10 build
-void main() {
-  runApp(const ProviderScope(child: MyApp()));
+Future<void> main() async {
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = 'https://143ecd79de653a2d4c96a9a5ffc84ace@o4510202029801472.ingest.de.sentry.io/4510202031112272';
+      options.tracesSampleRate = 1.0;
+      options.profilesSampleRate = 1.0;
+    },
+    appRunner: () => runApp(SentryWidget(child: const ProviderScope(child: MyApp()))),
+  );
+  // runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {

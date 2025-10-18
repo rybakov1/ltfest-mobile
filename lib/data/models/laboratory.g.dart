@@ -9,6 +9,7 @@ part of 'laboratory.dart';
 _Laboratory _$LaboratoryFromJson(Map<String, dynamic> json) => _Laboratory(
       id: (json['id'] as num).toInt(),
       title: json['title'] as String,
+      title2: json['title2'] as String?,
       image: json['image'] == null
           ? null
           : ImageData.fromJson(json['image'] as Map<String, dynamic>),
@@ -31,6 +32,7 @@ Map<String, dynamic> _$LaboratoryToJson(_Laboratory instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
+      'title2': instance.title2,
       'image': instance.image,
       'description': instance.description,
       'address': instance.address,

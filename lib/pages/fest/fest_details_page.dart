@@ -289,9 +289,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                                   ],
                                 ),
                               ),
-                              SizedBox(
-                                  height:
-                                      205 + MediaQuery.of(context).padding.top),
+                              SizedBox(height: 270 - MediaQuery.of(context).padding.top),
                               festivalInfo(festival),
                               const SizedBox(height: 2),
                               Container(
@@ -339,7 +337,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                                                   child: Center(
                                                     child: Text(
                                                       "Основное",
-                                                      style: Styles.h5.copyWith(
+                                                      style: Styles.b2.copyWith(
                                                         color: tabIndex == 0
                                                             ? Palette.white
                                                             : Palette.gray,
@@ -375,7 +373,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                                                   child: Center(
                                                     child: Text(
                                                       "Тарифы",
-                                                      style: Styles.h5.copyWith(
+                                                      style: Styles.b2.copyWith(
                                                         color: tabIndex == 1
                                                             ? Palette.white
                                                             : Palette.gray,
@@ -485,7 +483,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание",
+                        festival.title2 ?? "", //"ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание",
                         style: Styles.b2.copyWith(color: Palette.gray),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -518,7 +516,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              "описаниеописаниеописаниеописаниеописаниеописаниеописание",
+              festival.title2 ?? "",
               style: Styles.b2.copyWith(color: Palette.gray),
             ),
             const SizedBox(height: 8),
@@ -530,10 +528,10 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                     "от ${Utils.formatMoney(festival.price)}/чел",
                     style: Styles.h4.copyWith(color: Palette.gray),
                   ),
-                  const SizedBox(width: 8),
-                  SvgPicture.asset(
-                    'assets/icons/info.svg',
-                  ),
+                  // const SizedBox(width: 8),
+                  // SvgPicture.asset(
+                  //   'assets/icons/info.svg',
+                  // ),
                 ],
               ),
             ),
@@ -554,7 +552,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                 SvgPicture.asset('assets/icons/calendar.svg'),
                 const SizedBox(width: 12),
                 Text(
-                  "${DateFormat("dd", "ru").format(festival.dateStart!)} - ${DateFormat("dd", "ru").format(festival.dateEnd!)} ${DateFormat("MMMM yyyy", "ru").format(festival.dateStart!)}",
+                  "${DateFormat("dd.MM.yyyy", "ru").format(festival.dateStart!)} - ${DateFormat("dd.MM.yyyy", "ru").format(festival.dateEnd!)}",
                   style: Styles.b2.copyWith(color: Palette.black),
                 ),
               ],
@@ -719,7 +717,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
         const SizedBox(height: 16),
         LTButtons.elevatedButton(
           onPressed: () {},
-          child: const Text("Заполнить заявку"),
+          child: Text("Заполнить заявку", style: Styles.button1),
           backgroundColor: widget.category == "Театр"
               ? Palette.primaryLime
               : Palette.primaryPink,

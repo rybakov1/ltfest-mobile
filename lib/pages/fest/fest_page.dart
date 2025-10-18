@@ -60,8 +60,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
       curve: Curves.easeInOut,
     );
 
-    // Запускаем анимацию в начальное состояние (полностью видимое)
-    _storiesAnimationController.forward();
+    _storiesAnimationController.value = 1.0;
   }
 
   @override
@@ -75,16 +74,150 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
   }
 
   void _scrollListener() {
-    if (_scrollController.offset > 50 &&
-        _storiesAnimationController.isCompleted) {
-      _storiesAnimationController
-          .reverse();
-    }
-    else if (_scrollController.offset <= 50 &&
-        _storiesAnimationController.isDismissed) {
-      _storiesAnimationController
-          .forward();
-    }
+    final progress = (_scrollController.offset / 100.0).clamp(0.0, 1.0);
+    _storiesAnimationController.value = 1.0 - progress;
+  }
+
+  void _showCityBottomSheet(FestivalsState state) {
+    final uniqueCities = state.uniqueCities;
+    List<String> selected = List<String>.from(state.selectedCities);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Palette.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (modalContext) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            top: 16,
+            bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 41,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Palette.stroke,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Город',
+                textAlign: TextAlign.center,
+                style: Styles.h4,
+              ),
+              const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: uniqueCities.isEmpty
+                    ? const Center(child: Text("Нет городов для выбора"))
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: uniqueCities.length,
+                        itemBuilder: (context, index) {
+                          final city = uniqueCities.elementAt(index);
+                          final isSelected = selected.contains(city);
+                          return Column(
+                            children: [
+                              _buildCheckboxListTile(
+                                title: city,
+                                value: isSelected,
+                                onChanged: (value) {
+                                  setModalState(() {
+                                    if (value!) {
+                                      selected.add(city);
+                                    } else {
+                                      selected.remove(city);
+                                    }
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 0),
+                            ],
+                          );
+                        },
+                      ),
+              ),
+              // Footer
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16),
+                child: Row(
+                  children: [
+                    Flexible(
+                      flex: 1,
+                      fit: FlexFit.loose,
+                      child: Container(
+                        child: LTButtons.outlinedButton(
+                          onPressed: () {
+                            Navigator.pop(modalContext);
+                            ref
+                                .read(festivalsNotifierProvider(widget.category)
+                                    .notifier)
+                                .setSelectedCities([]);
+                          },
+                          child: Text('Сбросить', style: Styles.button1),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      flex: 2,
+                      fit: FlexFit.tight,
+                      child: LTButtons.elevatedButton(
+                        onPressed: () {
+                          Navigator.pop(modalContext);
+                          ref
+                              .read(festivalsNotifierProvider(widget.category)
+                                  .notifier)
+                              .setSelectedCities(selected);
+                        },
+                        child: Text('Применить', style: Styles.button1),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckboxListTile({
+    required String title,
+    required bool value,
+    required ValueChanged<bool?> onChanged,
+  }) {
+    return InkWell(
+      onTap: () => onChanged(!value),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          checkboxTheme: CheckboxThemeData(
+              side: BorderSide(color: Palette.stroke, width: 1.5)),
+        ),
+        child: Row(
+          children: [
+            Checkbox(
+              value: value,
+              onChanged: onChanged,
+              activeColor: Palette.secondary,
+              checkColor: Palette.white,
+            ),
+            const SizedBox(width: 0),
+            Expanded(
+              child: Text(title, style: Styles.b1),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -93,16 +226,25 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
 
     final festivalsAsync =
         ref.watch(festivalsNotifierProvider(widget.category));
-    final festivalState = festivalsAsync.valueOrNull ?? FestivalsState();
+    final festivalState = festivalsAsync.valueOrNull ?? const FestivalsState();
 
     ref.listen(festivalsNotifierProvider(widget.category), (_, next) {
       final newQuery = next.valueOrNull?.searchQuery ?? '';
       if (newQuery != _searchController.text) {
         _searchController.text = newQuery;
       }
+
+      final newState = next.valueOrNull;
+      if (newState != null &&
+          newState.filteredFestivals.isEmpty &&
+          _storiesAnimationController.value < 1.0) {
+        _storiesAnimationController.value = 1.0;
+      }
     });
+
     return Scaffold(
       backgroundColor: Palette.background,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: CustomScrollView(
           physics: const NeverScrollableScrollPhysics(),
@@ -163,19 +305,50 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                     ),
                     Row(
                       children: [
-                        // SizedBox(
-                        //   width: 100,
-                        //   child: Padding(
-                        //     padding : const EdgeInsets.only(
-                        //         right: 12, left: 12, top: 20, bottom: 6),
-                        //     child: CustomChip(
-                        //       onDirectionSelected: (direction) {
-                        //         ref.read(selectedDirectionProvider.notifier).state =
-                        //             direction;
-                        //       },
-                        //     ),
-                        //   ),
-                        // ),
+                        GestureDetector(
+                          onTap: () => _showCityBottomSheet(festivalState),
+                          child: Container(
+                            height: 43,
+                            padding: const EdgeInsets.only(
+                              left: 10,
+                              right: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: festivalState.selectedCities.isEmpty
+                                  ? Palette.white
+                                  : Palette.primaryLime,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Palette.stroke,
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Город",
+                                  style: Styles.b2.copyWith(
+                                    color: festivalState.selectedCities.isEmpty
+                                        ? Palette.gray
+                                        : Palette.white,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Icon(
+                                  festivalState.selectedCities.isEmpty
+                                      ? Icons.keyboard_arrow_down_outlined
+                                      : Icons.close,
+                                  color: festivalState.selectedCities.isEmpty
+                                      ? const Color(0xFF1C274C)
+                                      : Palette.white,
+                                  size: 16,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: TextField(
                             style: Styles.b2,
@@ -190,49 +363,67 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Palette.white,
+                              suffixIcon: Icon(Icons.search_rounded,
+                                  color: Palette.stroke),
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                      color: Palette.stroke, width: 1)),
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Palette.stroke,
+                                  width: 1,
+                                ),
+                              ),
                               enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                      color: Palette.stroke, width: 1)),
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Palette.stroke,
+                                  width: 1,
+                                ),
+                              ),
                               focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                      color: Palette.primaryLime, width: 1)),
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Palette.primaryLime,
+                                  width: 1,
+                                ),
+                              ),
                               errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                      color: Palette.error, width: 1)),
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Palette.error,
+                                  width: 1,
+                                ),
+                              ),
                               focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                      color: Palette.error, width: 1)),
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Palette.error,
+                                  width: 1,
+                                ),
+                              ),
                               hintText: "Поиск",
                               hintStyle: Styles.b2,
+                              constraints: const BoxConstraints(maxHeight: 43),
                               contentPadding: const EdgeInsets.only(
-                                  left: 16, top: 13, bottom: 13),
+                                left: 16,
+                                top: 13,
+                                bottom: 13,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Expanded(
-                      // Используем наш новый чистый виджет для отображения списка
+                    Flexible(
                       child: AsyncItemsListView(
                         scrollController: _scrollController,
                         asyncValue: festivalsAsync,
                         items: festivalState.filteredFestivals,
-                        // Передаем отфильтрованный список
                         onRefresh: () => ref.refresh(
                             festivalsNotifierProvider(widget.category).future),
                         itemBuilder: (context, index) {
                           final festival =
                               festivalState.filteredFestivals[index];
-                          // Разметка карточки остается здесь, как вы и просили
                           return Padding(
                             padding: EdgeInsets.only(
                               bottom: index <
@@ -264,7 +455,8 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
   }) {
     return GestureDetector(
       onTap: () {
-        context.push('${AppRoutes.festivals}/${widget.category}/${festival.id}');
+        context
+            .push('${AppRoutes.festivals}/${widget.category}/${festival.id}');
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,7 +467,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
                   'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
-                  height: 150,
+                  height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -304,7 +496,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
               Text(festival.address ?? 'Не указано',
                   style: Styles.b2.copyWith(color: Palette.gray)),
               Text(
-                "${DateFormat("dd", "ru").format(festival.dateStart!)} - ${DateFormat("dd", "ru").format(festival.dateEnd!)} ${DateFormat("MMMM yyyy", "ru").format(festival.dateStart!)}",
+                "${DateFormat("dd.MM.yyyy", "ru").format(festival.dateStart!)} - ${DateFormat("dd.MM.yyyy", "ru").format(festival.dateEnd!)}",
                 style: Styles.b2.copyWith(color: Palette.black),
               ),
             ],

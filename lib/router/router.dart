@@ -4,13 +4,14 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/pages/more/about_app_page.dart';
 import 'package:ltfest/pages/more/account_settings_page.dart';
 import 'package:ltfest/pages/more/app_settings_page.dart';
+import 'package:ltfest/pages/news/news_details_page.dart';
 import 'package:ltfest/pages/order/order_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_details_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_page.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:ltfest/pages/auth/login_page.dart';
 import 'package:ltfest/pages/auth/registration_page.dart';
-import 'package:ltfest/pages/news_page.dart';
+import 'package:ltfest/pages/news/news_page.dart';
 import 'package:ltfest/pages/fest/fest_details_page.dart';
 import 'package:ltfest/pages/fest/fest_page.dart';
 import 'package:ltfest/pages/home/home_page.dart';
@@ -157,6 +158,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: '${AppRoutes.news}/:id',
+            pageBuilder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return NoTransitionPage(
+                child: NewsDetailsPage(id: id),
+              );
+            },
+          ),
+          GoRoute(
             path: AppRoutes.more,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: MorePage(),
@@ -165,7 +175,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
-        path: "${AppRoutes.more}/${AppRoutes.user}",
+        path: AppRoutes.user,
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AccountSettingsPage(),
         ),
@@ -177,13 +187,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: "${AppRoutes.more}/${AppRoutes.settings}",
+        path: AppRoutes.settings,
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AppSettingsPage(),
         ),
       ),
       GoRoute(
-        path: "${AppRoutes.more}/${AppRoutes.about}",
+        path: AppRoutes.about,
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AboutAppPage(),
         ),
@@ -324,7 +334,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             if (savedId != null && savedId.isNotEmpty) {
               debugPrint(
                   'GoRouter redirect: replacing {PaymentId} with $savedId');
-              return '/success/$savedId';
+              return '/fail/$savedId';
             }
           }
           return null;

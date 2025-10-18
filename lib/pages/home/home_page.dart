@@ -31,34 +31,38 @@ class HomePage extends ConsumerWidget {
               automaticallyImplyLeading: false,
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
+
                 collapseMode: CollapseMode.pin,
                 background: Builder(builder: (innerContext) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 24, horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        InkWell(
-                          onTap: () => Scaffold.of(innerContext).openDrawer(),
-                          child: const Icon(Icons.menu, size: 24),
-                        ),
-                        const Spacer(),
-                        Column(
-                          children: [
-                            Image.asset(
-                              'assets/images/logo_black.png',
-                              height: 24,
-                            ),
-                            Text(
-                              "Всероссийское фестивальное движение",
-                              style: Styles.b3,
-                            )
-                          ],
-                        ),
-                        const Spacer(),
-                        const SizedBox(width: 24)
-                      ],
+                  return Container(
+                    color: Palette.background,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 24, horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () => Scaffold.of(innerContext).openDrawer(),
+                            child: const Icon(Icons.menu, size: 24),
+                          ),
+                          const Spacer(),
+                          Column(
+                            children: [
+                              Image.asset(
+                                'assets/images/logo_black.png',
+                                height: 24,
+                              ),
+                              Text(
+                                "Всероссийское фестивальное движение",
+                                style: Styles.b3,
+                              )
+                            ],
+                          ),
+                          const Spacer(),
+                          const SizedBox(width: 24)
+                        ],
+                      ),
                     ),
                   );
                 }),
@@ -196,6 +200,20 @@ class HomePage extends ConsumerWidget {
                         const BannerCarousel(),
                         const SizedBox(height: 24),
                         const NewsWidget(),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("LT Shop", style: Styles.h3),
+                            GestureDetector(
+                              onTap: () => context.push(AppRoutes.shop),
+                              child: Text(
+                                "Все",
+                                style: Styles.b2.copyWith(color: Palette.secondary),
+                              ),
+                            )
+                          ],
+                        ),
                         const SizedBox(height: 24),
                         const ShopWidget(),
                       ],

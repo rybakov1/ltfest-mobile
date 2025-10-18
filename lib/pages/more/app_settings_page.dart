@@ -50,7 +50,7 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.black,
+      backgroundColor: Palette.background,
       body: Column(
         children: [
           Padding(
@@ -66,7 +66,7 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
                   alignment: Alignment.center,
                   child: Text(
                     "Настройки приложения",
-                    style: Styles.h3.copyWith(color: Palette.white),
+                    style: Styles.h4,
                   ),
                 ),
                 Align(
@@ -93,8 +93,7 @@ class _AppSettingsPageState extends ConsumerState<AppSettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Уведомления',
-                      style: Styles.h5.copyWith(color: Palette.gray)),
+                  Text('Уведомления', style: Styles.h4),
                   const SizedBox(height: 16),
                   _SettingsSwitchTile(
                     iconPath: 'assets/icons/news.svg',

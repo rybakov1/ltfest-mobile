@@ -6,7 +6,7 @@ part of 'festival_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$festivalsNotifierHash() => r'ec4ee8d98397c3dac2467046b501f6e521224923';
+String _$festivalsNotifierHash() => r'ebfcb8c965707015bd3d14e36e3f9da37f277773';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,11 +31,11 @@ class _SystemHash {
 
 abstract class _$FestivalsNotifier
     extends BuildlessAsyncNotifier<FestivalsState> {
-  late final String category;
+  late final String? category;
 
-  FutureOr<FestivalsState> build(
-    String category,
-  );
+  FutureOr<FestivalsState> build([
+    String? category,
+  ]);
 }
 
 /// See also [FestivalsNotifier].
@@ -48,9 +48,9 @@ class FestivalsNotifierFamily extends Family<AsyncValue<FestivalsState>> {
   const FestivalsNotifierFamily();
 
   /// See also [FestivalsNotifier].
-  FestivalsNotifierProvider call(
-    String category,
-  ) {
+  FestivalsNotifierProvider call([
+    String? category,
+  ]) {
     return FestivalsNotifierProvider(
       category,
     );
@@ -84,9 +84,9 @@ class FestivalsNotifierFamily extends Family<AsyncValue<FestivalsState>> {
 class FestivalsNotifierProvider
     extends AsyncNotifierProviderImpl<FestivalsNotifier, FestivalsState> {
   /// See also [FestivalsNotifier].
-  FestivalsNotifierProvider(
-    String category,
-  ) : this._internal(
+  FestivalsNotifierProvider([
+    String? category,
+  ]) : this._internal(
           () => FestivalsNotifier()..category = category,
           from: festivalsNotifierProvider,
           name: r'festivalsNotifierProvider',
@@ -110,7 +110,7 @@ class FestivalsNotifierProvider
     required this.category,
   }) : super.internal();
 
-  final String category;
+  final String? category;
 
   @override
   FutureOr<FestivalsState> runNotifierBuild(
@@ -161,7 +161,7 @@ class FestivalsNotifierProvider
 // ignore: unused_element
 mixin FestivalsNotifierRef on AsyncNotifierProviderRef<FestivalsState> {
   /// The parameter `category` of this provider.
-  String get category;
+  String? get category;
 }
 
 class _FestivalsNotifierProviderElement
@@ -170,7 +170,7 @@ class _FestivalsNotifierProviderElement
   _FestivalsNotifierProviderElement(super.provider);
 
   @override
-  String get category => (origin as FestivalsNotifierProvider).category;
+  String? get category => (origin as FestivalsNotifierProvider).category;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

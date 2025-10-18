@@ -21,19 +21,13 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
   final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  bool canAuth = false;
-  bool isLoading = false;
-
-  // Локальное состояние для управления кнопкой и индикатором загрузки
+  //bool canAuth = false;
   bool _isLoading = false;
-
-  // Локальное состояние для включения/выключения кнопки в реальном времени
   bool _canSubmit = false;
 
   @override
   void initState() {
     super.initState();
-    // Слушаем изменения в поле, чтобы включать/выключать кнопку
     _phoneController.addListener(_updateCanSubmit);
   }
 
@@ -45,7 +39,6 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
   }
 
   void _updateCanSubmit() {
-    // Проверяем, соответствует ли текст в поле формату полного номера
     final isFullNumber = RegExp(r'^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$')
         .hasMatch(_phoneController.text);
     if (isFullNumber != _canSubmit) {
@@ -56,24 +49,19 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
   }
 
   Future<void> _requestOtp() async {
-    // Дополнительная проверка, если пользователь очень быстро нажал на кнопку
     if (!_canSubmit || _isLoading) return;
 
-    // Валидируем форму. Если есть ошибки, метод прервется.
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
 
     setState(() => _isLoading = true);
-
-    // Убираем все символы, кроме цифр, для отправки в API
     final phone = _phoneController.text.replaceAll(RegExp(r'\D'), '');
 
     try {
       await ref.read(authNotifierProvider.notifier).requestOtp(phone);
 
       if (mounted) {
-        // Успешно запросили код, переходим на следующую страницу
         context.push(AppRoutes.verification, extra: phone);
       }
     } catch (e) {
@@ -128,17 +116,17 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                           PhoneInputField(
                             phoneController: _phoneController,
                             onValidationChanged: (isValid) {
-                              setState(() {
-                                canAuth = isValid;
-                              });
+                              // setState(() {
+                              //   canAuth = isValid;
+                              // });
                             },
                           ),
                           const Spacer(),
                           LTButtons.elevatedButton(
                             disabledForegroundColor: Palette.gray,
                             foregroundColor: Palette.white,
-                            onPressed: _phoneController.text.isNotEmpty && canAuth && !isLoading ? _requestOtp : null,
-                            child: isLoading
+                            onPressed: _phoneController.text.isNotEmpty && _canSubmit && !_isLoading ? _requestOtp : null,
+                            child: _isLoading
                                 ? CircularProgressIndicator(color: Palette.black)
                                 : Text('Получить код', style: Styles.button1),
                           ),
@@ -148,14 +136,14 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                             child: RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
-                                style: Styles.b4.copyWith(color: Palette.gray),
+                                style: Styles.b3.copyWith(color: Palette.gray),
                                 children: [
                                   const TextSpan(
                                       text:
                                           'Нажимая на кнопку "Получить код", я принимаю условия '),
                                   TextSpan(
                                     text: 'пользовательского соглашения',
-                                    style: Styles.b4.copyWith(color: Palette.secondary),
+                                    style: Styles.b3.copyWith(color: Palette.secondary),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launchUrl(Uri.parse(
@@ -165,7 +153,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                                   const TextSpan(text: ' и '),
                                   TextSpan(
                                     text: 'обработки персональных данных',
-                                    style: Styles.b4.copyWith(color: Palette.secondary),
+                                    style: Styles.b3.copyWith(color: Palette.secondary),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launchUrl(Uri.parse(
@@ -211,7 +199,6 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
   @override
   void initState() {
     super.initState();
-    // Добавляем слушатель, чтобы обновлять состояние иконки очистки
     widget.phoneController.addListener(() {
       setState(() {});
     });

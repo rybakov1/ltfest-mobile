@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/providers/direction_provider.dart';
 
 class CustomChip extends ConsumerWidget {
-  // ИЗМЕНЕНИЕ: Тип коллбэка теперь может быть null
   final ValueChanged<String?> onDirectionSelected;
 
   const CustomChip({
@@ -14,139 +14,168 @@ class CustomChip extends ConsumerWidget {
   });
 
   void _showDirectionPicker(BuildContext context, WidgetRef ref) {
+    final initialSelected = ref.read(selectedDirectionProvider);
+    String? tempSelected = initialSelected;
+
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
-      useSafeArea: true,
+      isScrollControlled: true,
       backgroundColor: Palette.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (BuildContext context) {
+      builder: (BuildContext modalContext) {
         return Consumer(builder: (context, ref, child) {
-          // selectedDirection теперь может быть null
-          final selectedDirection = ref.watch(selectedDirectionProvider);
           final directionsAsync = ref.watch(directionsProvider);
 
-          return Container(
-            padding: EdgeInsets.only(
-                bottom: 24 + MediaQuery.of(context).viewPadding.bottom),
-            constraints: const BoxConstraints(minHeight: 200),
-            // Чтобы не было ошибки рендера при загрузке
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 8),
-                Center(
-                  child: Container(
-                    width: 41,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Palette.stroke,
+          return StatefulBuilder(
+            builder: (context, setModalState) {
+              return Padding(
+                padding: EdgeInsets.only(
+                  top: 16,
+                  bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 41,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Palette.stroke,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Center(
-                  child: Text('Направление', style: Styles.h4),
-                ),
-                const SizedBox(height: 32),
-
-                // --- ИЗМЕНЕНИЯ ЗДЕСЬ ---
-                directionsAsync.when(
-                  data: (directions) => Column(
-                    children: [
-                      ...directions.map((direction) {
-                        return RadioListTile<String?>(
-                          title: Text(direction.title, style: Styles.b2),
-                          value: direction.title,
-                          dense: true,
-                          groupValue: selectedDirection,
-                          onChanged: (value) {
-                            if (value != null) {
-                              ref
-                                  .read(selectedDirectionProvider.notifier)
-                                  .state = value;
-                              onDirectionSelected(value);
-                              //Navigator.pop(context);
-                            }
-                          },
-                          activeColor: Palette.secondary,
-                        );
-                      }),
-                      RadioListTile<String?>(
-                        title: Text('Все направления', style: Styles.b2),
-                        value: null,
-                        // Значение для "Все" - это null
-                        dense: true,
-                        groupValue: selectedDirection,
-                        onChanged: (value) {
-                          ref.read(selectedDirectionProvider.notifier).state =
-                              null;
-                          onDirectionSelected(null);
-                        },
-                        activeColor: Palette.secondary,
-                      ),
-                    ],
-                  ),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (e, s) => const Center(
-                      child: Text("Не удалось загрузить направления")),
-                ),
-                const SizedBox(height: 32),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: OutlinedButton(
-                            onPressed: () {
-                              ref
-                                  .read(selectedDirectionProvider.notifier)
-                                  .state = null;
-                              onDirectionSelected(null);
-                              Navigator.pop(context);
+                    const SizedBox(height: 12),
+                    Text(
+                      'Направление',
+                      textAlign: TextAlign.center,
+                      style: Styles.h4,
+                    ),
+                    const SizedBox(height: 32),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: directionsAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, s) => const Center(
+                            child: Text("Не удалось загрузить направления")),
+                        data: (directions) {
+                          final allItems = [
+                            ...directions.map((direction) => {
+                                  'title': direction.title,
+                                  'value': direction.title
+                                }),
+                            {
+                              'title': 'Все направления',
+                              'value': null as String?
                             },
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Palette.stroke),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                            child: Text("Отмена",
-                                style: Styles.button1
-                                    .copyWith(color: Palette.error)),
-                          ),
-                        ),
+                          ];
+                          if (allItems.isEmpty) {
+                            return const Center(
+                                child: Text("Нет данных для выбора"));
+                          }
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: allItems.length,
+                            itemBuilder: (context, index) {
+                              final item = allItems[index];
+                              final itemTitle = item['title'] as String;
+                              final itemValue = item['value'];
+                              return Column(
+                                children: [
+                                  _buildRadioListTile<String?>(
+                                    title: itemTitle,
+                                    value: itemValue,
+                                    groupValue: tempSelected,
+                                    onChanged: (newValue) {
+                                      setModalState(() {
+                                        tempSelected = newValue;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: LTButtons.elevatedButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              'Сохранить',
-                              style: Styles.button1,
+                    ),
+                    // Footer
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: LTButtons.outlinedButton(
+                              onPressed: () {
+                                Navigator.pop(modalContext);
+                                ref
+                                    .read(selectedDirectionProvider.notifier)
+                                    .state = null;
+                                onDirectionSelected(null);
+                              },
+                              child: Text('Сбросить', style: Styles.button1),
                             ),
                           ),
-                        ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 2,
+                            child: LTButtons.elevatedButton(
+                              onPressed: () {
+                                ref
+                                    .read(selectedDirectionProvider.notifier)
+                                    .state = tempSelected;
+                                onDirectionSelected(tempSelected);
+                                Navigator.pop(modalContext);
+                              },
+                              child: Text('Применить', style: Styles.button1),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           );
         });
       },
+    );
+  }
+
+  Widget _buildRadioListTile<T>({
+    required String title,
+    required T value,
+    required T? groupValue,
+    required ValueChanged<T?> onChanged,
+  }) {
+    return InkWell(
+      onTap: () => onChanged(value),
+      child: Row(
+        children: [
+          Radio<T>(
+            value: value,
+            groupValue: groupValue,
+            onChanged: onChanged,
+            visualDensity: VisualDensity.compact,
+            activeColor: Palette.secondary,
+            fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+              if (states.contains(WidgetState.selected)) {
+                return Palette.secondary;
+              }
+              return Palette.stroke;
+            }),
+          ),
+          const SizedBox(width: 0.0),
+          Expanded(
+            child: Text(title, style: Styles.b2),
+          ),
+        ],
+      ),
     );
   }
 
@@ -159,16 +188,19 @@ class CustomChip extends ConsumerWidget {
         final String displayText = selectedDirection ?? 'Все';
         final Color displayColor = selectedDirection == 'Танцы'
             ? Palette.primaryPink
-            : (selectedDirection == null ? Palette.secondary : Palette.primaryLime);
+            : (selectedDirection == null
+                ? Palette.secondary
+                : Palette.primaryLime);
 
         return GestureDetector(
           onTap: () => _showDirectionPicker(context, ref),
           child: Container(
+            height: 32,
             decoration: BoxDecoration(
               color: displayColor,
               borderRadius: BorderRadius.circular(8),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -194,6 +226,7 @@ class CustomChipWithName extends StatelessWidget {
   final String selectedDirection;
 
   const CustomChipWithName({super.key, required this.selectedDirection});
+
   @override
   Widget build(BuildContext context) {
     return Container(

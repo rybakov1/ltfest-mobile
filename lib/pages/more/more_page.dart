@@ -333,7 +333,7 @@ class MorePage extends ConsumerWidget {
                       iconPath: 'assets/icons/person.svg',
                       title: "Настройки аккаунта",
                       onTap: () {
-                        context.push("${AppRoutes.more}/${AppRoutes.user}");
+                        context.push(AppRoutes.user);
                       },
                     ),
                     _MenuTile(
@@ -341,14 +341,14 @@ class MorePage extends ConsumerWidget {
                       title: "Настройки приложения",
                       onTap: () {
                         context
-                            .push("${AppRoutes.more}/${AppRoutes.settings}");
+                            .push(AppRoutes.settings);
                       },
                     ),
                     _MenuTile(
                       iconPath: 'assets/icons/info.svg',
                       title: "О приложении",
                       onTap: () {
-                        context.push("${AppRoutes.more}/${AppRoutes.about}");
+                        context.push(AppRoutes.about);
                       },
                     ),
                   ],
@@ -369,20 +369,23 @@ class ProfileCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-      decoration: BoxDecoration(
-          color: Palette.primaryLime, borderRadius: BorderRadius.circular(12)),
-      child: Row(
-        children: [
-          Text("LT Priority", style: Styles.h4.copyWith(color: Palette.white)),
-          const Spacer(),
-          Text("Подключить",
-              style: Styles.button1.copyWith(color: Palette.white)),
-          const SizedBox(width: 8),
-          SvgPicture.asset('assets/icons/arrow_right.svg',
-              colorFilter: ColorFilter.mode(Palette.white, BlendMode.srcIn)),
-        ],
+    return InkWell(
+      onTap: () => context.push(AppRoutes.ltPriority),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+        decoration: BoxDecoration(
+            color: Palette.primaryLime, borderRadius: BorderRadius.circular(12)),
+        child: Row(
+          children: [
+            Text("LT Priority", style: Styles.h4.copyWith(color: Palette.white)),
+            const Spacer(),
+            Text("Подключить",
+                style: Styles.button1.copyWith(color: Palette.white)),
+            const SizedBox(width: 8),
+            SvgPicture.asset('assets/icons/arrow_right.svg',
+                colorFilter: ColorFilter.mode(Palette.white, BlendMode.srcIn)),
+          ],
+        ),
       ),
     );
   }

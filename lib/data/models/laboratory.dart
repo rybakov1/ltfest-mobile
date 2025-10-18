@@ -16,6 +16,7 @@ abstract class Laboratory with _$Laboratory { // implements Favoritable
   const factory Laboratory({
     required int id,
     required String title,
+    String? title2,
     ImageData? image,
     String? description,
     String? address,

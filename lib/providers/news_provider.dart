@@ -1,24 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/services/api_service.dart';
-import 'package:ltfest/providers/user_provider.dart';
 import '../data/models/news.dart';
-import 'auth_state.dart';
 
-final newsNotifierProvider = AsyncNotifierProvider<NewsNotifier, List<News>>(
-  NewsNotifier.new,
-);
+final newsNotifierProvider =
+    AsyncNotifierProvider<NewsNotifier, List<News>>(NewsNotifier.new);
 
 class NewsNotifier extends AsyncNotifier<List<News>> {
   @override
   Future<List<News>> build() async {
-    final authState = await ref.watch(authNotifierProvider.future);
+    final apiService = ref.read(apiServiceProvider);
+    return apiService.getNews();
+  }
 
-    if (authState is Authenticated) {
-      final apiService = ref.read(apiServiceProvider);
-      return apiService.getNews();
-    } else {
-      return [];
-    }
+  Future<News> getNewsDetails(String id) {
+    final apiService = ref.read(apiServiceProvider);
+    return apiService.getNewsById(id);
   }
 
   Future<void> refresh() async {
@@ -26,3 +22,14 @@ class NewsNotifier extends AsyncNotifier<List<News>> {
     state = await AsyncValue.guard(() => build());
   }
 }
+
+final newsByIdProvider = FutureProvider.family<News, String>(
+  (ref, id) async {
+    final api = ref.read(apiServiceProvider);
+    try {
+      return await api.getNewsById(id);
+    } catch (e, st) {
+      Error.throwWithStackTrace(e, st);
+    }
+  },
+);

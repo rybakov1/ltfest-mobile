@@ -16,7 +16,7 @@ class AboutAppPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.black,
+      backgroundColor: Palette.background,
       body: Column(
         children: [
           Padding(
@@ -32,7 +32,7 @@ class AboutAppPage extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     "О приложении",
-                    style: Styles.h3.copyWith(color: Palette.white),
+                    style: Styles.h4,
                   ),
                 ),
                 Align(
@@ -63,11 +63,11 @@ class AboutAppPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 24),
                     Image.asset('assets/images/logo_black.png', height: 60),
                     const SizedBox(height: 16),
                     Text('Версия 0.1.1, сборка 3',
-                        style: Styles.b3.copyWith(color: Palette.gray)),
+                        style: Styles.b2.copyWith(color: Palette.gray)),
                     const SizedBox(height: 24),
                     _buildContactInfo(),
                     const SizedBox(height: 24),

@@ -9,6 +9,7 @@ part of 'festival.dart';
 _Festival _$FestivalFromJson(Map<String, dynamic> json) => _Festival(
       id: (json['id'] as num).toInt(),
       title: json['title'] as String,
+      title2: json['title2'] as String?,
       image: json['image'] == null
           ? null
           : ImageData.fromJson(json['image'] as Map<String, dynamic>),
@@ -33,6 +34,7 @@ _Festival _$FestivalFromJson(Map<String, dynamic> json) => _Festival(
 Map<String, dynamic> _$FestivalToJson(_Festival instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
+      'title2': instance.title2,
       'image': instance.image,
       'price': instance.price,
       'date_start': instance.dateStart?.toIso8601String(),

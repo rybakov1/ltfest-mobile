@@ -121,7 +121,7 @@ class NewsWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+          borderRadius: BorderRadius.circular(12),
           child: Image.network(
             "http://37.46.132.144:1337$imageUrl",
             height: 160,

@@ -61,7 +61,27 @@ class CartPage extends ConsumerWidget {
                       .toList();
 
                   if (validItems.isEmpty) {
-                    return const Center(child: Text('Ваша корзина пуста'));
+                    return Container(
+                      decoration: Decor.base,
+                      margin: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 0.0, horizontal: 12),
+                      child: Column(
+                        children: [
+                          const Spacer(),
+                          Image.asset("assets/icons/states/nothing.png",
+                              width: 192),
+                          const SizedBox(height: 20),
+                          Text("В корзине пока пусто", style: Styles.b2),
+                          const Spacer(),
+                          LTButtons.elevatedButton(
+                            onPressed: () => context.push(AppRoutes.shop),
+                            child: const Text("За покупками"),
+                          ),
+                          SizedBox(height:12 + MediaQuery.of(context).padding.bottom),
+                        ],
+                      ),
+                    );
                   }
 
                   return Stack(
@@ -86,8 +106,28 @@ class CartPage extends ConsumerWidget {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) =>
-                    Center(child: Text('Ошибка загрузки корзины: $err')),
+                error: (err, stack) => Container(
+                  decoration: Decor.base,
+                  margin: const EdgeInsets.all(4),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0.0, horizontal: 12),
+                  child: Column(
+                    children: [
+                      const Spacer(),
+                      Image.asset("assets/icons/states/nothing.png",
+                          width: 192),
+                      const SizedBox(height: 20),
+                      Text("В корзине пока пусто", style: Styles.b2),
+                      const Spacer(),
+                      LTButtons.elevatedButton(
+                        onPressed: () => context.push(AppRoutes.shop),
+                        child: const Text("За покупками"),
+                      ),
+                      SizedBox(
+                          height: 12 + MediaQuery.of(context).padding.bottom),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -103,7 +143,7 @@ class CartItemCard extends ConsumerWidget {
 
   final CartItem cartItem;
 
-  void _showItemMore(BuildContext context) {
+  void _showItemMore(BuildContext context, CartItem cartItem, WidgetRef ref) {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
     showModalBottomSheet(
@@ -150,20 +190,24 @@ class CartItemCard extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 26),
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: Palette.error.withValues(alpha: 0.10),
-                            borderRadius: BorderRadius.circular(8)),
-                        child: SvgPicture.asset('assets/icons/trash.svg',
-                            fit: BoxFit.scaleDown, width: 24, height: 24),
-                      ),
-                      const SizedBox(width: 16),
-                      Text("Удалить из корзины", style: Styles.b1),
-                    ],
+                  InkWell(
+                    onTap: () =>
+                        ref.read(cartProvider.notifier).removeItem(cartItem.id),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              color: Palette.error.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(8)),
+                          child: SvgPicture.asset('assets/icons/trash.svg',
+                              fit: BoxFit.scaleDown, width: 24, height: 24),
+                        ),
+                        const SizedBox(width: 16),
+                        Text("Удалить из корзины", style: Styles.b1),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 68),
                   LTButtons.outlinedButton(
@@ -223,13 +267,13 @@ class CartItemCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: 10),
                       GestureDetector(
-                          onTap: () => _showItemMore(context),
+                          onTap: () => _showItemMore(context, cartItem, ref),
                           child: const Icon(Icons.more_horiz)),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${productStock.productSize.title.split(' ')[1] ?? ''} / ${productStock.productColor.title ?? ''}',
+                    '${productStock.productSize.title.split(' ')[1]} / ${productStock.productColor.title}',
                     style: Styles.b2.copyWith(color: Palette.gray),
                   ),
                   const SizedBox(height: 12),

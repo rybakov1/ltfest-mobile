@@ -16,6 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$Festival {
   int get id;
   String get title;
+  String? get title2;
   ImageData? get image;
   int get price;
   @JsonKey(name: "date_start")
@@ -47,6 +48,7 @@ mixin _$Festival {
             other is Festival &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
+            (identical(other.title2, title2) || other.title2 == title2) &&
             (identical(other.image, image) || other.image == image) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.dateStart, dateStart) ||
@@ -71,6 +73,7 @@ mixin _$Festival {
       runtimeType,
       id,
       title,
+      title2,
       image,
       price,
       dateStart,
@@ -85,7 +88,7 @@ mixin _$Festival {
 
   @override
   String toString() {
-    return 'Festival(id: $id, title: $title, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, websiteurl: $websiteurl, direction: $direction, persons: $persons)';
+    return 'Festival(id: $id, title: $title, title2: $title2, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, websiteurl: $websiteurl, direction: $direction, persons: $persons)';
   }
 }
 
@@ -97,6 +100,7 @@ abstract mixin class $FestivalCopyWith<$Res> {
   $Res call(
       {int id,
       String title,
+      String? title2,
       ImageData? image,
       int price,
       @JsonKey(name: "date_start") DateTime? dateStart,
@@ -127,6 +131,7 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? title = null,
+    Object? title2 = freezed,
     Object? image = freezed,
     Object? price = null,
     Object? dateStart = freezed,
@@ -148,6 +153,10 @@ class _$FestivalCopyWithImpl<$Res> implements $FestivalCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
+      title2: freezed == title2
+          ? _self.title2
+          : title2 // ignore: cast_nullable_to_non_nullable
+              as String?,
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -316,6 +325,7 @@ extension FestivalPatterns on Festival {
     TResult Function(
             int id,
             String title,
+            String? title2,
             ImageData? image,
             int price,
             @JsonKey(name: "date_start") DateTime? dateStart,
@@ -336,6 +346,7 @@ extension FestivalPatterns on Festival {
         return $default(
             _that.id,
             _that.title,
+            _that.title2,
             _that.image,
             _that.price,
             _that.dateStart,
@@ -370,6 +381,7 @@ extension FestivalPatterns on Festival {
     TResult Function(
             int id,
             String title,
+            String? title2,
             ImageData? image,
             int price,
             @JsonKey(name: "date_start") DateTime? dateStart,
@@ -389,6 +401,7 @@ extension FestivalPatterns on Festival {
         return $default(
             _that.id,
             _that.title,
+            _that.title2,
             _that.image,
             _that.price,
             _that.dateStart,
@@ -422,6 +435,7 @@ extension FestivalPatterns on Festival {
     TResult? Function(
             int id,
             String title,
+            String? title2,
             ImageData? image,
             int price,
             @JsonKey(name: "date_start") DateTime? dateStart,
@@ -441,6 +455,7 @@ extension FestivalPatterns on Festival {
         return $default(
             _that.id,
             _that.title,
+            _that.title2,
             _that.image,
             _that.price,
             _that.dateStart,
@@ -464,6 +479,7 @@ class _Festival implements Festival {
   const _Festival(
       {required this.id,
       required this.title,
+      this.title2,
       this.image,
       required this.price,
       @JsonKey(name: "date_start") this.dateStart,
@@ -483,6 +499,8 @@ class _Festival implements Festival {
   final int id;
   @override
   final String title;
+  @override
+  final String? title2;
   @override
   final ImageData? image;
   @override
@@ -537,6 +555,7 @@ class _Festival implements Festival {
             other is _Festival &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
+            (identical(other.title2, title2) || other.title2 == title2) &&
             (identical(other.image, image) || other.image == image) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.dateStart, dateStart) ||
@@ -561,6 +580,7 @@ class _Festival implements Festival {
       runtimeType,
       id,
       title,
+      title2,
       image,
       price,
       dateStart,
@@ -575,7 +595,7 @@ class _Festival implements Festival {
 
   @override
   String toString() {
-    return 'Festival(id: $id, title: $title, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, websiteurl: $websiteurl, direction: $direction, persons: $persons)';
+    return 'Festival(id: $id, title: $title, title2: $title2, image: $image, price: $price, dateStart: $dateStart, dateEnd: $dateEnd, address: $address, description: $description, pdfurl: $pdfurl, entryurl: $entryurl, websiteurl: $websiteurl, direction: $direction, persons: $persons)';
   }
 }
 
@@ -589,6 +609,7 @@ abstract mixin class _$FestivalCopyWith<$Res>
   $Res call(
       {int id,
       String title,
+      String? title2,
       ImageData? image,
       int price,
       @JsonKey(name: "date_start") DateTime? dateStart,
@@ -621,6 +642,7 @@ class __$FestivalCopyWithImpl<$Res> implements _$FestivalCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? title = null,
+    Object? title2 = freezed,
     Object? image = freezed,
     Object? price = null,
     Object? dateStart = freezed,
@@ -642,6 +664,10 @@ class __$FestivalCopyWithImpl<$Res> implements _$FestivalCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
+      title2: freezed == title2
+          ? _self.title2
+          : title2 // ignore: cast_nullable_to_non_nullable
+              as String?,
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable

@@ -342,8 +342,9 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
+                      if (laboratory.title2 != null)
                       Text(
-                        "ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание",
+                        laboratory.title2!,
                         style: Styles.b2.copyWith(color: Palette.gray),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -463,7 +464,8 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
               ],
             ),
           ),
-          SizedBox(height: 205 + MediaQuery.of(context).padding.top),
+          SizedBox(
+              height: 270 - MediaQuery.of(context).padding.top),
           Container(
             width: double.infinity,
             decoration: Decor.base,
@@ -477,9 +479,10 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                     laboratory.title,
                     style: Styles.h3,
                   ),
-                  const SizedBox(height: 8),
+                   SizedBox(height: laboratory.title2 != null ? 8 : 0),
+                  if (laboratory.title2 != null)
                   Text(
-                    "ОписаниеОписаниеОписаниеОписаниеОписаниеОписание",
+                    laboratory.title2!,
                     style: Styles.b2.copyWith(color: Palette.gray),
                   ),
                   const SizedBox(height: 8),
@@ -493,8 +496,8 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                               : "Цена недоступна",
                           style: Styles.h4.copyWith(color: Palette.gray),
                         ),
-                        const SizedBox(width: 8),
-                        SvgPicture.asset('assets/icons/info.svg'),
+                        // const SizedBox(width: 8),
+                        // SvgPicture.asset('assets/icons/info.svg'),
                       ],
                     ),
                   ),
@@ -515,7 +518,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                       SvgPicture.asset('assets/icons/calendar.svg'),
                       const SizedBox(width: 12),
                       Text(
-                        "${DateFormat("dd", "ru").format(laboratory.firstDayDate!)} - ${DateFormat("dd", "ru").format(laboratory.lastDayDate!)} ${DateFormat("MMMM yyyy", "ru").format(laboratory.firstDayDate!)}",
+                        "${DateFormat("dd.MM.yyyy", "ru").format(laboratory.firstDayDate!)} - ${DateFormat("dd.MM.yyyy", "ru").format(laboratory.lastDayDate!)}",
                         style: Styles.b2.copyWith(color: Palette.black),
                       ),
                     ],
@@ -553,7 +556,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                               child: Center(
                                 child: Text(
                                   "Основное",
-                                  style: Styles.h5.copyWith(
+                                  style: Styles.b2.copyWith(
                                     color: tabIndex == 0
                                         ? Palette.white
                                         : Palette.gray,
@@ -578,7 +581,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                               child: Center(
                                 child: Text(
                                   "Программа",
-                                  style: Styles.h5.copyWith(
+                                  style: Styles.b2.copyWith(
                                     color: tabIndex == 1
                                         ? Palette.white
                                         : Palette.gray,

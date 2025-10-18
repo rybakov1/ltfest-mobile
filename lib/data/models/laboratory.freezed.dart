@@ -16,6 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$Laboratory {
   int get id;
   String get title;
+  String? get title2;
   ImageData? get image;
   String? get description;
   String? get address;
@@ -43,6 +44,7 @@ mixin _$Laboratory {
             other is Laboratory &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
+            (identical(other.title2, title2) || other.title2 == title2) &&
             (identical(other.image, image) || other.image == image) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -63,6 +65,7 @@ mixin _$Laboratory {
       runtimeType,
       id,
       title,
+      title2,
       image,
       description,
       address,
@@ -74,7 +77,7 @@ mixin _$Laboratory {
 
   @override
   String toString() {
-    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, websiteurl: $websiteurl, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
+    return 'Laboratory(id: $id, title: $title, title2: $title2, image: $image, description: $description, address: $address, websiteurl: $websiteurl, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
 }
 
@@ -87,6 +90,7 @@ abstract mixin class $LaboratoryCopyWith<$Res> {
   $Res call(
       {int id,
       String title,
+      String? title2,
       ImageData? image,
       String? description,
       String? address,
@@ -114,6 +118,7 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? title = null,
+    Object? title2 = freezed,
     Object? image = freezed,
     Object? description = freezed,
     Object? address = freezed,
@@ -132,6 +137,10 @@ class _$LaboratoryCopyWithImpl<$Res> implements $LaboratoryCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
+      title2: freezed == title2
+          ? _self.title2
+          : title2 // ignore: cast_nullable_to_non_nullable
+              as String?,
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -288,6 +297,7 @@ extension LaboratoryPatterns on Laboratory {
     TResult Function(
             int id,
             String title,
+            String? title2,
             ImageData? image,
             String? description,
             String? address,
@@ -305,6 +315,7 @@ extension LaboratoryPatterns on Laboratory {
         return $default(
             _that.id,
             _that.title,
+            _that.title2,
             _that.image,
             _that.description,
             _that.address,
@@ -336,6 +347,7 @@ extension LaboratoryPatterns on Laboratory {
     TResult Function(
             int id,
             String title,
+            String? title2,
             ImageData? image,
             String? description,
             String? address,
@@ -352,6 +364,7 @@ extension LaboratoryPatterns on Laboratory {
         return $default(
             _that.id,
             _that.title,
+            _that.title2,
             _that.image,
             _that.description,
             _that.address,
@@ -382,6 +395,7 @@ extension LaboratoryPatterns on Laboratory {
     TResult? Function(
             int id,
             String title,
+            String? title2,
             ImageData? image,
             String? description,
             String? address,
@@ -398,6 +412,7 @@ extension LaboratoryPatterns on Laboratory {
         return $default(
             _that.id,
             _that.title,
+            _that.title2,
             _that.image,
             _that.description,
             _that.address,
@@ -418,6 +433,7 @@ class _Laboratory extends Laboratory {
   const _Laboratory(
       {required this.id,
       required this.title,
+      this.title2,
       this.image,
       this.description,
       this.address,
@@ -437,6 +453,8 @@ class _Laboratory extends Laboratory {
   final int id;
   @override
   final String title;
+  @override
+  final String? title2;
   @override
   final ImageData? image;
   @override
@@ -500,6 +518,7 @@ class _Laboratory extends Laboratory {
             other is _Laboratory &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
+            (identical(other.title2, title2) || other.title2 == title2) &&
             (identical(other.image, image) || other.image == image) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -520,6 +539,7 @@ class _Laboratory extends Laboratory {
       runtimeType,
       id,
       title,
+      title2,
       image,
       description,
       address,
@@ -531,7 +551,7 @@ class _Laboratory extends Laboratory {
 
   @override
   String toString() {
-    return 'Laboratory(id: $id, title: $title, image: $image, description: $description, address: $address, websiteurl: $websiteurl, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
+    return 'Laboratory(id: $id, title: $title, title2: $title2, image: $image, description: $description, address: $address, websiteurl: $websiteurl, direction: $direction, persons: $persons, learningTypes: $learningTypes, days: $days)';
   }
 }
 
@@ -546,6 +566,7 @@ abstract mixin class _$LaboratoryCopyWith<$Res>
   $Res call(
       {int id,
       String title,
+      String? title2,
       ImageData? image,
       String? description,
       String? address,
@@ -575,6 +596,7 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? title = null,
+    Object? title2 = freezed,
     Object? image = freezed,
     Object? description = freezed,
     Object? address = freezed,
@@ -593,6 +615,10 @@ class __$LaboratoryCopyWithImpl<$Res> implements _$LaboratoryCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
+      title2: freezed == title2
+          ? _self.title2
+          : title2 // ignore: cast_nullable_to_non_nullable
+              as String?,
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable

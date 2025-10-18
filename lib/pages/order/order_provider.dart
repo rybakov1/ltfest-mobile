@@ -86,7 +86,7 @@ class OrderNotifier extends StateNotifier<OrderState> {
     // Проверяем, что пользователь не null (т.е. он авторизован)
     if (user != null) {
       state = state.copyWith(
-        payerName: '${user.lastname ?? ''} ${user.firstname ?? ''}'.trim(),
+        payerName: (user.lastname ?? '').trim(),
         email: user.email,
         phone: user.phone,
         collectiveName: user.collectiveName,

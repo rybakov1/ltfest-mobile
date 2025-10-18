@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
-import 'package:ltfest/router/app_routes.dart';
-
-import '../constants.dart';
+// import 'package:flutter/services.dart';
+// import 'package:flutter_svg/svg.dart';
+// import 'package:go_router/go_router.dart';
+// import 'package:ltfest/router/app_routes.dart';
+//
+// import '../constants.dart';
 
 class MainScreen extends StatefulWidget {
   final Widget child;
@@ -17,35 +17,35 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _getCurrentIndex(BuildContext context) {
-    final String currentPath = GoRouterState.of(context).matchedLocation;
-    if (currentPath.startsWith('/home')) return 0;
-    if (currentPath.startsWith('/fest')) return 1;
-    if (currentPath.startsWith('/lab')) return 2;
-    if (currentPath.startsWith('/blog')) return 3;
-    if (currentPath.startsWith('/more')) return 4;
-    return 0;
-  }
-
-  void _onTap(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go(AppRoutes.home);
-        break;
-      case 1:
-        context.go(AppRoutes.festivals);
-        break;
-      case 2:
-        context.go(AppRoutes.laboratories);
-        break;
-      case 3:
-        context.go(AppRoutes.news);
-        break;
-      case 4:
-        context.go(AppRoutes.more);
-        break;
-    }
-  }
+  // int _getCurrentIndex(BuildContext context) {
+  //   final String currentPath = GoRouterState.of(context).matchedLocation;
+  //   if (currentPath.startsWith('/home')) return 0;
+  //   if (currentPath.startsWith('/fest')) return 1;
+  //   if (currentPath.startsWith('/lab')) return 2;
+  //   if (currentPath.startsWith('/blog')) return 3;
+  //   if (currentPath.startsWith('/more')) return 4;
+  //   return 0;
+  // }
+  //
+  // void _onTap(BuildContext context, int index) {
+  //   switch (index) {
+  //     case 0:
+  //       context.go(AppRoutes.home);
+  //       break;
+  //     case 1:
+  //       context.go(AppRoutes.festivals);
+  //       break;
+  //     case 2:
+  //       context.go(AppRoutes.laboratories);
+  //       break;
+  //     case 3:
+  //       context.go(AppRoutes.news);
+  //       break;
+  //     case 4:
+  //       context.go(AppRoutes.more);
+  //       break;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

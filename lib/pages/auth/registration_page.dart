@@ -558,7 +558,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                       });
                                     },
                                   ),
-                                  SizedBox(height: 20),
+                                  const SizedBox(height: 20),
                                 ],
                               );
                             },

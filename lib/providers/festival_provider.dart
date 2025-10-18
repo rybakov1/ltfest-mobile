@@ -8,56 +8,122 @@ part 'festival_provider.g.dart';
 class FestivalsState {
   final List<Festival> allFestivals;
   final String searchQuery;
+  final List<String> selectedCities;
+  final bool isRefreshing;
 
-  FestivalsState({
+  const FestivalsState({
     this.allFestivals = const [],
     this.searchQuery = '',
+    this.selectedCities = const [],
+    this.isRefreshing = false,
   });
 
-  List<Festival> get filteredFestivals {
-    if (searchQuery.isEmpty) {
-      return allFestivals;
-    }
+  Set<String> get uniqueCities {
     return allFestivals
-        .where((festival) =>
-            festival.title.toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
+        .map((f) => f.address?.split(',').first.trim() ?? '')
+        .where((c) => c.isNotEmpty)
+        .toSet()
+      ..toList()
+      .sort();
+  }
+
+  List<Festival> get filteredFestivals {
+    return allFestivals.where((festival) {
+      final titleMatch = searchQuery.isEmpty ||
+          festival.title.toLowerCase().contains(searchQuery.toLowerCase());
+      final addressMatch = selectedCities.isEmpty ||
+          selectedCities.any((city) =>
+          festival.address?.toLowerCase().contains(city.toLowerCase()) ??
+              false);
+      return titleMatch && addressMatch;
+    }).toList();
   }
 
   FestivalsState copyWith({
     List<Festival>? allFestivals,
     String? searchQuery,
+    List<String>? selectedCities,
+    bool? isRefreshing,
   }) {
     return FestivalsState(
       allFestivals: allFestivals ?? this.allFestivals,
       searchQuery: searchQuery ?? this.searchQuery,
+      selectedCities: selectedCities ?? this.selectedCities,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
     );
   }
 }
 
 @Riverpod(keepAlive: true)
 class FestivalsNotifier extends _$FestivalsNotifier {
+  ApiService get _api => ref.read(apiServiceProvider);
+  String? _category;
+
   @override
-  Future<FestivalsState> build(String category) async {
-    final apiService = ref.read(apiServiceProvider);
-    final festivals = await apiService.getFestivalsByDirection(category);
+  Future<FestivalsState> build([String? category]) async {
+    _category = category;
 
+    return _fetchFestivals(category);
+  }
+
+  Future<FestivalsState> _fetchFestivals(String? category) async {
     try {
-      festivals.sort((a, b) => a.dateStart!.compareTo(b.dateStart!));
-    } catch (e) {
-      print("Ошибка сортировки фестивалей: $e");
-    }
+      List<Festival> festivals;
 
-    return FestivalsState(allFestivals: festivals);
+      if (category == null || category.isEmpty) {
+        festivals = await _api.getFestivals();
+      } else {
+        festivals = await _api.getFestivalsByDirection(category);
+      }
+
+      festivals.sort((a, b) {
+        final aDate = a.dateStart ?? DateTime(2100);
+        final bDate = b.dateStart ?? DateTime(2100);
+        return aDate.compareTo(bDate);
+      });
+
+      return FestivalsState(allFestivals: festivals);
+    } catch (e, st) {
+      Error.throwWithStackTrace(e, st);
+    }
+  }
+
+  Future<void> refresh() async {
+    if (state.isLoading) return;
+
+    final prev = state.valueOrNull;
+    if (prev == null) return;
+
+    state = AsyncData(prev.copyWith(isRefreshing: true));
+
+    final result = await AsyncValue.guard(() => _fetchFestivals(_category));
+
+    state = result.whenData((data) => data.copyWith(
+      searchQuery: prev.searchQuery,
+      selectedCities: prev.selectedCities,
+      isRefreshing: false,
+    ));
   }
 
   void setSearchQuery(String query) {
-    if (state.hasValue) {
-      state = AsyncData(state.value!.copyWith(searchQuery: query));
-    }
+    final prev = state.valueOrNull;
+    if (prev == null) return;
+    state = AsyncData(prev.copyWith(searchQuery: query));
+  }
+
+  void setSelectedCities(List<String> cities) {
+    final prev = state.valueOrNull;
+    if (prev == null) return;
+    state = AsyncData(prev.copyWith(selectedCities: cities));
   }
 }
 
-final festivalByIdProvider = FutureProvider.family<Festival, String>((ref, id) {
-  return ref.read(apiServiceProvider).getFestivalById(id);
+final festivalByIdProvider =
+FutureProvider.family<Festival, String>((ref, id) async {
+  final api = ref.read(apiServiceProvider);
+  try {
+    return await api.getFestivalById(id);
+  } catch (e, st) {
+    Error.throwWithStackTrace(e, st);
+  }
 });
