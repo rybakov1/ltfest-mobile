@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
@@ -17,121 +18,95 @@ class CartPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Palette.background,
-      body: CustomScrollView(
-        physics: const NeverScrollableScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 16, right: 16, top: 40, bottom: 16),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Корзина LT Shop",
-                      style: Styles.h4.copyWith(color: Palette.black),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      height: 43,
-                      width: 43,
-                      decoration:
-                          Decor.base.copyWith(color: Palette.primaryLime),
-                      child: IconButton(
-                        onPressed: () => context.pop(),
-                        icon: Icon(Icons.arrow_back, color: Palette.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          slivers: [
+            const SliverToBoxAdapter(
+              child: LTAppBar(title: "Корзина LT Shop"),
             ),
-          ),
-          SliverFillRemaining(
-            child: Container(
-              child: cartAsync.when(
-                data: (cart) {
-                  // Убираем из списка товары, которые могли быть удалены (product_in_stock: null)
-                  final validItems = cart.items
-                      .where((item) => item.productInStock != null)
-                      .toList();
+            SliverFillRemaining(
+              child: Container(
+                child: cartAsync.when(
+                  data: (cart) {
+                    final validItems = cart.items
+                        .where((item) => item.productInStock != null)
+                        .toList();
 
-                  if (validItems.isEmpty) {
-                    return Container(
-                      decoration: Decor.base,
-                      margin: const EdgeInsets.all(4),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 0.0, horizontal: 12),
-                      child: Column(
-                        children: [
-                          const Spacer(),
-                          Image.asset("assets/icons/states/nothing.png",
-                              width: 192),
-                          const SizedBox(height: 20),
-                          Text("В корзине пока пусто", style: Styles.b2),
-                          const Spacer(),
-                          LTButtons.elevatedButton(
-                            onPressed: () => context.push(AppRoutes.shop),
-                            child: const Text("За покупками"),
-                          ),
-                          SizedBox(height:12 + MediaQuery.of(context).padding.bottom),
-                        ],
-                      ),
+                    if (validItems.isEmpty) {
+                      return Container(
+                        decoration: Decor.base,
+                        margin: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 0.0, horizontal: 12),
+                        child: Column(
+                          children: [
+                            const Spacer(),
+                            Image.asset("assets/icons/states/nothing.png",
+                                width: 192),
+                            const SizedBox(height: 20),
+                            Text("В корзине пока пусто", style: Styles.b2),
+                            const Spacer(),
+                            LTButtons.elevatedButton(
+                              onPressed: () => context.push(AppRoutes.shop),
+                              child:
+                                  Text("За покупками", style: Styles.button1),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Stack(
+                      children: [
+                        ListView.builder(
+                          padding:
+                              const EdgeInsets.all(0.0).copyWith(bottom: 150),
+                          itemCount: validItems.length,
+                          itemBuilder: (context, index) {
+                            final cartItem = validItems[index];
+                            return CartItemCard(cartItem: cartItem);
+                          },
+                        ),
+                        const Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: CartSummary(),
+                        ),
+                      ],
                     );
-                  }
-
-                  return Stack(
-                    children: [
-                      ListView.builder(
-                        padding:
-                            const EdgeInsets.all(0.0).copyWith(bottom: 150),
-                        itemCount: validItems.length,
-                        itemBuilder: (context, index) {
-                          final cartItem = validItems[index];
-                          return CartItemCard(cartItem: cartItem);
-                        },
-                      ),
-                      // Нижняя панель с итоговой суммой и кнопкой "Оплатить"
-                      const Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: CartSummary(),
-                      ),
-                    ],
-                  );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Container(
-                  decoration: Decor.base,
-                  margin: const EdgeInsets.all(4),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 0.0, horizontal: 12),
-                  child: Column(
-                    children: [
-                      const Spacer(),
-                      Image.asset("assets/icons/states/nothing.png",
-                          width: 192),
-                      const SizedBox(height: 20),
-                      Text("В корзине пока пусто", style: Styles.b2),
-                      const Spacer(),
-                      LTButtons.elevatedButton(
-                        onPressed: () => context.push(AppRoutes.shop),
-                        child: const Text("За покупками"),
-                      ),
-                      SizedBox(
-                          height: 12 + MediaQuery.of(context).padding.bottom),
-                    ],
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) => Container(
+                    decoration: Decor.base,
+                    margin: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 0.0, horizontal: 12),
+                    child: Column(
+                      children: [
+                        const Spacer(),
+                        Image.asset("assets/icons/states/nothing.png",
+                            width: 192),
+                        const SizedBox(height: 20),
+                        Text("В корзине пока пусто", style: Styles.b2),
+                        const Spacer(),
+                        LTButtons.elevatedButton(
+                          onPressed: () => context.push(AppRoutes.shop),
+                          child: const Text("За покупками"),
+                        ),
+                        SizedBox(
+                            height: 12 + MediaQuery.of(context).padding.bottom),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

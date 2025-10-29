@@ -33,4 +33,5 @@ Map<String, dynamic> _$UpcomingEventToJson(_UpcomingEvent instance) =>
 const _$EventTypeEnumMap = {
   EventType.festival: 'festival',
   EventType.laboratory: 'laboratory',
+  EventType.product: 'product',
 };

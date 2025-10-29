@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/async_items_list_view.dart';
@@ -11,6 +12,7 @@ import 'package:ltfest/data/models/festival.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 
+import '../../components/lt_appbar.dart';
 import '../../providers/favorites_provider.dart';
 
 class FestivalPage extends ConsumerStatefulWidget {
@@ -228,19 +230,24 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
         ref.watch(festivalsNotifierProvider(widget.category));
     final festivalState = festivalsAsync.valueOrNull ?? const FestivalsState();
 
-    ref.listen(festivalsNotifierProvider(widget.category), (_, next) {
-      final newQuery = next.valueOrNull?.searchQuery ?? '';
-      if (newQuery != _searchController.text) {
-        _searchController.text = newQuery;
-      }
+    ref.listen(
+      festivalsNotifierProvider(widget.category),
+      (_, next) {
+        final newState = next.valueOrNull;
+        if (newState != null && newState.filteredFestivals.length <= 2) {
+          _storiesAnimationController.animateTo(
+            1.0,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+          );
+        }
 
-      final newState = next.valueOrNull;
-      if (newState != null &&
-          newState.filteredFestivals.isEmpty &&
-          _storiesAnimationController.value < 1.0) {
-        _storiesAnimationController.value = 1.0;
-      }
-    });
+        final newQuery = next.valueOrNull?.searchQuery ?? '';
+        if (newQuery != _searchController.text) {
+          _searchController.text = newQuery;
+        }
+      },
+    );
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -249,37 +256,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
         child: CustomScrollView(
           physics: const NeverScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16, right: 16, top: 16, bottom: 16),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        title,
-                        style: Styles.h4.copyWith(color: Palette.black),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        height: 43,
-                        width: 43,
-                        decoration:
-                            Decor.base.copyWith(color: Palette.primaryLime),
-                        child: IconButton(
-                          onPressed: () => context.pop(),
-                          icon: Icon(Icons.arrow_back, color: Palette.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            SliverToBoxAdapter(child: LTAppBar(title: title)),
             SliverFillRemaining(
               child: Container(
                 padding:
@@ -319,7 +296,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                                   : Palette.primaryLime,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: Palette.stroke,
+                                color: festivalState.selectedCities.isEmpty ? Palette.stroke : Palette.primaryLime,
                                 width: 1,
                               ),
                             ),
@@ -335,14 +312,34 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                Icon(
-                                  festivalState.selectedCities.isEmpty
-                                      ? Icons.keyboard_arrow_down_outlined
-                                      : Icons.close,
-                                  color: festivalState.selectedCities.isEmpty
-                                      ? const Color(0xFF1C274C)
-                                      : Palette.white,
-                                  size: 16,
+                                // TODO: ? This is maybe not right realisation
+                                SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: IconButton(
+                                    padding: const EdgeInsets.all(4),
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () {
+                                      if (festivalState
+                                          .selectedCities.isNotEmpty) {
+                                        setState(() {
+                                          festivalState.selectedCities.clear();
+                                        });
+                                      } else {
+                                        _showCityBottomSheet(festivalState);
+                                      }
+                                    },
+                                    icon: Icon(
+                                      festivalState.selectedCities.isEmpty
+                                          ? Icons.keyboard_arrow_down_outlined
+                                          : Icons.close,
+                                      color:
+                                          festivalState.selectedCities.isEmpty
+                                              ? const Color(0xFF1C274C)
+                                              : Palette.white,
+                                      size: 16,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -363,8 +360,10 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Palette.white,
-                              suffixIcon: Icon(Icons.search_rounded,
-                                  color: Palette.stroke),
+                              suffixIcon: SvgPicture.asset(
+                                "assets/icons/search.svg",
+                                fit: BoxFit.scaleDown,
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
@@ -401,7 +400,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                                 ),
                               ),
                               hintText: "Поиск",
-                              hintStyle: Styles.b2,
+                              hintStyle: Styles.b2.copyWith(color: Palette.gray),
                               constraints: const BoxConstraints(maxHeight: 43),
                               contentPadding: const EdgeInsets.only(
                                 left: 16,
@@ -481,7 +480,10 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                       selectedDirection: festival.direction.title,
                     ),
                     FavoriteButton(
-                        id: festival.id, eventType: EventType.festival),
+                      id: festival.id,
+                      type: EventType.festival,
+                      color: Palette.white.withValues(alpha: 0.5),
+                    ),
                   ],
                 ),
               ),

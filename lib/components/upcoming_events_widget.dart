@@ -132,7 +132,10 @@ class UpcomingEventsWidget extends ConsumerWidget {
                     CustomChipWithName(
                       selectedDirection: event.direction.title,
                     ),
-                    FavoriteButton(id: event.id, eventType: event.type)
+                    FavoriteButton(
+                        id: event.id,
+                        type: event.type,
+                        color: Palette.primaryLime),
                   ],
                 ),
               ),

@@ -31,7 +31,6 @@ class HomePage extends ConsumerWidget {
               automaticallyImplyLeading: false,
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
-
                 collapseMode: CollapseMode.pin,
                 background: Builder(builder: (innerContext) {
                   return Container(
@@ -179,19 +178,19 @@ class HomePage extends ConsumerWidget {
                                 imagePath: 'assets/images/lt_travel.png',
                                 label: 'LT Travel',
                                 isSmall: true,
-                                onTap: () {},
+                                onTap: () => context.push(AppRoutes.ltTravel),
                               ),
                               _buildServiceCard(
                                 imagePath: 'assets/images/lt_priority.png',
                                 label: 'LT Priority',
                                 isSmall: true,
-                                onTap: () {},
+                                onTap: () => context.push(AppRoutes.ltPriority),
                               ),
                               _buildServiceCard(
                                 imagePath: 'assets/images/lt_camp.png',
                                 label: 'LT Camp',
                                 isSmall: true,
-                                onTap: () {},
+                                onTap: () => context.push(AppRoutes.ltPriority),
                               ),
                             ],
                           ),
@@ -209,7 +208,8 @@ class HomePage extends ConsumerWidget {
                               onTap: () => context.push(AppRoutes.shop),
                               child: Text(
                                 "Все",
-                                style: Styles.b2.copyWith(color: Palette.secondary),
+                                style: Styles.b2
+                                    .copyWith(color: Palette.secondary),
                               ),
                             )
                           ],

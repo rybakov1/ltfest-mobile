@@ -4,14 +4,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
+import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/components/share_button.dart';
 import 'package:ltfest/data/models/person.dart';
+import 'package:ltfest/pages/shop/presenter/shop_widget.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/providers/user_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-final tabIndexProvider = StateProvider<int>((ref) => 0);
+import '../../router/app_routes.dart';
 
 class FestivalDetailPage extends ConsumerStatefulWidget {
   final String id;
@@ -28,13 +31,16 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
   final ScrollController _scrollController = ScrollController();
   bool _showHeader = false;
 
+  int _selectedTabIndex = 0;
+  void _onTabTapped(int index) => setState(() => _selectedTabIndex = index);
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.offset > 120 && !_showHeader) {
+      if (_scrollController.offset > 320 && !_showHeader) {
         setState(() => _showHeader = true);
-      } else if (_scrollController.offset <= 120 && _showHeader) {
+      } else if (_scrollController.offset <= 320 && _showHeader) {
         setState(() => _showHeader = false);
       }
     });
@@ -219,7 +225,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
   @override
   Widget build(BuildContext context) {
     final festivalAsync = ref.watch(festivalByIdProvider(widget.id));
-    final tabIndex = ref.watch(tabIndexProvider);
+    const tabs = ["Основное", "Тарифы"];
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -245,159 +251,68 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                         ),
                       ),
                       SafeArea(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 12, right: 12, top: 16),
-                                child: Row(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(12)),
-                                      child: Container(
-                                        width: 43,
-                                        height: 43,
-                                        color: const Color.fromRGBO(
-                                            255, 255, 255, 0.5),
-                                        child: IconButton(
-                                          icon: Icon(
-                                            Icons.arrow_back,
-                                            color: Palette.white,
-                                            size: 24,
+                        child: Column(
+                          children: [
+                            LTAppBar(
+                              suffixIconColor:
+                                  Palette.white.withValues(alpha: 0.5),
+                              postfixWidget: Row(
+                                children: [
+                                  ShareButton(
+                                    link: festival.websiteurl ??
+                                        "https://ltfest.ru",
+                                    color: Palette.white.withValues(alpha: 0.5),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  FavoriteButton(
+                                    id: festival.id,
+                                    size: 40,
+                                    type: EventType.festival,
+                                    color: Palette.white.withValues(alpha: 0.5),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                                height:
+                                    254 - MediaQuery.of(context).padding.top),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: Column(
+                                children: [
+                                  festivalMainInfo(festival),
+                                  const SizedBox(height: 2),
+                                  Container(
+                                    width: double.infinity,
+                                    decoration: Decor.base,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 20,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _CustomSegmentedControl(
+                                            tabs: tabs,
+                                            selectedIndex: _selectedTabIndex,
+                                            onTap: _onTabTapped,
                                           ),
-                                          onPressed: () {
-                                            context.pop();
-                                          },
-                                        ),
+                                          const SizedBox(height: 24),
+                                          _buildContentForTab(
+                                            _selectedTabIndex,
+                                            festival,
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    const Spacer(),
-                                    ShareButton(
-                                        link: festival.websiteurl ??
-                                            "https://ltfest.ru",
-                                        color: const Color.fromRGBO(
-                                            255, 255, 255, 0.5)),
-                                    const SizedBox(width: 8),
-                                    FavoriteButtonDetails(
-                                        id: festival.id,
-                                        eventType: EventType.festival,
-                                        color: const Color.fromRGBO(
-                                            255, 255, 255, 0.5)),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 270 - MediaQuery.of(context).padding.top),
-                              festivalInfo(festival),
-                              const SizedBox(height: 2),
-                              Container(
-                                width: double.infinity,
-                                decoration: Decor.base,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0,
-                                    vertical: 20,
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Palette.background,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: GestureDetector(
-                                                onTap: () => ref
-                                                    .read(tabIndexProvider
-                                                        .notifier)
-                                                    .state = 0,
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 12),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    color: tabIndex == 0
-                                                        ? widget.category ==
-                                                                "Театр"
-                                                            ? Palette
-                                                                .primaryLime
-                                                            : Palette
-                                                                .primaryPink
-                                                        : null,
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Основное",
-                                                      style: Styles.b2.copyWith(
-                                                        color: tabIndex == 0
-                                                            ? Palette.white
-                                                            : Palette.gray,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: GestureDetector(
-                                                onTap: () => ref
-                                                    .read(tabIndexProvider
-                                                        .notifier)
-                                                    .state = 1,
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 12),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    color: tabIndex == 1
-                                                        ? widget.category ==
-                                                                "Театр"
-                                                            ? Palette
-                                                                .primaryLime
-                                                            : Palette
-                                                                .primaryPink
-                                                        : null,
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Тарифы",
-                                                      style: Styles.b2.copyWith(
-                                                        color: tabIndex == 1
-                                                            ? Palette.white
-                                                            : Palette.gray,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 24),
-                                      if (tabIndex == 0) ...[
-                                        festivalMoreInfo(festival)
-                                      ] else ...[
-                                        festivalTariffInfo(festival)
-                                      ]
-                                    ],
-                                  ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -418,10 +333,8 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                 opacity: _showHeader ? 1 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: Container(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + 16,
-                    left: 16,
-                    right: 16,
+                  padding: const EdgeInsets.only(
+                    top: 24,
                     bottom: 16,
                   ),
                   decoration: BoxDecoration(
@@ -435,58 +348,42 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                            child: Container(
-                              width: 43,
-                              height: 43,
-                              color: widget.category == "Театр"
-                                  ? Palette.primaryLime
-                                  : Palette.primaryPink,
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.arrow_back,
-                                  color: Palette.white,
-                                  size: 24,
-                                ),
-                                onPressed: () {
-                                  context.pop();
-                                },
-                              ),
-                            ),
-                          ),
-                          const Spacer(),
-                          ShareButton(
+                      LTAppBar(
+                        postfixWidget: Row(
+                          children: [
+                            ShareButton(
                               link: festival.websiteurl ?? "https://ltfest.ru",
-                              color: widget.category == "Театр"
-                                  ? Palette.primaryLime
-                                  : Palette.primaryPink),
-                          const SizedBox(width: 8),
-                          FavoriteButtonDetails(
-                            id: festival.id,
-                            eventType: EventType.festival,
-                            color: widget.category == "Театр"
-                                ? Palette.primaryLime
-                                : Palette.primaryPink,
-                          ),
-                        ],
+                              color: Palette.primaryLime,
+                            ),
+                            const SizedBox(width: 8),
+                            FavoriteButton(
+                              id: festival.id,
+                              size: 40,
+                              type: EventType.festival,
+                              color: Palette.primaryLime,
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      Text(
-                        festival.title,
-                        style: Styles.h3.copyWith(color: Palette.black),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      const SizedBox(height: 4),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          festival.title,
+                          style: Styles.h3.copyWith(color: Palette.black),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        festival.title2 ?? "", //"ОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписаниеОписание",
-                        style: Styles.b2.copyWith(color: Palette.gray),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          festival.title2 ?? "",
+                          style: Styles.b2.copyWith(color: Palette.gray),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
@@ -501,7 +398,18 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
     );
   }
 
-  Widget festivalInfo(festival) {
+  Widget _buildContentForTab(int index, festivals) {
+    switch (index) {
+      case 0:
+        return festivalMoreInfo(festivals);
+      case 1:
+        return festivalTariffInfo(festivals);
+      default:
+        return const SizedBox.shrink(key: ValueKey('empty'));
+    }
+  }
+
+  Widget festivalMainInfo(festival) {
     return Container(
       width: double.infinity,
       decoration: Decor.base,
@@ -515,24 +423,17 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
               style: Styles.h3,
             ),
             const SizedBox(height: 8),
-            Text(
-              festival.title2 ?? "",
-              style: Styles.b2.copyWith(color: Palette.gray),
-            ),
+            if (festival.title2 != null)
+              Text(
+                festival.title2,
+                style: Styles.b2.copyWith(color: Palette.gray),
+              ),
             const SizedBox(height: 8),
             GestureDetector(
               onTap: () => _showPriceInfo(context, festival),
-              child: Row(
-                children: [
-                  Text(
-                    "от ${Utils.formatMoney(festival.price)}/чел",
-                    style: Styles.h4.copyWith(color: Palette.gray),
-                  ),
-                  // const SizedBox(width: 8),
-                  // SvgPicture.asset(
-                  //   'assets/icons/info.svg',
-                  // ),
-                ],
+              child: Text(
+                "от ${Utils.formatMoney(festival.price)}/чел",
+                style: Styles.h4.copyWith(color: Palette.gray),
               ),
             ),
             const SizedBox(height: 24),
@@ -564,164 +465,153 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
   }
 
   Widget festivalMoreInfo(festival) {
-    return Container(
-      width: double.infinity,
-      decoration: Decor.base,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Описание",
-            style: Styles.h4,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            festival.description ?? 'Описание отсутствует',
-            style: Styles.b2,
-          ),
-          const SizedBox(height: 16),
-          InkWell(
-            onTap: () async {
-              final Uri uri = Uri.parse(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Описание",
+          style: Styles.h4,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          festival.description ?? 'Описание отсутствует',
+          style: Styles.b2,
+        ),
+        const SizedBox(height: 16),
+        LTButtons.outlinedButton(
+          onPressed: () async {
+            await launchUrl(
+              Uri.parse(
                 festival.pdfurl!,
-              );
-              await launchUrl(
-                uri,
-                mode: LaunchMode.externalApplication,
-              );
-            },
-            child: Container(
-              height: 43,
+              ),
+              mode: LaunchMode.externalApplication,
+            );
+          },
+          child: Text(
+            "Подробнее в положении",
+            style: Styles.button1,
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          "Жюри",
+          style: Styles.h3,
+        ),
+        const SizedBox(height: 16),
+        if (festival.persons!.isEmpty)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              'assets/images/jury_placeholder.png',
               width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Palette.stroke,
-                ),
-              ),
-              child: Center(
-                child: Text("Подробнее в положении",
-                    style: Styles.button1.copyWith(color: Palette.black)),
-              ),
+              fit: BoxFit.cover,
             ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            "Жюри",
-            style: Styles.h3,
-          ),
-          const SizedBox(height: 16),
-          if (festival.persons!.isEmpty)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/images/jury_placeholder.png',
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            )
-          else
-            Row(
-              children: [
-                ...festival.persons!
-                    .expand(
-                      (person) => [
-                        SizedBox(
-                          width: 170,
-                          child: InkWell(
-                            onTap: () => _showJuryInfo(context, person),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.network(
-                                        'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
-                                        height: 150,
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Image.asset(
-                                          'assets/images/jury_placeholder.png',
-                                          height: 150,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )),
-                                  const SizedBox(height: 12),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${person.firstname}\n${person.lastname}',
-                                        style: Styles.h4,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Подробнее',
-                                        style: Styles.b3
-                                            .copyWith(color: Palette.secondary),
-                                      ),
-                                    ],
+          )
+        else
+          Row(
+            children: [
+              ...festival.persons!
+                  .expand(
+                    (person) => [
+                      SizedBox(
+                        width: 170,
+                        child: InkWell(
+                          onTap: () => _showJuryInfo(context, person),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                      'assets/images/jury_placeholder.png',
+                                      height: 150,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(height: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${person.firstname}\n${person.lastname}',
+                                      style: Styles.h4,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Подробнее',
+                                      style: Styles.b3
+                                          .copyWith(color: Palette.secondary),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                      ],
-                    )
-                    .toList()
-                  ..removeLast(),
-              ],
-            ),
-          const SizedBox(height: 24),
-          Text("LT Shop", style: Styles.h3), // TODO: LT SHOP
-          const SizedBox(height: 24),
-          Container(
-            height: 150,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Palette.background,
-            ),
-            child: Center(
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                  )
+                  .toList()
+                ..removeLast(),
+            ],
+          ),
+        const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("LT Shop", style: Styles.h3),
+            GestureDetector(
+              onTap: () => context.push(AppRoutes.shop),
               child: Text(
-                "Скоро",
-                style: Styles.h4,
+                "Все",
+                style: Styles.b2.copyWith(color: Palette.secondary),
               ),
-            ),
-          )
-        ],
-      ),
+            )
+          ],
+        ),
+        const SizedBox(height: 24),
+        const ShopWidget(),
+      ],
     );
   }
 
   Widget festivalTariffInfo(festival) {
+    final user = ref.watch(userProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Важно", style: Styles.h3),
         const SizedBox(height: 16),
         Text(
-            "Перед оплатой фестиваля необходимо чтобы руководитель заполнил заявку на участие. Только после заполнения заявки и подтверждения от организатора, родители приступают к оплате фестиваля.",
-            style: Styles.b1),
-        const SizedBox(height: 16),
-        LTButtons.elevatedButton(
-          onPressed: () {},
-          child: Text("Заполнить заявку", style: Styles.button1),
-          backgroundColor: widget.category == "Театр"
-              ? Palette.primaryLime
-              : Palette.primaryPink,
+          "Перед оплатой фестиваля необходимо чтобы руководитель заполнил заявку на участие. Только после заполнения заявки и подтверждения от организатора, родители приступают к оплате фестиваля.",
+          style: Styles.b1,
         ),
+        if (user!.activity!.title != "Руководитель коллектива") ...[
+          const SizedBox(height: 16),
+          LTButtons.elevatedButton(
+            onPressed: () {},
+            child: Text("Заполнить заявку", style: Styles.button1),
+            backgroundColor: widget.category == "Театр"
+                ? Palette.primaryLime
+                : Palette.primaryPink,
+          ),
+        ],
         const SizedBox(height: 24),
         Text("Тарифы", style: Styles.h3),
         const SizedBox(height: 16),
@@ -730,119 +620,23 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
           price: 7500,
           category: widget.category,
           description: "Стоимость тарифа включает один спектакль",
-          children: [
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-          ],
+          bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         LTTariff(
           title: "Самостоятельный",
           price: 15000,
           category: widget.category,
           description: "Стоимость тарифа включает один спектакль",
-          children: [
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-          ],
+          bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         LTTariff(
           title: "Всё включено",
           price: 26950,
           description: "Стоимость тарифа включает один спектакль",
           category: widget.category,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.brightness_1),
-                SizedBox(width: 8),
-                Text("Фирменный подарок", style: Styles.b2)
-              ],
-            ),
-          ],
+          bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
         ),
       ],
     );
@@ -854,6 +648,7 @@ class LTTariff extends StatefulWidget {
   final int price;
   final String description;
   final String category;
+  final List<String> bonuses;
 
   final List<Widget> children;
   final bool initiallyExpanded;
@@ -867,6 +662,7 @@ class LTTariff extends StatefulWidget {
     required this.description,
     required this.category,
     this.children = const [],
+    this.bonuses = const [],
     this.initiallyExpanded = false,
     this.animationDuration = const Duration(milliseconds: 200),
     this.animationCurve = Curves.easeInOut,
@@ -903,63 +699,71 @@ class _LTTariffState extends State<LTTariff>
             onTap: _toggle,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
-              child: Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.title, style: Styles.h4),
-                    Text("${Utils.formatMoney(widget.price)}/чел",
-                        style: Styles.h2),
-                    const SizedBox(height: 8),
-                    Text(widget.description, style: Styles.b2),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Text("Подробнее",
-                            style:
-                                Styles.b3.copyWith(color: Palette.secondary)),
-                        AnimatedRotation(
-                          turns: _expanded ? 0.5 : 0.0,
-                          duration: widget.animationDuration,
-                          child: Icon(
-                            Icons.expand_more,
-                            color: Palette.secondary,
-                            size: 18,
-                          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.title, style: Styles.h4),
+                  Text("${Utils.formatMoney(widget.price)}/чел",
+                      style: Styles.h2),
+                  const SizedBox(height: 8),
+                  Text(widget.description, style: Styles.b2),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Text("Подробнее",
+                          style: Styles.b3.copyWith(color: Palette.secondary)),
+                      AnimatedRotation(
+                        turns: _expanded ? 0.5 : 0.0,
+                        duration: widget.animationDuration,
+                        child: Icon(
+                          Icons.expand_more,
+                          color: Palette.secondary,
+                          size: 18,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
           AnimatedCrossFade(
             firstChild: const SizedBox.shrink(),
-            secondChild:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Column(children: widget.children),
-              const SizedBox(height: 24),
-              Text("Предоплата 50%",
-                  style: Styles.b2.copyWith(color: Palette.gray)),
-              const SizedBox(height: 8),
-              Text("${Utils.formatMoney((widget.price / 2).toInt())}/чел",
-                  style: Styles.h2),
-              const SizedBox(height: 16),
-              LTButtons.elevatedButton(
-                  onPressed: () {},
-                  child: Text("Купить"),
-                  backgroundColor: widget.category == "Театр"
-                      ? Palette.primaryLime
-                      : Palette.primaryPink),
-              SizedBox(height: 8),
-              LTButtons.elevatedButton(
-                  onPressed: () {},
-                  child: Text("В рассрочку от 3 мес."),
-                  backgroundColor: widget.category == "Театр"
-                      ? Palette.primaryLime
-                      : Palette.primaryPink)
-            ]),
+            secondChild: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.bonuses.isNotEmpty)
+                  for (int i = 0; i < widget.bonuses.length; i++) ...[
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Palette.primaryLime),
+                        const SizedBox(width: 8),
+                        Text(widget.bonuses[i], style: Styles.b2)
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                const SizedBox(height: 24),
+                Text("Предоплата 50%",
+                    style: Styles.b2.copyWith(color: Palette.gray)),
+                const SizedBox(height: 8),
+                Text("${Utils.formatMoney((widget.price / 2).toInt())}/чел",
+                    style: Styles.h2),
+                const SizedBox(height: 16),
+                LTButtons.elevatedButton(
+                    onPressed: () {},
+                    child: Text("Купить", style: Styles.button1),
+                    backgroundColor: widget.category == "Театр"
+                        ? Palette.primaryLime
+                        : Palette.primaryPink),
+                const SizedBox(height: 8),
+                LTButtons.elevatedButton(
+                    onPressed: () {},
+                    child: Text("В рассрочку от 3 мес.",
+                        style: Styles.button1.copyWith(color: Palette.black)),
+                    backgroundColor: Palette.secondaryGray)
+              ],
+            ),
             crossFadeState: _expanded
                 ? CrossFadeState.showSecond
                 : CrossFadeState.showFirst,
@@ -967,6 +771,57 @@ class _LTTariffState extends State<LTTariff>
             sizeCurve: widget.animationCurve,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CustomSegmentedControl extends StatelessWidget {
+  final List<String> tabs;
+  final int selectedIndex;
+  final ValueChanged<int> onTap;
+
+  const _CustomSegmentedControl({
+    required this.tabs,
+    required this.selectedIndex,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 45,
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: Palette.background,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: tabs.asMap().entries.map((entry) {
+          final index = entry.key;
+          final title = entry.value;
+          final isSelected = selectedIndex == index;
+
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onTap(index),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: isSelected ? Palette.primaryLime : Colors.transparent,
+                ),
+                child: Center(
+                  child: Text(
+                    title,
+                    style: isSelected
+                        ? Styles.h5.copyWith(color: Palette.white)
+                        : Styles.b2.copyWith(color: Palette.gray),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

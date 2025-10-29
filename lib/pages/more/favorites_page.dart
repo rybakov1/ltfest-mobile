@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:ltfest/components/favorite_button.dart';
+import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 
 import '../../components/custom_chip.dart';
 import '../../data/models/favorite.dart';
+import '../../router/app_routes.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
   const FavoritesPage({super.key});
@@ -15,170 +19,143 @@ class FavoritesPage extends ConsumerStatefulWidget {
 }
 
 class _FavoritesPageState extends ConsumerState<FavoritesPage> {
-  int _selectedIndex = 0;
+  int _selectedTabIndex = 0;
 
-  void _onTabTapped(int index) => setState(() => _selectedIndex = index);
+  void _onTabTapped(int index) => setState(() => _selectedTabIndex = index);
 
   @override
   Widget build(BuildContext context) {
     final favState = ref.watch(favoritesProvider);
+    const tabs = ["Афиша", "Лаборатории", "Магазин"];
 
     return Scaffold(
-      backgroundColor: Palette.black,
-      body: favState.when(
-        data: (favorites) {
-          // Разделяем на фестивали и лаборатории
-          final favoriteFestivals =
-              favorites.where((f) => f.type == 'festival').toList();
-          final favoriteLabs =
-              favorites.where((f) => f.type == 'laboratory').toList();
+      backgroundColor: Palette.background,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          slivers: [
+            const SliverToBoxAdapter(child: LTAppBar(title: "Избранное")),
+            SliverFillRemaining(
+              child: Container(
+                margin: const EdgeInsets.all(4),
+                decoration: Decor.base,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 4.0,
+                        bottom: 16,
+                        left: 4,
+                        right: 4,
+                      ),
+                      child: _CustomSegmentedControl(
+                        tabs: tabs,
+                        selectedIndex: _selectedTabIndex,
+                        onTap: _onTabTapped,
+                      ),
+                    ),
+                    Expanded(
+                      child: favState.when(
+                        data: (favorites) {
+                          final favoriteFestivals = favorites
+                              .where((f) => f.type == 'festival')
+                              .toList();
+                          final favoriteLabs = favorites
+                              .where((f) => f.type == 'laboratory')
+                              .toList();
+                          final favoriteProducts = favorites
+                              .where((f) => f.type == 'product')
+                              .toList();
 
-          return CustomScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      top: 24 + MediaQuery.of(context).padding.top,
-                      bottom: 16),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Избранное",
-                          style: Styles.h3.copyWith(color: Palette.white),
+                          return AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: _buildContentForTab(
+                              _selectedTabIndex,
+                              festivals: favoriteFestivals,
+                              laboratories: favoriteLabs,
+                              products: favoriteProducts,
+                            ),
+                          );
+                        },
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, st) => Center(
+                          child: Text("Ошибка загрузки избранного: $e",
+                              style: Styles.b2.copyWith(color: Palette.white)),
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          height: 43,
-                          width: 43,
-                          decoration:
-                              Decor.base.copyWith(color: Palette.primaryLime),
-                          child: IconButton(
-                            onPressed: () => context.pop(),
-                            icon: Icon(Icons.arrow_back, color: Palette.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              SliverFillRemaining(
-                child: Container(
-                  margin: const EdgeInsets.all(4),
-                  decoration: Decor.base,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 20.0, bottom: 16, left: 12, right: 12),
-                        child: _CustomSegmentedControl(
-                          selectedIndex: _selectedIndex,
-                          onTap: _onTabTapped,
-                        ),
-                      ),
-                      Expanded(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: _selectedIndex == 0
-                              ? _buildFavoritesList(favoriteFestivals)
-                              : _buildFavoritesList(favoriteLabs),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => Center(
-          child: Text("Ошибка загрузки избранного: $e",
-              style: Styles.b2.copyWith(color: Palette.white)),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildFavoritesList(List<Favorite> items) {
-    if (items.isEmpty) return _emptyState();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final fav = items[index];
-          return Padding(
-            padding:
-                EdgeInsets.only(bottom: index < items.length - 1 ? 32.0 : 0),
-            child: _buildFavoriteCard(fav),
-          );
-        },
-      ),
-    );
+  Widget _buildContentForTab(
+    int index, {
+    required List<Favorite> festivals,
+    required List<Favorite> laboratories,
+    required List<Favorite> products,
+  }) {
+    switch (index) {
+      case 0:
+        return _buildFavoritesList(festivals, key: const ValueKey('festivals'));
+      case 1:
+        return _buildFavoritesList(laboratories, key: const ValueKey('labs'));
+      case 2:
+        return _buildFavoritesListProducts(products,
+            key: const ValueKey('products'));
+      default:
+        return const SizedBox.shrink(key: ValueKey('empty'));
+    }
   }
 
-  Widget _buildFavoriteCard(Favorite fav) {
-    // final dateText = fav.dateEnd != null
-    //     ? "${DateFormat("dd.MM.yyyy", "ru").format(fav.dateStart! as DateTime)} - ${DateFormat("dd.MM.yyyy", "ru").format(fav.dateEnd! as DateTime)}"
-    //     : '';
+  Widget _buildFavoritesList(List<Favorite> items, {Key? key}) {
+    if (items.isEmpty) return _emptyState(key: key);
 
-    final dateText =
-        "${fav.dateStart.replaceAll('-', '.')} - ${fav.dateEnd.replaceAll('-', '.')}";
-    return GestureDetector(
-      onTap: () {
-        if (fav.type == 'festival') {
-          context.push('/fest/${fav.id}');
-        } else {
-          context.push('/lab/${fav.id}');
-        }
+    return ListView.builder(
+      key: key,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24.0),
+          child: _FavoriteCard(item: items[index]),
+        );
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  'http://37.46.132.144:1337${fav.image ?? ''}',
-                  height: 150,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              if (fav.direction != null)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CustomChipWithName(
-                    selectedDirection: fav.direction!.title,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(fav.title, style: Styles.h4),
-          const SizedBox(height: 8),
-          Text(fav.address ?? 'Не указано',
-              style: Styles.b2.copyWith(color: Palette.gray)),
-          if (dateText.isNotEmpty)
-            Text(dateText, style: Styles.b2.copyWith(color: Palette.gray)),
-        ],
-      ),
     );
   }
 
-  Widget _emptyState() {
+  Widget _buildFavoritesListProducts(List<Favorite> items, {Key? key}) {
+    if (items.isEmpty) return _emptyState(key: key);
+
+    return GridView.builder(
+      key: key,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 16,
+        mainAxisExtent: 295,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24.0),
+          child: _FavoriteCard(item: items[index]),
+        );
+      },
+    );
+  }
+
+  Widget _emptyState({Key? key}) {
     return Center(
+      key: key,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -191,12 +168,174 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   }
 }
 
-/// Кастомный переключатель (как у тебя в примере)
+EventType _stringToEventType(String type) {
+  switch (type) {
+    case 'festival':
+      return EventType.festival;
+    case 'laboratory':
+      return EventType.laboratory;
+    case 'product':
+      return EventType.product;
+    default:
+      throw Exception('Unknown event type: $type');
+  }
+}
+
+class _FavoriteCard extends StatelessWidget {
+  final Favorite item;
+
+  const _FavoriteCard({required this.item});
+
+  String _formatDateRange(String? start, String? end) {
+    if (start == null || end == null) return '';
+    try {
+      final startDate = DateFormat('yyyy-MM-dd').parse(start);
+      final endDate = DateFormat('yyyy-MM-dd').parse(end);
+      final format = DateFormat('dd.MM.yyyy', 'ru');
+      return '${format.format(startDate)} - ${format.format(endDate)}';
+    } catch (e) {
+      return '$start - $end';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    void onTap() {
+      switch (item.type) {
+        case 'festival':
+          context.push(
+              '${AppRoutes.festivals}/${item.direction!.title}/${item.id}');
+          break;
+        case 'laboratory':
+          context.push('${AppRoutes.laboratories}/${item.id}');
+          break;
+        case 'product':
+          context.push('${AppRoutes.shop}/${item.id}');
+          break;
+      }
+    }
+
+    return switch (item.type) {
+      'product' => _buildProductCard(item, onTap),
+      _ => _buildEventCard(item, onTap),
+    };
+  }
+
+  Widget _buildEventCard(Favorite fav, onTap) {
+    final dateText = _formatDateRange(fav.date_start, fav.date_end);
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  'http://37.46.132.144:1337${item.image ?? ''}',
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    if (item.direction != null)
+                      CustomChipWithName(
+                        selectedDirection: item.direction!.title,
+                      ),
+                    const Spacer(),
+                    FavoriteButton(
+                        id: item.id,
+                        type: _stringToEventType(item.type),
+                        color: const Color(0x63656B33)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(fav.title, style: Styles.h4),
+          const SizedBox(height: 8),
+          Text(fav.address ?? 'Адрес не указан',
+              style: Styles.b2.copyWith(color: Palette.gray)),
+          if (dateText.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(dateText,
+                  style: Styles.b2.copyWith(color: Palette.gray)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductCard(Favorite fav, onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  'http://37.46.132.144:1337${item.image ?? ''}',
+                  width: double.infinity,
+                  height: 196,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, right: 8),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: FavoriteButton(
+                    id: item.id,
+                    type: _stringToEventType(item.type),
+                    color: const Color(0x63656B33),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            Utils.formatMoney(
+              fav.price!.toInt(),
+            ),
+            style: Styles.h5,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            fav.title,
+            style: Styles.b2.copyWith(
+              color: Palette.gray,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "арт. ${fav.article!}",
+            overflow: TextOverflow.ellipsis,
+            style: Styles.b3,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CustomSegmentedControl extends StatelessWidget {
+  final List<String> tabs;
   final int selectedIndex;
   final ValueChanged<int> onTap;
 
   const _CustomSegmentedControl({
+    required this.tabs,
     required this.selectedIndex,
     required this.onTap,
   });
@@ -204,40 +343,38 @@ class _CustomSegmentedControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
+      height: 45,
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         color: Palette.background,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        children: [
-          _buildTabItem("Афиша", 0),
-          const SizedBox(width: 8),
-          _buildTabItem("Лаборатории", 1),
-        ],
-      ),
-    );
-  }
+        children: tabs.asMap().entries.map((entry) {
+          final index = entry.key;
+          final title = entry.value;
+          final isSelected = selectedIndex == index;
 
-  Widget _buildTabItem(String title, int index) {
-    final bool isSelected = selectedIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => onTap(index),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: isSelected ? Palette.primaryLime : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            title,
-            style: isSelected
-                ? Styles.button2.copyWith(color: Palette.white)
-                : Styles.button2.copyWith(color: Palette.gray),
-          ),
-        ),
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onTap(index),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: isSelected ? Palette.primaryLime : Colors.transparent,
+                ),
+                child: Center(
+                  child: Text(
+                    title,
+                    style: isSelected
+                        ? Styles.h5.copyWith(color: Palette.white)
+                        : Styles.b2.copyWith(color: Palette.gray),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

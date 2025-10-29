@@ -2,85 +2,61 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/models/favorite.dart';
 import 'package:ltfest/data/services/api_service.dart';
 
-enum EventType { festival, laboratory }
+enum EventType { festival, laboratory, product }
 
-// Провайдер для избранных мероприятий
 final favoritesProvider =
-    StateNotifierProvider<FavoritesNotifier, AsyncValue<List<Favorite>>>(
-  (ref) {
-    final apiService = ref.watch(apiServiceProvider);
-    return FavoritesNotifier(apiService);
-  },
-);
+AsyncNotifierProvider<FavoritesNotifier, List<Favorite>>(FavoritesNotifier.new);
 
-class FavoritesNotifier extends StateNotifier<AsyncValue<List<Favorite>>> {
-  final ApiService _apiService;
-  int? _userId;
+class FavoritesNotifier extends AsyncNotifier<List<Favorite>> {
+  late final ApiService _api;
 
-  FavoritesNotifier(this._apiService) : super(const AsyncValue.loading()) {
-    _init();
+  @override
+  Future<List<Favorite>> build() async {
+    _api = ref.read(apiServiceProvider);
+    return _api.fetchFavorites();
   }
 
-  Future<void> _init() async {
-    try {
-      final user = await _apiService.getMe();
-      _userId = user.id;
-      await _fetchFavorites();
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
+  Future<void> toggleFavorite(EventType type, int eventId) async {
+    final items = state.value;
+    if (items == null) return;
 
-  Future<void> _fetchFavorites() async {
-    if (_userId == null) {
-      state = const AsyncValue.data([]);
-      return;
-    }
+    final isFav = items.any((f) => f.type == type.name && f.id == eventId);
 
-    try {
-      state = const AsyncValue.loading();
-      final favorites = await _apiService.fetchFavorites();
-      state = AsyncValue.data(favorites);
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-    }
-  }
-
-  Future<void> addFavorite(EventType eventType, int eventId) async {
-    if (_userId == null) {
-      throw Exception('Пользователь не аутентифицирован');
-    }
-
-    try {
-      await _apiService.addFavorite(eventType.name, eventId);
-      await _fetchFavorites(); // Обновляем список избранного
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-      rethrow; // Пробрасываем ошибку для обработки в UI
-    }
-  }
-
-  Future<void> removeFavorite(EventType eventType, int eventId) async {
-    if (_userId == null) {
-      throw Exception('Пользователь не аутентифицирован');
-    }
-
-    try {
-      await _apiService.removeFavorite(_userId!, eventType.name, eventId);
-      await _fetchFavorites(); // Обновляем список избранного
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-      rethrow; // Пробрасываем ошибку для обработки в UI
-    }
-  }
-
-  bool isFavorite(EventType eventType, int eventId) {
-    if (state is AsyncData<List<Favorite>>) {
-      final favorites = (state as AsyncData<List<Favorite>>).value;
-      return favorites.any(
-        (event) => event.type == eventType.name && event.id == eventId,
+    if (isFav) {
+      final favoriteToRemove = items.firstWhere(
+            (f) => f.type == type.name && f.id == eventId,
       );
+
+      // Оптимистично удаляем
+      state = AsyncValue.data(
+        items.where((f) => f.favoriteId != favoriteToRemove.favoriteId).toList(),
+      );
+
+      try {
+        await _api.removeFavorite(favoriteToRemove.favoriteId);
+      } catch (e) {
+        state = AsyncValue.data(items);
+        rethrow;
+      }
+    } else {
+      try {
+        await _api.addFavorite(type.name, eventId);
+
+        // Ставим состояние "загрузка", но сохраняем старые данные
+        state = const AsyncLoading<List<Favorite>>().copyWithPrevious(state);
+
+        final freshFavorites = await _api.fetchFavorites();
+        state = AsyncValue.data(freshFavorites);
+      } catch (e) {
+        state = AsyncValue.data(items);
+        rethrow;
+      }
     }
-    return false;
+  }
+
+  bool isFavorite(EventType type, int eventId) {
+    final items = state.value;
+    if (items == null) return false;
+    return items.any((f) => f.type == type.name && f.id == eventId);
   }
 }

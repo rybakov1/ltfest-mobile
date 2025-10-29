@@ -8,6 +8,7 @@ import '../constants.dart';
 import '../data/models/news.dart';
 import '../pages/home/more_items_page.dart';
 import '../providers/news_provider.dart';
+import '../router/app_routes.dart';
 
 class NewsWidget extends ConsumerWidget {
   const NewsWidget({super.key});
@@ -23,18 +24,12 @@ class NewsWidget extends ConsumerWidget {
           children: [
             Text("Новости LT Fest", style: Styles.h3),
             GestureDetector(
-              onTap: () {
-                context.pushNamed('all-items', extra: {
-                  'title': 'Ближайшие мероприятия',
-                  'itemsAsync': ref.watch(newsNotifierProvider),
-                  'itemBuilder': (News news) => buildNewsCard(news: news)
-                });
-              },
+              onTap: () => context.push(AppRoutes.news),
               child: Text(
-                'Все',
-                style: Styles.button2.copyWith(color: Palette.secondary),
+                "Все",
+                style: Styles.b2.copyWith(color: Palette.secondary),
               ),
-            ),
+            )
           ],
         ),
         const SizedBox(height: 16),

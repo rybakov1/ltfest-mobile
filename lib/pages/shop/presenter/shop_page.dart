@@ -3,9 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/pages/shop/provider/shop_provider.dart';
+import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/router/app_routes.dart';
@@ -48,9 +50,9 @@ class _ShopPageState extends ConsumerState<ShopPage> {
           physics: const NeverScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: LtAppbar(
+              child: LTAppBar(
                 title: "LT Shop",
-                postfixIcon: IconButton(
+                postfixWidget: IconButton(
                   onPressed: () => context.push(AppRoutes.cart),
                   icon: Icon(
                     cartIsNotEmpty > 0
@@ -146,25 +148,40 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: (firstVariation.images.isNotEmpty)
-                ? Image.network(
-                    'http://37.46.132.144:1337${firstVariation.images.first.url}',
-                    height: 196,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.error),
-                  )
-                : Container(
-                    height: 196,
-                    color: Palette.stroke,
-                    child: const Center(
-                      child:
-                          Icon(Icons.image_not_supported, color: Colors.grey),
-                    ),
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: (firstVariation.images.isNotEmpty)
+                    ? Image.network(
+                        'http://37.46.132.144:1337${firstVariation.images.first.url}',
+                        height: 196,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.error),
+                      )
+                    : Container(
+                        height: 196,
+                        color: Palette.stroke,
+                        child: const Center(
+                          child: Icon(Icons.image_not_supported,
+                              color: Colors.grey),
+                        ),
+                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8, right: 8),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: FavoriteButton(
+                    id: product.id,
+                    type: EventType.product,
+                    color: const Color(0x8E8A8A80),
                   ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(

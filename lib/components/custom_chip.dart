@@ -185,7 +185,7 @@ class CustomChip extends ConsumerWidget {
       builder: (context, ref, child) {
         final selectedDirection = ref.watch(selectedDirectionProvider);
 
-        final String displayText = selectedDirection ?? 'Все';
+        final String displayText = selectedDirection ?? 'Все направления';
         final Color displayColor = selectedDirection == 'Танцы'
             ? Palette.primaryPink
             : (selectedDirection == null

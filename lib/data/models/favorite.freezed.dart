@@ -15,15 +15,16 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Favorite {
   int get id;
-  String get title;
+  int get favoriteId;
   String get type;
-  @JsonKey(name: 'date_start')
-  String get dateStart;
-  @JsonKey(name: 'date_end')
-  String get dateEnd;
-  String? get image;
+  String get title;
+  String? get image; // Поля для фестивалей и лабораторий
+  String? get date_start;
+  String? get date_end;
   String? get address;
-  Direction? get direction;
+  Direction? get direction; // Поля для продуктов
+  double? get price;
+  String? get article;
 
   /// Create a copy of Favorite
   /// with the given fields replaced by the non-null parameter values.
@@ -41,25 +42,30 @@ mixin _$Favorite {
         (other.runtimeType == runtimeType &&
             other is Favorite &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.title, title) || other.title == title) &&
+            (identical(other.favoriteId, favoriteId) ||
+                other.favoriteId == favoriteId) &&
             (identical(other.type, type) || other.type == type) &&
-            (identical(other.dateStart, dateStart) ||
-                other.dateStart == dateStart) &&
-            (identical(other.dateEnd, dateEnd) || other.dateEnd == dateEnd) &&
+            (identical(other.title, title) || other.title == title) &&
             (identical(other.image, image) || other.image == image) &&
+            (identical(other.date_start, date_start) ||
+                other.date_start == date_start) &&
+            (identical(other.date_end, date_end) ||
+                other.date_end == date_end) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.direction, direction) ||
-                other.direction == direction));
+                other.direction == direction) &&
+            (identical(other.price, price) || other.price == price) &&
+            (identical(other.article, article) || other.article == article));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, type, dateStart,
-      dateEnd, image, address, direction);
+  int get hashCode => Object.hash(runtimeType, id, favoriteId, type, title,
+      image, date_start, date_end, address, direction, price, article);
 
   @override
   String toString() {
-    return 'Favorite(id: $id, title: $title, type: $type, dateStart: $dateStart, dateEnd: $dateEnd, image: $image, address: $address, direction: $direction)';
+    return 'Favorite(id: $id, favoriteId: $favoriteId, type: $type, title: $title, image: $image, date_start: $date_start, date_end: $date_end, address: $address, direction: $direction, price: $price, article: $article)';
   }
 }
 
@@ -70,13 +76,16 @@ abstract mixin class $FavoriteCopyWith<$Res> {
   @useResult
   $Res call(
       {int id,
-      String title,
+      int favoriteId,
       String type,
-      @JsonKey(name: 'date_start') String dateStart,
-      @JsonKey(name: 'date_end') String dateEnd,
+      String title,
       String? image,
+      String? date_start,
+      String? date_end,
       String? address,
-      Direction? direction});
+      Direction? direction,
+      double? price,
+      String? article});
 
   $DirectionCopyWith<$Res>? get direction;
 }
@@ -94,38 +103,45 @@ class _$FavoriteCopyWithImpl<$Res> implements $FavoriteCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? title = null,
+    Object? favoriteId = null,
     Object? type = null,
-    Object? dateStart = null,
-    Object? dateEnd = null,
+    Object? title = null,
     Object? image = freezed,
+    Object? date_start = freezed,
+    Object? date_end = freezed,
     Object? address = freezed,
     Object? direction = freezed,
+    Object? price = freezed,
+    Object? article = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      title: null == title
-          ? _self.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
+      favoriteId: null == favoriteId
+          ? _self.favoriteId
+          : favoriteId // ignore: cast_nullable_to_non_nullable
+              as int,
       type: null == type
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
-      dateStart: null == dateStart
-          ? _self.dateStart
-          : dateStart // ignore: cast_nullable_to_non_nullable
-              as String,
-      dateEnd: null == dateEnd
-          ? _self.dateEnd
-          : dateEnd // ignore: cast_nullable_to_non_nullable
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
               as String,
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      date_start: freezed == date_start
+          ? _self.date_start
+          : date_start // ignore: cast_nullable_to_non_nullable
+              as String?,
+      date_end: freezed == date_end
+          ? _self.date_end
+          : date_end // ignore: cast_nullable_to_non_nullable
               as String?,
       address: freezed == address
           ? _self.address
@@ -135,6 +151,14 @@ class _$FavoriteCopyWithImpl<$Res> implements $FavoriteCopyWith<$Res> {
           ? _self.direction
           : direction // ignore: cast_nullable_to_non_nullable
               as Direction?,
+      price: freezed == price
+          ? _self.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as double?,
+      article: freezed == article
+          ? _self.article
+          : article // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 
@@ -248,21 +272,34 @@ extension FavoritePatterns on Favorite {
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
             int id,
-            String title,
+            int favoriteId,
             String type,
-            @JsonKey(name: 'date_start') String dateStart,
-            @JsonKey(name: 'date_end') String dateEnd,
+            String title,
             String? image,
+            String? date_start,
+            String? date_end,
             String? address,
-            Direction? direction)?
+            Direction? direction,
+            double? price,
+            String? article)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _Favorite() when $default != null:
-        return $default(_that.id, _that.title, _that.type, _that.dateStart,
-            _that.dateEnd, _that.image, _that.address, _that.direction);
+        return $default(
+            _that.id,
+            _that.favoriteId,
+            _that.type,
+            _that.title,
+            _that.image,
+            _that.date_start,
+            _that.date_end,
+            _that.address,
+            _that.direction,
+            _that.price,
+            _that.article);
       case _:
         return orElse();
     }
@@ -285,20 +322,33 @@ extension FavoritePatterns on Favorite {
   TResult when<TResult extends Object?>(
     TResult Function(
             int id,
-            String title,
+            int favoriteId,
             String type,
-            @JsonKey(name: 'date_start') String dateStart,
-            @JsonKey(name: 'date_end') String dateEnd,
+            String title,
             String? image,
+            String? date_start,
+            String? date_end,
             String? address,
-            Direction? direction)
+            Direction? direction,
+            double? price,
+            String? article)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Favorite():
-        return $default(_that.id, _that.title, _that.type, _that.dateStart,
-            _that.dateEnd, _that.image, _that.address, _that.direction);
+        return $default(
+            _that.id,
+            _that.favoriteId,
+            _that.type,
+            _that.title,
+            _that.image,
+            _that.date_start,
+            _that.date_end,
+            _that.address,
+            _that.direction,
+            _that.price,
+            _that.article);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -320,20 +370,33 @@ extension FavoritePatterns on Favorite {
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
             int id,
-            String title,
+            int favoriteId,
             String type,
-            @JsonKey(name: 'date_start') String dateStart,
-            @JsonKey(name: 'date_end') String dateEnd,
+            String title,
             String? image,
+            String? date_start,
+            String? date_end,
             String? address,
-            Direction? direction)?
+            Direction? direction,
+            double? price,
+            String? article)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Favorite() when $default != null:
-        return $default(_that.id, _that.title, _that.type, _that.dateStart,
-            _that.dateEnd, _that.image, _that.address, _that.direction);
+        return $default(
+            _that.id,
+            _that.favoriteId,
+            _that.type,
+            _that.title,
+            _that.image,
+            _that.date_start,
+            _that.date_end,
+            _that.address,
+            _that.direction,
+            _that.price,
+            _that.article);
       case _:
         return null;
     }
@@ -345,34 +408,43 @@ extension FavoritePatterns on Favorite {
 class _Favorite implements Favorite {
   const _Favorite(
       {required this.id,
-      required this.title,
+      required this.favoriteId,
       required this.type,
-      @JsonKey(name: 'date_start') required this.dateStart,
-      @JsonKey(name: 'date_end') required this.dateEnd,
+      required this.title,
       this.image,
+      this.date_start,
+      this.date_end,
       this.address,
-      this.direction});
+      this.direction,
+      this.price,
+      this.article});
   factory _Favorite.fromJson(Map<String, dynamic> json) =>
       _$FavoriteFromJson(json);
 
   @override
   final int id;
   @override
-  final String title;
+  final int favoriteId;
   @override
   final String type;
   @override
-  @JsonKey(name: 'date_start')
-  final String dateStart;
-  @override
-  @JsonKey(name: 'date_end')
-  final String dateEnd;
+  final String title;
   @override
   final String? image;
+// Поля для фестивалей и лабораторий
+  @override
+  final String? date_start;
+  @override
+  final String? date_end;
   @override
   final String? address;
   @override
   final Direction? direction;
+// Поля для продуктов
+  @override
+  final double? price;
+  @override
+  final String? article;
 
   /// Create a copy of Favorite
   /// with the given fields replaced by the non-null parameter values.
@@ -395,25 +467,30 @@ class _Favorite implements Favorite {
         (other.runtimeType == runtimeType &&
             other is _Favorite &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.title, title) || other.title == title) &&
+            (identical(other.favoriteId, favoriteId) ||
+                other.favoriteId == favoriteId) &&
             (identical(other.type, type) || other.type == type) &&
-            (identical(other.dateStart, dateStart) ||
-                other.dateStart == dateStart) &&
-            (identical(other.dateEnd, dateEnd) || other.dateEnd == dateEnd) &&
+            (identical(other.title, title) || other.title == title) &&
             (identical(other.image, image) || other.image == image) &&
+            (identical(other.date_start, date_start) ||
+                other.date_start == date_start) &&
+            (identical(other.date_end, date_end) ||
+                other.date_end == date_end) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.direction, direction) ||
-                other.direction == direction));
+                other.direction == direction) &&
+            (identical(other.price, price) || other.price == price) &&
+            (identical(other.article, article) || other.article == article));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, type, dateStart,
-      dateEnd, image, address, direction);
+  int get hashCode => Object.hash(runtimeType, id, favoriteId, type, title,
+      image, date_start, date_end, address, direction, price, article);
 
   @override
   String toString() {
-    return 'Favorite(id: $id, title: $title, type: $type, dateStart: $dateStart, dateEnd: $dateEnd, image: $image, address: $address, direction: $direction)';
+    return 'Favorite(id: $id, favoriteId: $favoriteId, type: $type, title: $title, image: $image, date_start: $date_start, date_end: $date_end, address: $address, direction: $direction, price: $price, article: $article)';
   }
 }
 
@@ -426,13 +503,16 @@ abstract mixin class _$FavoriteCopyWith<$Res>
   @useResult
   $Res call(
       {int id,
-      String title,
+      int favoriteId,
       String type,
-      @JsonKey(name: 'date_start') String dateStart,
-      @JsonKey(name: 'date_end') String dateEnd,
+      String title,
       String? image,
+      String? date_start,
+      String? date_end,
       String? address,
-      Direction? direction});
+      Direction? direction,
+      double? price,
+      String? article});
 
   @override
   $DirectionCopyWith<$Res>? get direction;
@@ -451,38 +531,45 @@ class __$FavoriteCopyWithImpl<$Res> implements _$FavoriteCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? title = null,
+    Object? favoriteId = null,
     Object? type = null,
-    Object? dateStart = null,
-    Object? dateEnd = null,
+    Object? title = null,
     Object? image = freezed,
+    Object? date_start = freezed,
+    Object? date_end = freezed,
     Object? address = freezed,
     Object? direction = freezed,
+    Object? price = freezed,
+    Object? article = freezed,
   }) {
     return _then(_Favorite(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      title: null == title
-          ? _self.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
+      favoriteId: null == favoriteId
+          ? _self.favoriteId
+          : favoriteId // ignore: cast_nullable_to_non_nullable
+              as int,
       type: null == type
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
-      dateStart: null == dateStart
-          ? _self.dateStart
-          : dateStart // ignore: cast_nullable_to_non_nullable
-              as String,
-      dateEnd: null == dateEnd
-          ? _self.dateEnd
-          : dateEnd // ignore: cast_nullable_to_non_nullable
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
               as String,
       image: freezed == image
           ? _self.image
           : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      date_start: freezed == date_start
+          ? _self.date_start
+          : date_start // ignore: cast_nullable_to_non_nullable
+              as String?,
+      date_end: freezed == date_end
+          ? _self.date_end
+          : date_end // ignore: cast_nullable_to_non_nullable
               as String?,
       address: freezed == address
           ? _self.address
@@ -492,6 +579,14 @@ class __$FavoriteCopyWithImpl<$Res> implements _$FavoriteCopyWith<$Res> {
           ? _self.direction
           : direction // ignore: cast_nullable_to_non_nullable
               as Direction?,
+      price: freezed == price
+          ? _self.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as double?,
+      article: freezed == article
+          ? _self.article
+          : article // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 

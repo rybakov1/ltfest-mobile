@@ -132,9 +132,8 @@ class _NewsDetailsPageState extends ConsumerState<NewsDetailsPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      LtAppbar(
-                        title: "",
-                        postfixIcon: ShareButton(
+                      LTAppBar(
+                        postfixWidget: ShareButton(
                           link: news.url ?? 'https://ltfest.ru',
                           color: Palette.primaryLime,
                         ),
@@ -173,7 +172,7 @@ class _NewsDetailsPageState extends ConsumerState<NewsDetailsPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-                child: ElevatedButton(
+                child: LTButtons.elevatedButton(
                   onPressed: () async {
                     final uri = Uri.parse(news.url ?? 'https://ltfest.ru');
                     if (await canLaunchUrl(uri)) {
@@ -181,18 +180,9 @@ class _NewsDetailsPageState extends ConsumerState<NewsDetailsPage> {
                           mode: LaunchMode.externalApplication);
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primaryLime,
-                    foregroundColor: Palette.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 24),
-                  ),
-                  child: const Text(
+                  child: Text(
                     'Перейти',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: Styles.button1,
                   ),
                 ),
               ),
@@ -211,12 +201,11 @@ class _NewsDetailsPageState extends ConsumerState<NewsDetailsPage> {
 
     return Column(
       children: [
-        LtAppbar(
-          title: "",
-          suffixIconColor: Palette.stroke,
-          postfixIcon: ShareButton(
+        LTAppBar(
+          suffixIconColor: const Color.fromRGBO(255, 255, 255, 0.5),
+          postfixWidget: ShareButton(
             link: url,
-            color: Palette.stroke,
+            color: const Color.fromRGBO(255, 255, 255, 0.5),
           ),
         ),
         SizedBox(height: 270 - MediaQuery.of(context).padding.top),

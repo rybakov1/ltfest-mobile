@@ -196,8 +196,20 @@ class ApiService {
   Future<List<UpcomingEvent>> fetchUpcomingEvents() =>
       _fetchCollection(ApiEndpoints.upcomingEvents, UpcomingEvent.fromJson);
 
-  Future<List<Favorite>> fetchFavorites() =>
-      _fetchCollection(ApiEndpoints.favorites, Favorite.fromJson);
+  // Future<List<Favorite>> fetchFavorites() =>
+  //     _fetchCollection(ApiEndpoints.favorites, Favorite.fromJson);
+
+  Future<List<Favorite>> fetchFavorites() async {
+    try {
+      final response = await _dio.get(ApiEndpoints.favorites);
+      final List<dynamic> data = response.data;
+      return data
+          .map((json) => Favorite.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
 
   Future<Festival> getFestivalById(String id) async {
     try {
@@ -295,11 +307,7 @@ class ApiService {
     }
   }
 
-  Future<void> addFavorite(String eventType, int eventId) async {
-    if (!['festival', 'laboratory'].contains(eventType)) {
-      throw ApiException(message: 'Invalid event_type: $eventType');
-    }
-
+  Future<Map<String, dynamic>> addFavorite(String eventType, int eventId) async {
     try {
       final response = await _dio.post(
         ApiEndpoints.favorites,
@@ -308,72 +316,103 @@ class ApiService {
           'event_id': eventId,
         },
       );
-
-      if (response.statusCode != 200) {
-        throw ApiException(
-          message:
-              'Failed to add favorite $eventType: ${response.statusMessage}',
-          statusCode: response.statusCode,
-        );
-      }
+      // Просто возвращаем сырой JSON-ответ. Notifier разберется.
+      return response.data as Map<String, dynamic>;
     } catch (e) {
       _handleError(e);
     }
   }
 
-// Удаление мероприятия из избранного
-  Future<void> removeFavorite(int userId, String eventType, int eventId) async {
-    if (!['festival', 'laboratory'].contains(eventType)) {
-      throw ApiException(message: 'Invalid event_type: $eventType');
-    }
 
+// --- ЭТОТ МЕТОД ОСТАЕТСЯ ВЕРНЫМ ---
+// Он принимает ID самого "избранного" и передает его в URL, что правильно для вашего бэкенда.
+  Future<void> removeFavorite(int favoriteId) async {
     try {
-      // Находим запись в Favorites
-      final response = await _dio.get(
-        ApiEndpoints.favorites,
-        queryParameters: {
-          'filters[users_permissions_user][id][\$eq]': userId,
-          'filters[event_type][\$eq]': eventType,
-          'filters[event_id][\$eq]': eventId,
-        },
-      );
-
-      print("$eventType/$eventId/$userId/$response");
-
-      if (response.statusCode != 200) {
-        throw ApiException(
-          message:
-              'Failed to find favorite $eventType: ${response.statusMessage}',
-          statusCode: response.statusCode,
-        );
-      }
-
-      print("api response: ${response.data}");
-
-      final data = response.data as List<dynamic>;
-      if (data.isEmpty) {
-        throw ApiException(message: 'Favorite $eventType not found');
-      }
-
-      print(data[0].toString());
-      final favoriteId = int.parse(data[0]['favoriteId'].toString());
-      print(favoriteId);
-
-      //Удаляем запись
-      final deleteResponse =
-          await _dio.delete(ApiEndpoints.favoriteById(favoriteId));
-
-      if (deleteResponse.statusCode != 200) {
-        throw ApiException(
-          message:
-              'Failed to remove favorite $eventType: ${deleteResponse.statusMessage}',
-          statusCode: deleteResponse.statusCode,
-        );
-      }
+      await _dio.delete('${ApiEndpoints.favorites}/$favoriteId');
     } catch (e) {
       _handleError(e);
     }
   }
+
+//   Future<void> addFavorite(String eventType, int eventId) async {
+//     if (!['festival', 'laboratory'].contains(eventType)) {
+//       throw ApiException(message: 'Invalid event_type: $eventType');
+//     }
+//
+//     try {
+//       final response = await _dio.post(
+//         ApiEndpoints.favorites,
+//         data: {
+//           'event_type': eventType,
+//           'event_id': eventId,
+//         },
+//       );
+//
+//       if (response.statusCode != 200) {
+//         throw ApiException(
+//           message:
+//               'Failed to add favorite $eventType: ${response.statusMessage}',
+//           statusCode: response.statusCode,
+//         );
+//       }
+//     } catch (e) {
+//       _handleError(e);
+//     }
+//   }
+//
+// // Удаление мероприятия из избранного
+//   Future<void> removeFavorite(int userId, String eventType, int eventId) async {
+//     if (!['festival', 'laboratory'].contains(eventType)) {
+//       throw ApiException(message: 'Invalid event_type: $eventType');
+//     }
+//
+//     try {
+//       // Находим запись в Favorites
+//       final response = await _dio.get(
+//         ApiEndpoints.favorites,
+//         queryParameters: {
+//           'filters[users_permissions_user][id][\$eq]': userId,
+//           'filters[event_type][\$eq]': eventType,
+//           'filters[event_id][\$eq]': eventId,
+//         },
+//       );
+//
+//       print("$eventType/$eventId/$userId/$response");
+//
+//       if (response.statusCode != 200) {
+//         throw ApiException(
+//           message:
+//               'Failed to find favorite $eventType: ${response.statusMessage}',
+//           statusCode: response.statusCode,
+//         );
+//       }
+//
+//       print("api response: ${response.data}");
+//
+//       final data = response.data as List<dynamic>;
+//       if (data.isEmpty) {
+//         throw ApiException(message: 'Favorite $eventType not found');
+//       }
+//
+//       print(data[0].toString());
+//       final favoriteId = int.parse(data[0]['favoriteId'].toString());
+//       print(favoriteId);
+//
+//       //Удаляем запись
+//       final deleteResponse =
+//           await _dio.delete(ApiEndpoints.favoriteById(favoriteId));
+//
+//       if (deleteResponse.statusCode != 200) {
+//         throw ApiException(
+//           message:
+//               'Failed to remove favorite $eventType: ${deleteResponse.statusMessage}',
+//           statusCode: deleteResponse.statusCode,
+//         );
+//       }
+//     } catch (e) {
+//       _handleError(e);
+//     }
+//   }
 
   // --- SHOP & CART ---
 

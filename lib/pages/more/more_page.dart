@@ -212,8 +212,7 @@ class MorePage extends ConsumerWidget {
         child: Column(
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               child: Row(
                 children: [
                   InkWell(
@@ -232,10 +231,11 @@ class MorePage extends ConsumerWidget {
                 ],
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.all(4),
-              child: ProfileCard(),
-            ),
+            if (user.activity!.title == "Руководитель коллектива")
+              const Padding(
+                padding: EdgeInsets.all(4),
+                child: ProfileCard(),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Row(
@@ -284,13 +284,10 @@ class MorePage extends ConsumerWidget {
                     const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: _MenuTile(
-                    iconPath: 'assets/icons/favourite.svg',
-                    title: "Избранное СКОРО",
-                    onTap: () {}
-                    //{
-                    //context.push(AppRoutes.favorites);
-                    //},
-                    ),
+                  iconPath: 'assets/icons/favourite.svg',
+                  title: "Избранное",
+                  onTap: () => context.push(AppRoutes.favorites),
+                ),
               ),
             ),
             const SizedBox(height: 4),
@@ -340,8 +337,7 @@ class MorePage extends ConsumerWidget {
                       iconPath: 'assets/icons/settings.svg',
                       title: "Настройки приложения",
                       onTap: () {
-                        context
-                            .push(AppRoutes.settings);
+                        context.push(AppRoutes.settings);
                       },
                     ),
                     _MenuTile(
@@ -374,10 +370,12 @@ class ProfileCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
         decoration: BoxDecoration(
-            color: Palette.primaryLime, borderRadius: BorderRadius.circular(12)),
+            color: Palette.primaryLime,
+            borderRadius: BorderRadius.circular(12)),
         child: Row(
           children: [
-            Text("LT Priority", style: Styles.h4.copyWith(color: Palette.white)),
+            Text("LT Priority",
+                style: Styles.h4.copyWith(color: Palette.white)),
             const Spacer(),
             Text("Подключить",
                 style: Styles.button1.copyWith(color: Palette.white)),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/pages/shop/provider/shop_provider.dart';
 import '../../../components/favorite_button.dart';
@@ -26,8 +27,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
   ProductSize? _selectedSize;
   ProductInStock? _selectedVariation;
 
-  void _showColorPicker(
-      BuildContext context, List<ProductColor> productColors, List<ProductInStock> variations) {
+  void _showColorPicker(BuildContext context, List<ProductColor> productColors,
+      List<ProductInStock> variations) {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
     showModalBottomSheet(
       context: context,
@@ -63,13 +64,15 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                   for (int i = 0; i < productColors.length; i++)
                     Builder(
                       builder: (context) {
-                        final isSelected = _selectedVariation?.productColor.id == productColors[i].id;
+                        final isSelected =
+                            _selectedVariation?.productColor.id ==
+                                productColors[i].id;
                         final isAvailable = _isVariationAvailable(
-                          variations, 
-                          productColors[i].id, 
-                          _selectedVariation?.productSize.id ?? variations.first.productSize.id
-                        );
-                        
+                            variations,
+                            productColors[i].id,
+                            _selectedVariation?.productSize.id ??
+                                variations.first.productSize.id);
+
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: InkWell(
@@ -78,7 +81,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                 _selectedColor = productColors[i];
                               });
                               // Обновляем вариацию при выборе цвета
-                              _updateSelectedVariation(variations, colorId: productColors[i].id);
+                              _updateSelectedVariation(variations,
+                                  colorId: productColors[i].id);
                             },
                             child: Row(
                               children: [
@@ -88,11 +92,13 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
                                     color: hexToColor(productColors[i].hex!),
-                                    border: isAvailable 
-                                        ? null 
-                                        : Border.all(color: Colors.grey.withOpacity(0.5), width: 1),
+                                    border: isAvailable
+                                        ? null
+                                        : Border.all(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            width: 1),
                                   ),
-                                  child: !isAvailable 
+                                  child: !isAvailable
                                       ? Icon(
                                           Icons.close,
                                           size: 12,
@@ -102,10 +108,10 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  productColors[i].title, 
+                                  productColors[i].title,
                                   style: Styles.b1.copyWith(
-                                    color: isAvailable 
-                                        ? Palette.black 
+                                    color: isAvailable
+                                        ? Palette.black
                                         : Palette.black.withOpacity(0.5),
                                   ),
                                 ),
@@ -151,7 +157,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
       {int? colorId, int? sizeId}) {
     final currentColorId = colorId ?? _selectedVariation?.productColor.id;
     final currentSizeId = sizeId ?? _selectedVariation?.productSize.id;
-    
+
     // Ищем точное совпадение
     final newVariation = variations.firstWhere(
       (v) =>
@@ -167,14 +173,17 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
           (v) => v.productSize.id == currentSizeId,
           orElse: () => variations.first,
         );
-        
+
         final color = colorVariation.productColor;
         final size = sizeVariation.productSize;
-        
+
         return ProductInStock(
-          id: -1, // Специальный ID для недоступных комбинаций
-          price: variations.first.price, // Используем цену первой доступной вариации
-          stockQuantity: 0, // Нет в наличии
+          id: -1,
+          // Специальный ID для недоступных комбинаций
+          price: variations.first.price,
+          // Используем цену первой доступной вариации
+          stockQuantity: 0,
+          // Нет в наличии
           productColor: color,
           productSize: size,
           images: [], // Пустой список изображений для недоступных комбинаций
@@ -212,7 +221,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
   }
 
   // Проверяем доступность комбинации цвета и размера
-  bool _isVariationAvailable(List<ProductInStock> variations, int colorId, int sizeId) {
+  bool _isVariationAvailable(
+      List<ProductInStock> variations, int colorId, int sizeId) {
     final variation = variations.firstWhere(
       (v) => v.productColor.id == colorId && v.productSize.id == sizeId,
       orElse: () => ProductInStock(
@@ -227,7 +237,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
   }
 
   // Получаем доступную вариацию или null если недоступна
-  ProductInStock? _getAvailableVariation(List<ProductInStock> variations, int colorId, int sizeId) {
+  ProductInStock? _getAvailableVariation(
+      List<ProductInStock> variations, int colorId, int sizeId) {
     final variation = variations.firstWhere(
       (v) => v.productColor.id == colorId && v.productSize.id == sizeId,
       orElse: () => ProductInStock(
@@ -260,7 +271,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                   (v) => v.images.isNotEmpty,
                   orElse: () => variations.first,
                 );
-                
+
                 setState(() {
                   _selectedVariation = initialVariation;
                   _selectedColor = initialVariation.productColor;
@@ -315,39 +326,19 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                     SafeArea(
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
+                          LTAppBar(
+                            postfixWidget: Row(
                               children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(12)),
-                                  child: Container(
-                                    width: 43,
-                                    height: 43,
-                                    color: Palette.primaryLime,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.arrow_back,
-                                        color: Palette.white,
-                                        size: 24,
-                                      ),
-                                      onPressed: () {
-                                        context.pop();
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
                                 ShareButton(
                                   link: "https://ltfest.ru",
                                   color: Palette.primaryLime,
                                 ),
                                 const SizedBox(width: 8),
-                                FavoriteButtonDetails(
-                                  id: 1,
-                                  eventType: EventType.laboratory,
+                                FavoriteButton(
+                                  size: 40,
+                                  type: EventType.product,
                                   color: Palette.primaryLime,
+                                  id: product.id,
                                 ),
                               ],
                             ),
@@ -393,22 +384,31 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                     for (final sizeItem in uniqueSizes)
                                       Builder(
                                         builder: (context) {
-                                          final isSelected = _selectedVariation?.productSize.id == sizeItem.id;
-                                          final isAvailable = _isVariationAvailable(
-                                            variations, 
-                                            _selectedVariation?.productColor.id ?? variations.first.productColor.id, 
-                                            sizeItem.id
-                                          );
-                                          
+                                          final isSelected = _selectedVariation
+                                                  ?.productSize.id ==
+                                              sizeItem.id;
+                                          final isAvailable =
+                                              _isVariationAvailable(
+                                                  variations,
+                                                  _selectedVariation
+                                                          ?.productColor.id ??
+                                                      variations.first
+                                                          .productColor.id,
+                                                  sizeItem.id);
+
                                           return InkWell(
                                             onTap: () {
-                                              _updateSelectedVariation(variations,
+                                              _updateSelectedVariation(
+                                                  variations,
                                                   sizeId: sizeItem.id);
                                             },
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 12, vertical: 10),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 10),
                                               decoration: BoxDecoration(
                                                   color: isSelected
                                                       ? Palette.primaryLime
@@ -418,7 +418,9 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                                           ? Palette.primaryLime
                                                           : isAvailable
                                                               ? Palette.stroke
-                                                              : Palette.stroke.withOpacity(0.3)),
+                                                              : Palette.stroke
+                                                                  .withOpacity(
+                                                                      0.3)),
                                                   borderRadius:
                                                       BorderRadius.circular(8)),
                                               child: Text(
@@ -428,7 +430,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                                       ? Palette.white
                                                       : isAvailable
                                                           ? Palette.black
-                                                          : Palette.black.withOpacity(0.5),
+                                                          : Palette.black
+                                                              .withOpacity(0.5),
                                                 ),
                                               ),
                                             ),
@@ -442,8 +445,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                 const SizedBox(height: 16),
                                 if (uniqueColors.isNotEmpty)
                                   GestureDetector(
-                                    onTap: () =>
-                                        _showColorPicker(context, uniqueColors, variations),
+                                    onTap: () => _showColorPicker(
+                                        context, uniqueColors, variations),
                                     child: Container(
                                       width: double.infinity,
                                       padding: const EdgeInsets.symmetric(
@@ -462,7 +465,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                               borderRadius:
                                                   BorderRadius.circular(8),
                                               color: hexToColor(
-                                                  _selectedVariation!.productColor.hex!),
+                                                  _selectedVariation!
+                                                      .productColor.hex!),
                                             ),
                                           ),
                                           const SizedBox(width: 12),
@@ -621,8 +625,10 @@ class CartBottomBar extends ConsumerWidget {
                             icon: Icon(Icons.remove_circle,
                                 size: 32, color: Palette.primaryLime),
                             onPressed: () {
-                              ref.read(cartProvider.notifier).updateItemQuantity(
-                                  cartItem!.id, cartItem!.quantity - 1);
+                              ref
+                                  .read(cartProvider.notifier)
+                                  .updateItemQuantity(
+                                      cartItem!.id, cartItem!.quantity - 1);
                             },
                           ),
                           const SizedBox(width: 10),
@@ -632,8 +638,10 @@ class CartBottomBar extends ConsumerWidget {
                             icon: Icon(Icons.add_circle,
                                 size: 32, color: Palette.primaryLime),
                             onPressed: () {
-                              ref.read(cartProvider.notifier).updateItemQuantity(
-                                  cartItem!.id, cartItem!.quantity + 1);
+                              ref
+                                  .read(cartProvider.notifier)
+                                  .updateItemQuantity(
+                                      cartItem!.id, cartItem!.quantity + 1);
                             },
                           ),
                           const SizedBox(width: 16),

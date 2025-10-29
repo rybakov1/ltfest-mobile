@@ -8,24 +8,30 @@ part of 'favorite.dart';
 
 _Favorite _$FavoriteFromJson(Map<String, dynamic> json) => _Favorite(
       id: (json['id'] as num).toInt(),
-      title: json['title'] as String,
+      favoriteId: (json['favoriteId'] as num).toInt(),
       type: json['type'] as String,
-      dateStart: json['date_start'] as String,
-      dateEnd: json['date_end'] as String,
+      title: json['title'] as String,
       image: json['image'] as String?,
+      date_start: json['date_start'] as String?,
+      date_end: json['date_end'] as String?,
       address: json['address'] as String?,
       direction: json['direction'] == null
           ? null
           : Direction.fromJson(json['direction'] as Map<String, dynamic>),
+      price: (json['price'] as num?)?.toDouble(),
+      article: json['article'] as String?,
     );
 
 Map<String, dynamic> _$FavoriteToJson(_Favorite instance) => <String, dynamic>{
       'id': instance.id,
-      'title': instance.title,
+      'favoriteId': instance.favoriteId,
       'type': instance.type,
-      'date_start': instance.dateStart,
-      'date_end': instance.dateEnd,
+      'title': instance.title,
       'image': instance.image,
+      'date_start': instance.date_start,
+      'date_end': instance.date_end,
       'address': instance.address,
       'direction': instance.direction,
+      'price': instance.price,
+      'article': instance.article,
     };

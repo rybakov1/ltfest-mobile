@@ -1,53 +1,63 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../constants.dart';
 
-class LtAppbar extends StatelessWidget {
-  const LtAppbar(
-      {super.key, required this.title, this.postfixIcon, this.suffixIconColor});
-
+class LTAppBar extends StatelessWidget {
   final Color? suffixIconColor;
-  final String title;
-  final Widget? postfixIcon;
+  final String? title;
+  final Widget? postfixWidget;
+
+  const LTAppBar({
+    super.key,
+    this.title,
+    this.postfixWidget,
+    this.suffixIconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 24, bottom: 16),
-      child: Stack(
-        alignment: Alignment.center,
+      padding: const EdgeInsets.all(16),
+      child: Row(
         children: [
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              title,
-              style: Styles.h4.copyWith(color: Palette.black),
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              height: 43,
-              width: 43,
-              decoration: Decor.base
-                  .copyWith(color: suffixIconColor ?? Palette.primaryLime),
-              child: IconButton(
-                onPressed: () => context.pop(),
-                icon: Icon(Icons.arrow_back, color: Palette.white),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: suffixIconColor != null ? 10 : 0,
+                sigmaY: suffixIconColor != null ? 10 : 0,
               ),
-            ),
-          ),
-          if (postfixIcon != null)
-            Align(
-              alignment: Alignment.centerRight,
               child: Container(
-                height: 43,
-                width: 43,
-                decoration: Decor.base.copyWith(color: Palette.primaryLime),
-                child: postfixIcon,
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: suffixIconColor ?? Palette.primaryLime,
+                ),
+                child: IconButton(
+                  onPressed: () => context.pop(),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Palette.white,
+                    size: 24,
+                  ),
+                ),
               ),
             ),
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                title ?? "",
+                style: Styles.h4.copyWith(color: Palette.black),
+              ),
+            ),
+          ),
+          if (postfixWidget != null) postfixWidget!,
+          if (postfixWidget == null) const SizedBox(width: 40)
         ],
       ),
     );

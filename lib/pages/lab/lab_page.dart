@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/async_items_list_view.dart';
 import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/components/favorite_button.dart';
+import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
@@ -304,46 +306,16 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
         child: CustomScrollView(
           physics: const NeverScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16, right: 16, top: 24, bottom: 16),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Лаборатории",
-                        style: Styles.h4.copyWith(color: Palette.black),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        height: 43,
-                        width: 43,
-                        decoration:
-                            Decor.base.copyWith(color: Palette.primaryLime),
-                        child: IconButton(
-                          onPressed: () => context.pop(),
-                          icon: Icon(Icons.arrow_back, color: Palette.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            const SliverToBoxAdapter(
+              child: LTAppBar(
+                title: "Лаборатории",
               ),
             ),
             SliverFillRemaining(
               child: Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: Palette.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                padding: const EdgeInsets.only(top: 20, left: 12, right: 12),
+                decoration: Decor.base,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -356,6 +328,10 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                             .setSearchQuery(query);
                       },
                       decoration: InputDecoration(
+                        suffixIcon: SvgPicture.asset(
+                          "assets/icons/search.svg",
+                          fit: BoxFit.scaleDown,
+                        ),
                         filled: true,
                         fillColor: Palette.white,
                         border: OutlineInputBorder(
@@ -379,121 +355,179 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                             borderSide:
                                 BorderSide(color: Palette.error, width: 1)),
                         hintText: "Поиск",
-                        hintStyle: Styles.b2,
+                        hintStyle: Styles.b2.copyWith(color: Palette.gray),
                         contentPadding: const EdgeInsets.only(
-                            left: 16, top: 13, bottom: 13),
+                          left: 16,
+                          top: 13,
+                          bottom: 13,
+                        ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20, bottom: 6),
-                      child: Row(
-                        children: [
-                          CustomChip(
-                            onDirectionSelected: (direction) {
-                              ref
-                                  .read(selectedDirectionProvider.notifier)
-                                  .state = direction;
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => _showLearningTypeBottomSheet(
-                                laboratoryState, selectedDirection),
-                            child: Container(
-                              height: 32,
-                              padding: const EdgeInsets.only(
-                                left: 10,
-                                right: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: laboratoryState
-                                        .selectedLearningTypes.isEmpty
-                                    ? Palette.white
-                                    : Palette.primaryLime,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Palette.stroke,
-                                  width: 1,
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16, bottom: 16),
+                        child: Row(
+                          children: [
+                            CustomChip(
+                              onDirectionSelected: (direction) {
+                                ref
+                                    .read(selectedDirectionProvider.notifier)
+                                    .state = direction;
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => _showLearningTypeBottomSheet(
+                                  laboratoryState, selectedDirection),
+                              child: Container(
+                                height: 32,
+                                padding: const EdgeInsets.only(
+                                  left: 10,
+                                  right: 10,
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Тип обучения",
-                                    style: Styles.b2.copyWith(
-                                      color: laboratoryState
-                                              .selectedLearningTypes.isEmpty
-                                          ? Palette.gray
-                                          : Palette.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Icon(
-                                    laboratoryState
-                                            .selectedLearningTypes.isEmpty
-                                        ? Icons.keyboard_arrow_down_outlined
-                                        : Icons.close,
+                                decoration: BoxDecoration(
+                                  color: laboratoryState
+                                          .selectedLearningTypes.isEmpty
+                                      ? Palette.white
+                                      : Palette.primaryLime,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
                                     color: laboratoryState
                                             .selectedLearningTypes.isEmpty
-                                        ? const Color(0xFF1C274C)
-                                        : Palette.white,
-                                    size: 16,
+                                        ? Palette.stroke
+                                        : Palette.primaryLime,
+                                    width: 1,
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => _showCityBottomSheet(
-                                laboratoryState, selectedDirection),
-                            child: Container(
-                              height: 32,
-                              padding: const EdgeInsets.only(
-                                left: 10,
-                                right: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: laboratoryState.selectedCities.isEmpty
-                                    ? Palette.white
-                                    : Palette.primaryLime,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Palette.stroke,
-                                  width: 1,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Тип обучения",
+                                      style: Styles.b2.copyWith(
+                                        color: laboratoryState
+                                                .selectedLearningTypes.isEmpty
+                                            ? Palette.gray
+                                            : Palette.white,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                        onPressed: () {
+                                          if (laboratoryState
+                                              .selectedLearningTypes
+                                              .isNotEmpty) {
+                                            setState(() {
+                                              laboratoryState
+                                                  .selectedLearningTypes
+                                                  .clear();
+                                            });
+                                          } else {
+                                            _showLearningTypeBottomSheet(
+                                                laboratoryState,
+                                                selectedDirection);
+                                          }
+                                        },
+                                        icon: Icon(
+                                          laboratoryState
+                                                  .selectedLearningTypes.isEmpty
+                                              ? Icons
+                                                  .keyboard_arrow_down_outlined
+                                              : Icons.close,
+                                          color: laboratoryState
+                                                  .selectedLearningTypes.isEmpty
+                                              ? const Color(0xFF1C274C)
+                                              : Palette.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Город",
-                                    style: Styles.b2.copyWith(
-                                      color:
-                                          laboratoryState.selectedCities.isEmpty
-                                              ? Palette.gray
-                                              : Palette.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Icon(
-                                    laboratoryState.selectedCities.isEmpty
-                                        ? Icons.keyboard_arrow_down_outlined
-                                        : Icons.close,
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => _showCityBottomSheet(
+                                  laboratoryState, selectedDirection),
+                              child: Container(
+                                height: 32,
+                                padding: const EdgeInsets.only(
+                                  left: 10,
+                                  right: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: laboratoryState.selectedCities.isEmpty
+                                      ? Palette.white
+                                      : Palette.primaryLime,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
                                     color:
                                         laboratoryState.selectedCities.isEmpty
-                                            ? const Color(0xFF1C274C)
-                                            : Palette.white,
-                                    size: 16,
+                                            ? Palette.stroke
+                                            : Palette.primaryLime,
+                                    width: 1,
                                   ),
-                                ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Город",
+                                      style: Styles.b2.copyWith(
+                                        color: laboratoryState
+                                                .selectedCities.isEmpty
+                                            ? Palette.gray
+                                            : Palette.white,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                        onPressed: () {
+                                          if (laboratoryState
+                                              .selectedCities.isNotEmpty) {
+                                            setState(() {
+                                              laboratoryState.selectedCities
+                                                  .clear();
+                                            });
+                                          } else {
+                                            _showCityBottomSheet(
+                                                laboratoryState,
+                                                selectedDirection);
+                                          }
+                                        },
+                                        icon: Icon(
+                                          laboratoryState.selectedCities.isEmpty
+                                              ? Icons
+                                                  .keyboard_arrow_down_outlined
+                                              : Icons.close,
+                                          color: laboratoryState
+                                                  .selectedCities.isEmpty
+                                              ? const Color(0xFF1C274C)
+                                              : Palette.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     Expanded(
@@ -557,7 +591,10 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                       selectedDirection: laboratory.direction.title,
                     ),
                     FavoriteButton(
-                        id: laboratory.id, eventType: EventType.laboratory)
+                      id: laboratory.id,
+                      type: EventType.laboratory,
+                      color: Palette.white.withValues(alpha: 0.5),
+                    ),
                   ],
                 ),
               ),

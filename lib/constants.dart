@@ -35,6 +35,7 @@ class Palette {
   static Color shimmerBase = const Color(0xFFF0F2F5);
   static Color shimmerHighlight = const Color(0xFFE7EAED);
   static Color grayTimer = const Color.fromRGBO(157, 157, 157, 1);
+  static Color secondaryGray = const Color(0xFFE2E6F1);
 }
 
 class Styles {

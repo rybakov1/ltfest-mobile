@@ -194,7 +194,7 @@ Widget buildEventCard({
                       ),
                     ),
                   ),
-                  FavoriteButton(id: event.id, eventType: event.type)
+                  FavoriteButton(id: event.id, type: event.type, color: Palette.white),
                 ],
               ),
             ),

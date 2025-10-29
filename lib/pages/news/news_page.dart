@@ -23,7 +23,7 @@ class NewsPage extends ConsumerWidget {
         child: CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(
-              child: LtAppbar(title: "Новости LT Fest"),
+              child: LTAppBar(title: "Новости LT Fest"),
             ),
             SliverFillRemaining(
               child: Padding(
