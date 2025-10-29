@@ -15,6 +15,7 @@ class CartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cartAsync = ref.watch(cartProvider);
+    final cartItems = ref.watch(cartItemsProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -25,82 +26,80 @@ class CartPage extends ConsumerWidget {
             const SliverToBoxAdapter(
               child: LTAppBar(title: "Корзина LT Shop"),
             ),
-            SliverFillRemaining(
-              child: Container(
-                child: cartAsync.when(
-                  data: (cart) {
-                    final validItems = cart.items
-                        .where((item) => item.productInStock != null)
-                        .toList();
-
-                    if (validItems.isEmpty) {
-                      return Container(
-                        decoration: Decor.base,
-                        margin: const EdgeInsets.all(4),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 0.0, horizontal: 12),
-                        child: Column(
-                          children: [
-                            const Spacer(),
-                            Image.asset("assets/icons/states/nothing.png",
-                                width: 192),
-                            const SizedBox(height: 20),
-                            Text("В корзине пока пусто", style: Styles.b2),
-                            const Spacer(),
-                            LTButtons.elevatedButton(
-                              onPressed: () => context.push(AppRoutes.shop),
-                              child:
-                                  Text("За покупками", style: Styles.button1),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
-                        ),
-                      );
-                    }
-
-                    return Stack(
-                      children: [
-                        ListView.builder(
-                          padding:
-                              const EdgeInsets.all(0.0).copyWith(bottom: 150),
-                          itemCount: validItems.length,
-                          itemBuilder: (context, index) {
-                            final cartItem = validItems[index];
-                            return CartItemCard(cartItem: cartItem);
-                          },
-                        ),
-                        const Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: CartSummary(),
-                        ),
-                      ],
-                    );
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (err, stack) => Container(
-                    decoration: Decor.base,
-                    margin: const EdgeInsets.all(4),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 0.0, horizontal: 12),
-                    child: Column(
-                      children: [
-                        const Spacer(),
-                        Image.asset("assets/icons/states/nothing.png",
-                            width: 192),
-                        const SizedBox(height: 20),
-                        Text("В корзине пока пусто", style: Styles.b2),
-                        const Spacer(),
-                        LTButtons.elevatedButton(
-                          onPressed: () => context.push(AppRoutes.shop),
-                          child: const Text("За покупками"),
-                        ),
-                        SizedBox(
-                            height: 12 + MediaQuery.of(context).padding.bottom),
-                      ],
+            cartAsync.when(
+              data: (cart) {
+                if (cartItems.isEmpty) {
+                  return SliverFillRemaining(
+                    child: Container(
+                      decoration: Decor.base,
+                      margin: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 0.0, horizontal: 12),
+                      child: Column(
+                        children: [
+                          const Spacer(),
+                          Image.asset("assets/icons/states/nothing.png",
+                              width: 192),
+                          const SizedBox(height: 20),
+                          Text("В корзине пока пусто", style: Styles.b2),
+                          const Spacer(),
+                          LTButtons.elevatedButton(
+                            onPressed: () => context.push(AppRoutes.shop),
+                            child: Text("За покупками", style: Styles.button1),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
                     ),
+                  );
+                }
+
+                return SliverFillRemaining(
+                  child: Stack(
+                    children: [
+                      ListView.builder(
+                        padding:
+                            const EdgeInsets.all(0.0).copyWith(bottom: 150),
+                        itemCount: cartItems.length,
+                        itemBuilder: (context, index) {
+                          final cartItem = cartItems[index];
+                          return CartItemCard(cartItemId: cartItem.id);
+                        },
+                      ),
+                      const Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: CartSummary(),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              loading: () => const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (err, stack) => SliverFillRemaining(
+                child: Container(
+                  decoration: Decor.base,
+                  margin: const EdgeInsets.all(4),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0.0, horizontal: 12),
+                  child: Column(
+                    children: [
+                      const Spacer(),
+                      Image.asset("assets/icons/states/nothing.png",
+                          width: 192),
+                      const SizedBox(height: 20),
+                      Text("В корзине пока пусто", style: Styles.b2),
+                      const Spacer(),
+                      LTButtons.elevatedButton(
+                        onPressed: () => context.push(AppRoutes.shop),
+                        child: const Text("За покупками"),
+                      ),
+                      SizedBox(
+                          height: 12 + MediaQuery.of(context).padding.bottom),
+                    ],
                   ),
                 ),
               ),
@@ -114,9 +113,9 @@ class CartPage extends ConsumerWidget {
 
 /// Виджет для отображения одного товара в корзине
 class CartItemCard extends ConsumerWidget {
-  const CartItemCard({super.key, required this.cartItem});
+  final int cartItemId;
 
-  final CartItem cartItem;
+  const CartItemCard({super.key, required this.cartItemId});
 
   void _showItemMore(BuildContext context, CartItem cartItem, WidgetRef ref) {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
@@ -203,6 +202,14 @@ class CartItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cartItem = ref.watch(cartItemProvider(cartItemId));
+    final isCartLoading =
+        ref.watch(cartProvider.select((asyncCart) => asyncCart.isLoading));
+
+    if (cartItem == null) {
+      return const SizedBox.shrink();
+    }
+
     final productStock = cartItem.productInStock!;
 
     return Container(
@@ -242,8 +249,9 @@ class CartItemCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: 10),
                       GestureDetector(
-                          onTap: () => _showItemMore(context, cartItem, ref),
-                          child: const Icon(Icons.more_horiz)),
+                        onTap: () => _showItemMore(context, cartItem, ref),
+                        child: const Icon(Icons.more_horiz),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -260,19 +268,27 @@ class CartItemCard extends ConsumerWidget {
                       IconButton(
                         icon: Icon(Icons.remove_circle,
                             size: 32, color: Palette.primaryLime),
-                        onPressed: () {
-                          ref.read(cartProvider.notifier).updateItemQuantity(
-                              cartItem.id, cartItem.quantity - 1);
-                        },
+                        onPressed: isCartLoading
+                            ? null
+                            : () {
+                                ref
+                                    .read(cartProvider.notifier)
+                                    .updateItemQuantity(
+                                        cartItem.id, cartItem.quantity - 1);
+                              },
                       ),
                       Text('${cartItem.quantity}', style: Styles.h4),
                       IconButton(
                         icon: Icon(Icons.add_circle,
                             size: 32, color: Palette.primaryLime),
-                        onPressed: () {
-                          ref.read(cartProvider.notifier).updateItemQuantity(
-                              cartItem.id, cartItem.quantity + 1);
-                        },
+                        onPressed: isCartLoading
+                            ? null
+                            : () {
+                                ref
+                                    .read(cartProvider.notifier)
+                                    .updateItemQuantity(
+                                        cartItem.id, cartItem.quantity + 1);
+                              },
                       ),
                     ],
                   )
@@ -292,6 +308,8 @@ class CartSummary extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final totalPrice = ref.watch(cartTotalPriceProvider);
+    final isCartLoading =
+        ref.watch(cartProvider.select((asyncCart) => asyncCart.isLoading));
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -307,7 +325,18 @@ class CartSummary extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Итого:', style: Styles.h4),
-              Text(Utils.formatMoney(totalPrice), style: Styles.h3),
+              isCartLoading
+                  ? Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: SizedBox(
+                        width: 25,
+                        height: 25,
+                        child: CircularProgressIndicator(
+                          color: Palette.primaryLime,
+                        ),
+                      ),
+                    )
+                  : Text(Utils.formatMoney(totalPrice), style: Styles.h3),
             ],
           ),
           const SizedBox(height: 24),

@@ -3,15 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/data/models/image_data.dart';
 import 'package:ltfest/pages/shop/provider/shop_provider.dart';
 import '../../../components/favorite_button.dart';
 import '../../../components/share_button.dart';
+import '../../../data/models/product/product.dart';
 import '../../../data/models/product/product_attribute.dart';
 import '../../../data/models/product/product_in_stock.dart';
 import '../../../providers/favorites_provider.dart';
 import '../../../router/app_routes.dart';
 import '../../cart/models/cart_item.dart';
 import '../../cart/provider/cart_provider.dart';
+import '../provider/shop_selection_provider.dart';
+
+final carouselPageIndexProvider =
+    StateProvider.family.autoDispose<int, int>((ref, productVariationId) {
+  return 0; // Начальная страница всегда 0
+});
 
 class ShopDetailsPage extends ConsumerStatefulWidget {
   final String id;
@@ -23,9 +31,26 @@ class ShopDetailsPage extends ConsumerStatefulWidget {
 }
 
 class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
-  ProductColor? _selectedColor;
-  ProductSize? _selectedSize;
-  ProductInStock? _selectedVariation;
+  final ScrollController _scrollController = ScrollController();
+  bool _showHeader = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 150 && !_showHeader) {
+        setState(() => _showHeader = true);
+      } else if (_scrollController.offset <= 150 && _showHeader) {
+        setState(() => _showHeader = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _showColorPicker(BuildContext context, List<ProductColor> productColors,
       List<ProductInStock> variations) {
@@ -37,9 +62,14 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter modalSetState) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final selectionState =
+                ref.watch(productSelectionProvider(widget.id));
+            final selectedVariation = selectionState.selectedVariation;
+
             return Container(
+              height: 400,
               padding: EdgeInsets.only(
                   left: 16, right: 16, bottom: 24 + bottomPadding),
               child: Column(
@@ -57,81 +87,48 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Center(
-                    child: Text('Цвет', style: Styles.h4),
-                  ),
+                  Center(child: Text('Цвет', style: Styles.h4)),
                   const SizedBox(height: 32),
-                  for (int i = 0; i < productColors.length; i++)
-                    Builder(
-                      builder: (context) {
-                        final isSelected =
-                            _selectedVariation?.productColor.id ==
-                                productColors[i].id;
-                        final isAvailable = _isVariationAvailable(
-                            variations,
-                            productColors[i].id,
-                            _selectedVariation?.productSize.id ??
-                                variations.first.productSize.id);
-
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: InkWell(
-                            onTap: () {
-                              modalSetState(() {
-                                _selectedColor = productColors[i];
-                              });
-                              // Обновляем вариацию при выборе цвета
-                              _updateSelectedVariation(variations,
-                                  colorId: productColors[i].id);
-                            },
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: hexToColor(productColors[i].hex!),
-                                    border: isAvailable
-                                        ? null
-                                        : Border.all(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            width: 1),
-                                  ),
-                                  child: !isAvailable
-                                      ? Icon(
-                                          Icons.close,
-                                          size: 12,
-                                          color: Colors.grey.withOpacity(0.7),
-                                        )
-                                      : null,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  productColors[i].title,
-                                  style: Styles.b1.copyWith(
-                                    color: isAvailable
-                                        ? Palette.black
-                                        : Palette.black.withOpacity(0.5),
-                                  ),
-                                ),
-                                const Spacer(),
-                                if (isSelected)
-                                  Icon(
-                                    Icons.check,
-                                    color: Palette.primaryLime,
-                                  ),
-                              ],
+                  for (final color in productColors)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: InkWell(
+                        onTap: () {
+                          ref
+                              .read(
+                                  productSelectionProvider(widget.id).notifier)
+                              .updateSelection(colorId: color.id);
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: hexToColor(color.hex!),
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                            const SizedBox(width: 8),
+                            Text(
+                              color.title,
+                              style: Styles.b1.copyWith(color: Palette.black),
+                            ),
+                            const Spacer(),
+                            if (selectedVariation?.productColor.id == color.id)
+                              Icon(
+                                Icons.check_circle,
+                                color: Palette.primaryLime,
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  const SizedBox(height: 32),
+                  const Spacer(),
                   LTButtons.elevatedButton(
                     onPressed: () => context.pop(),
                     child: Text(
-                      "Сохранить",
+                      "Применить",
                       style: Styles.button1,
                     ),
                   )
@@ -153,74 +150,6 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
     return Color(hexValue);
   }
 
-  void _updateSelectedVariation(List<ProductInStock> variations,
-      {int? colorId, int? sizeId}) {
-    final currentColorId = colorId ?? _selectedVariation?.productColor.id;
-    final currentSizeId = sizeId ?? _selectedVariation?.productSize.id;
-
-    // Ищем точное совпадение
-    final newVariation = variations.firstWhere(
-      (v) =>
-          v.productColor.id == currentColorId &&
-          v.productSize.id == currentSizeId,
-      orElse: () {
-        // Если комбинации нет в наличии, создаем "виртуальную" вариацию
-        final colorVariation = variations.firstWhere(
-          (v) => v.productColor.id == currentColorId,
-          orElse: () => variations.first,
-        );
-        final sizeVariation = variations.firstWhere(
-          (v) => v.productSize.id == currentSizeId,
-          orElse: () => variations.first,
-        );
-
-        final color = colorVariation.productColor;
-        final size = sizeVariation.productSize;
-
-        return ProductInStock(
-          id: -1,
-          // Специальный ID для недоступных комбинаций
-          price: variations.first.price,
-          // Используем цену первой доступной вариации
-          stockQuantity: 0,
-          // Нет в наличии
-          productColor: color,
-          productSize: size,
-          images: [], // Пустой список изображений для недоступных комбинаций
-        );
-      },
-    );
-
-    setState(() {
-      _selectedVariation = newVariation;
-      _selectedColor = newVariation.productColor;
-      _selectedSize = newVariation.productSize;
-    });
-  }
-
-  List<T> _getUniqueAttributes<T>(List<ProductInStock> variations,
-      T Function(ProductInStock) getAttr, int Function(T) getId) {
-    final uniqueIds = <int>{};
-    final result = <T>[];
-    for (final variation in variations) {
-      final attr = getAttr(variation);
-      if (uniqueIds.add(getId(attr))) {
-        result.add(attr);
-      }
-    }
-    return result;
-  }
-
-  // Получаем все уникальные цвета и размеры из всех вариаций (включая недоступные)
-  List<ProductColor> _getAllUniqueColors(List<ProductInStock> variations) {
-    return _getUniqueAttributes(variations, (v) => v.productColor, (c) => c.id);
-  }
-
-  List<ProductSize> _getAllUniqueSizes(List<ProductInStock> variations) {
-    return _getUniqueAttributes(variations, (v) => v.productSize, (s) => s.id);
-  }
-
-  // Проверяем доступность комбинации цвета и размера
   bool _isVariationAvailable(
       List<ProductInStock> variations, int colorId, int sizeId) {
     final variation = variations.firstWhere(
@@ -236,53 +165,35 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
     return variation.stockQuantity > 0;
   }
 
-  // Получаем доступную вариацию или null если недоступна
-  ProductInStock? _getAvailableVariation(
-      List<ProductInStock> variations, int colorId, int sizeId) {
-    final variation = variations.firstWhere(
-      (v) => v.productColor.id == colorId && v.productSize.id == sizeId,
-      orElse: () => ProductInStock(
-        id: -1,
-        price: 0,
-        stockQuantity: 0,
-        productColor: ProductColor(id: colorId, title: ''),
-        productSize: ProductSize(id: sizeId, title: ''),
-      ),
-    );
-    return variation.stockQuantity > 0 ? variation : null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final productDetailsAsync = ref.watch(productByIdProvider(widget.id));
     final cartAsync = ref.watch(cartProvider);
+
+    final selectionState = ref.watch(productSelectionProvider(widget.id));
+    final selectedVariation = selectionState.selectedVariation;
+
+    ref.listen<AsyncValue<Product>>(productByIdProvider(widget.id),
+        (previous, next) {
+      if (!next.isLoading && next.hasValue && selectedVariation == null) {
+        final variations = next.value!.variations;
+        if (variations.isNotEmpty) {
+          ProductInStock initialVariation = variations.firstWhere(
+            (v) => v.images.isNotEmpty,
+            orElse: () => variations.first,
+          );
+          ref
+              .read(productSelectionProvider(widget.id).notifier)
+              .setInitial(initialVariation);
+        }
+      }
+    });
+
     return Scaffold(
       backgroundColor: Palette.background,
       body: productDetailsAsync.when(
         data: (product) {
-          final variations = product.variations;
-
-          // Инициализируем выбранную вариацию при первой загрузке
-          if (_selectedVariation == null && variations.isNotEmpty) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) {
-                // Ищем первую вариацию с изображениями, если есть
-                ProductInStock initialVariation = variations.firstWhere(
-                  (v) => v.images.isNotEmpty,
-                  orElse: () => variations.first,
-                );
-
-                setState(() {
-                  _selectedVariation = initialVariation;
-                  _selectedColor = initialVariation.productColor;
-                  _selectedSize = initialVariation.productSize;
-                });
-              }
-            });
-          }
-
-          // Если данные загрузились, а _selectedVariation еще не установлен, показываем загрузку
-          if (_selectedVariation == null) {
+          if (selectedVariation == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -290,34 +201,35 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
           CartItem? currentCartItem;
           if (cart != null) {
             for (final item in cart.items) {
-              if (item.productInStock?.id == _selectedVariation!.id) {
+              if (item.productInStock?.id == selectedVariation.id) {
                 currentCartItem = item;
-                break; // Нашли, выходим из цикла
+                break;
               }
             }
           }
 
-          final uniqueSizes = _getAllUniqueSizes(variations);
-          final uniqueColors = _getAllUniqueColors(variations);
+          final uniqueSizes = ref.watch(uniqueProductSizesProvider(widget.id));
+          final uniqueColors =
+              ref.watch(uniqueProductColorsProvider(widget.id));
+          final variations = product.variations;
 
           return Stack(
             children: [
               SingleChildScrollView(
+                controller: _scrollController,
                 child: Stack(
                   children: [
-                    _selectedVariation!.images.isNotEmpty
-                        ? Image.network(
-                            "http://37.46.132.144:1337${_selectedVariation!.images[0].url}",
-                            height: 360,
-                            fit: BoxFit.cover,
-                            // Можно добавить fade-in анимацию при смене картинки
+                    selectedVariation.images.isNotEmpty
+                        ? ProductImageCarousel(
+                            images: selectedVariation.images,
+                            productVariationId: selectedVariation.id,
                           )
                         : Container(
                             height: 360,
-                            color: Colors.grey.withOpacity(0.3),
+                            color: Colors.grey.withAlpha(77),
                             child: const Center(
                               child: Icon(
-                                Icons.image_not_supported,
+                                Icons.image_not_supported_outlined,
                                 size: 64,
                                 color: Colors.grey,
                               ),
@@ -349,9 +261,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                             decoration: Decor.base,
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             padding: const EdgeInsets.symmetric(
-                              vertical: 20,
-                              horizontal: 12,
-                            ),
+                                vertical: 20, horizontal: 12),
                             width: double.infinity,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,9 +269,11 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                 Text(product.name, style: Styles.h3),
                                 const SizedBox(height: 8),
                                 Text(
-                                    Utils.formatMoney(
-                                        _selectedVariation!.price.toInt()),
-                                    style: Styles.h4),
+                                  Utils.formatMoney(
+                                    selectedVariation.price.toInt(),
+                                  ),
+                                  style: Styles.h4,
+                                ),
                               ],
                             ),
                           ),
@@ -384,23 +296,25 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                     for (final sizeItem in uniqueSizes)
                                       Builder(
                                         builder: (context) {
-                                          final isSelected = _selectedVariation
-                                                  ?.productSize.id ==
+                                          final isSelected = selectedVariation
+                                                  .productSize.id ==
                                               sizeItem.id;
                                           final isAvailable =
                                               _isVariationAvailable(
                                                   variations,
-                                                  _selectedVariation
-                                                          ?.productColor.id ??
-                                                      variations.first
-                                                          .productColor.id,
+                                                  selectedVariation
+                                                      .productColor.id,
                                                   sizeItem.id);
 
                                           return InkWell(
                                             onTap: () {
-                                              _updateSelectedVariation(
-                                                  variations,
-                                                  sizeId: sizeItem.id);
+                                              ref
+                                                  .read(
+                                                      productSelectionProvider(
+                                                              widget.id)
+                                                          .notifier)
+                                                  .updateSelection(
+                                                      sizeId: sizeItem.id);
                                             },
                                             borderRadius:
                                                 BorderRadius.circular(8),
@@ -411,27 +325,33 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                                       vertical: 10),
                                               decoration: BoxDecoration(
                                                   color: isSelected
-                                                      ? Palette.primaryLime
-                                                      : Colors.transparent,
-                                                  border: Border.all(
-                                                      color: isSelected
+                                                      ? isAvailable
                                                           ? Palette.primaryLime
-                                                          : isAvailable
-                                                              ? Palette.stroke
-                                                              : Palette.stroke
-                                                                  .withOpacity(
-                                                                      0.3)),
+                                                          : Palette.background
+                                                      : isAvailable
+                                                          ? Palette.white
+                                                          : Palette.background,
+                                                  border: Border.all(
+                                                    width: isSelected ? 2 : 1,
+                                                    color: isSelected
+                                                        ? Palette.primaryLime
+                                                        : isAvailable
+                                                            ? Palette.stroke
+                                                            : Palette
+                                                                .background,
+                                                  ),
                                                   borderRadius:
                                                       BorderRadius.circular(8)),
                                               child: Text(
                                                 sizeItem.title,
                                                 style: TextStyle(
                                                   color: isSelected
-                                                      ? Palette.white
+                                                      ? isAvailable
+                                                          ? Palette.white
+                                                          : Palette.gray
                                                       : isAvailable
                                                           ? Palette.black
-                                                          : Palette.black
-                                                              .withOpacity(0.5),
+                                                          : Palette.gray,
                                                 ),
                                               ),
                                             ),
@@ -465,13 +385,13 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                               borderRadius:
                                                   BorderRadius.circular(8),
                                               color: hexToColor(
-                                                  _selectedVariation!
+                                                  selectedVariation
                                                       .productColor.hex!),
                                             ),
                                           ),
                                           const SizedBox(width: 12),
                                           Text(
-                                            _selectedVariation!
+                                            selectedVariation
                                                 .productColor.title,
                                             style: Styles.b2,
                                           ),
@@ -503,7 +423,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                     ],
                                   ),
                                 ),
-                                const Divider(),
+                                Divider(color: Palette.stroke),
                                 SizedBox(
                                   height: 36,
                                   child: Row(
@@ -523,11 +443,13 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                     ],
                                   ),
                                 ),
-                                const Divider(),
+                                Divider(color: Palette.stroke),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 82),
+                          SizedBox(
+                              height:
+                                  76 + MediaQuery.of(context).padding.bottom),
                         ],
                       ),
                     ),
@@ -535,25 +457,64 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                 ),
               ),
               Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                child: AnimatedOpacity(
+                  opacity: _showHeader ? 1 : 0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                      top: 24,
+                      bottom: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Palette.background,
+                      borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                      ),
+                    ),
+                    child: LTAppBar(
+                      postfixWidget: Row(
+                        children: [
+                          ShareButton(
+                            link: "https://ltfest.ru",
+                            color: Palette.primaryLime,
+                          ),
+                          const SizedBox(width: 8),
+                          FavoriteButton(
+                            size: 40,
+                            type: EventType.product,
+                            color: Palette.primaryLime,
+                            id: product.id,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
                 bottom: 0,
                 left: 0,
                 right: 0,
                 child: CartBottomBar(
-                  selectedVariation: _selectedVariation!,
+                  selectedVariation: selectedVariation,
                   cartItem: currentCartItem,
-                  isLoading: cartAsync.isLoading, // Передаем состояние загрузки
-                  isAvailable: _selectedVariation!.stockQuantity > 0,
+                  isLoading: cartAsync.isLoading,
+                  isAvailable: selectedVariation.stockQuantity > 0,
                 ),
               ),
             ],
           );
         },
         error: (_, st) {
-          print(st);
+          debugPrint(st.toString());
           return Text("This is error, $st");
         },
         loading: () {
-          return Text("loading.......");
+          return const Text("loading.......");
         },
       ),
     );
@@ -580,81 +541,153 @@ class CartBottomBar extends ConsumerWidget {
     final bool isInCart = cartItem != null;
     return Container(
       padding: EdgeInsets.fromLTRB(
-          16, 16, 16, MediaQuery.of(context).padding.bottom + 16),
+          16, 24, 16, MediaQuery.of(context).padding.bottom + 16),
       decoration: BoxDecoration(
         color: Palette.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
-        child: isLoading
-            ? const Center(heightFactor: 1, child: CircularProgressIndicator())
-            : !isAvailable
-                ? Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.withOpacity(0.3)),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Нет в наличии',
-                        style: Styles.button1.copyWith(
-                          color: Colors.grey,
-                        ),
-                      ),
+        child: !isAvailable
+            ? Column(
+                children: [
+                  Text(
+                    "Нет в наличии",
+                    style: Styles.b2.copyWith(color: Palette.gray),
+                  ),
+                  const SizedBox(height: 12),
+                  LTButtons.outlinedButton(
+                    onPressed: () {},
+                    child: Text(
+                      "Сообщить об поступлении",
+                      style: Styles.button1,
                     ),
                   )
-                : !isInCart
-                    ? LTButtons.elevatedButton(
+                ],
+              )
+            : !isInCart
+                ? LTButtons.elevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(cartProvider.notifier)
+                          .addItem(selectedVariation.id);
+                    },
+                    child: Text(
+                      'Добавить в корзину',
+                      style: Styles.button1,
+                    ),
+                  )
+                : Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove_circle,
+                            size: 32, color: Palette.primaryLime),
                         onPressed: () {
-                          ref
-                              .read(cartProvider.notifier)
-                              .addItem(selectedVariation.id);
+                          ref.read(cartProvider.notifier).updateItemQuantity(
+                              cartItem!.id, cartItem!.quantity - 1);
                         },
-                        child: Text(
-                          'Добавить в корзину',
-                          style: Styles.button1,
-                        ),
-                      )
-                    : Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.remove_circle,
-                                size: 32, color: Palette.primaryLime),
-                            onPressed: () {
-                              ref
-                                  .read(cartProvider.notifier)
-                                  .updateItemQuantity(
-                                      cartItem!.id, cartItem!.quantity - 1);
-                            },
-                          ),
-                          const SizedBox(width: 10),
-                          Text('${cartItem!.quantity}', style: Styles.h4),
-                          const SizedBox(width: 10),
-                          IconButton(
-                            icon: Icon(Icons.add_circle,
-                                size: 32, color: Palette.primaryLime),
-                            onPressed: () {
-                              ref
-                                  .read(cartProvider.notifier)
-                                  .updateItemQuantity(
-                                      cartItem!.id, cartItem!.quantity + 1);
-                            },
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: LTButtons.elevatedButton(
-                              onPressed: () {
-                                context.push(AppRoutes.cart);
-                              },
-                              child: Text('В корзину', style: Styles.button1),
-                            ),
-                          ),
-                        ],
                       ),
+                      const SizedBox(width: 10),
+                      Text('${cartItem!.quantity}', style: Styles.h4),
+                      const SizedBox(width: 10),
+                      IconButton(
+                        icon: Icon(Icons.add_circle,
+                            size: 32, color: Palette.primaryLime),
+                        onPressed: () {
+                          ref.read(cartProvider.notifier).updateItemQuantity(
+                              cartItem!.id, cartItem!.quantity + 1);
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: LTButtons.elevatedButton(
+                          onPressed: () {
+                            context.push(AppRoutes.cart);
+                          },
+                          child: isLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(),
+                                )
+                              : Text('В корзину', style: Styles.button1),
+                        ),
+                      ),
+                    ],
+                  ),
+      ),
+    );
+  }
+}
+
+class ProductImageCarousel extends ConsumerWidget {
+  final List<ImageData> images;
+  final int productVariationId;
+
+  const ProductImageCarousel(
+      {super.key, required this.images, required this.productVariationId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentPage =
+        ref.watch(carouselPageIndexProvider(productVariationId));
+
+    // PageController нужен для программного управления PageView
+    final pageController = PageController(initialPage: currentPage);
+
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          PageView.builder(
+            itemCount: images.length,
+            // onPageChanged обновляет состояние провайдера при свайпе
+            onPageChanged: (page) {
+              ref
+                  .read(carouselPageIndexProvider(productVariationId).notifier)
+                  .state = page;
+            },
+            itemBuilder: (context, index) {
+              final imageUrl = "http://37.46.132.144:1337${images[index].url}";
+              return Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child:
+                        Icon(Icons.error_outline, color: Colors.grey, size: 48),
+                  );
+                },
+              );
+            },
+          ),
+          if (images.length > 1)
+            Positioned(
+              bottom: 60,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(images.length, (index) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    width: currentPage == index ? 16 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: currentPage == index
+                          ? Palette.black
+                          : Palette.black.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  );
+                }),
+              ),
+            ),
+        ],
       ),
     );
   }

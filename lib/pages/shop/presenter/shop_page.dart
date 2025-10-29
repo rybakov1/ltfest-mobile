@@ -65,8 +65,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
             ),
             SliverFillRemaining(
               child: Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4),
+                margin: const EdgeInsets.all(4),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: Palette.white,

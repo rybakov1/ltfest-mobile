@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/services/api_service.dart';
 
 import '../models/cart.dart';
+import '../models/cart_item.dart';
 
 final cartProvider =
     AsyncNotifierProvider<CartNotifier, Cart>(() => CartNotifier());
@@ -45,7 +46,7 @@ class CartNotifier extends AsyncNotifier<Cart> {
   /// Добавляет товар в корзину.
   Future<void> addItem(int productInStockId) async {
     // Устанавливаем состояние загрузки, сохраняя предыдущие данные для плавного UI
-    state = const AsyncValue.loading();
+    state = const AsyncValue<Cart>.loading().copyWithPrevious(state);
 
     try {
       await _apiService.addToCart(productInStockId: productInStockId);
@@ -55,13 +56,13 @@ class CartNotifier extends AsyncNotifier<Cart> {
       ref.invalidateSelf();
     } catch (e, st) {
       // В случае ошибки, возвращаем предыдущее состояние
-      state = AsyncValue.error(e, st);
+      state = AsyncValue<Cart>.error(e, st).copyWithPrevious(state);
     }
   }
 
   /// Обновляет количество товара или удаляет его, если количество <= 0.
   Future<void> updateItemQuantity(int cartItemId, int newQuantity) async {
-    state = const AsyncValue.loading();
+    state = const AsyncValue<Cart>.loading().copyWithPrevious(state);
 
     try {
       if (newQuantity > 0) {
@@ -73,18 +74,18 @@ class CartNotifier extends AsyncNotifier<Cart> {
       }
       ref.invalidateSelf();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncValue<Cart>.error(e, st).copyWithPrevious(state);
     }
   }
 
   /// Полностью удаляет товар из корзины.
   Future<void> removeItem(int cartItemId) async {
-    state = const AsyncValue.loading();
+    state = const AsyncValue<Cart>.loading().copyWithPrevious(state);
     try {
       await _apiService.removeCartItem(cartItemId: cartItemId);
       ref.invalidateSelf();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncValue<Cart>.error(e, st).copyWithPrevious(state);
     }
   }
 
@@ -93,7 +94,7 @@ class CartNotifier extends AsyncNotifier<Cart> {
     final currentCart = state.valueOrNull;
     if (currentCart == null || currentCart.items.isEmpty) return;
 
-    state = const AsyncValue.loading();
+    state = const AsyncValue<Cart>.loading().copyWithPrevious(state);
     try {
       // Отправляем запросы на удаление для каждого элемента в корзине
       final futures = currentCart.items
@@ -102,7 +103,25 @@ class CartNotifier extends AsyncNotifier<Cart> {
 
       ref.invalidateSelf();
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      state = AsyncValue<Cart>.error(e, st).copyWithPrevious(state);
     }
   }
 }
+
+final cartItemsProvider = Provider<List<CartItem>>((ref) {
+  // Мы следим за cartProvider, и если он меняется,
+  // этот провайдер вернет обновленный список товаров.
+  return ref.watch(cartProvider).valueOrNull?.items ?? [];
+});
+
+/// Провайдер, который по ID возвращает ОДИН конкретный товар.
+/// Каждая карточка товара (CartItemCard) будет следить за своим таким провайдером.
+final cartItemProvider = Provider.family<CartItem?, int>((ref, cartItemId) {
+  final items = ref.watch(cartItemsProvider);
+  // Ищем в списке нужный товар.
+  try {
+    return items.firstWhere((item) => item.id == cartItemId);
+  } catch (e) {
+    return null; // Возвращаем null, если товар был удален
+  }
+});
