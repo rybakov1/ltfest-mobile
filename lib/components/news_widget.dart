@@ -41,7 +41,7 @@ class NewsWidget extends ConsumerWidget {
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () => context.push("${AppRoutes.news}/${first.id}"),
                     child: _buildNewsCard(
                       title: first.title,
                       date: first.date,
@@ -52,7 +52,7 @@ class NewsWidget extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () => context.push("${AppRoutes.news}/${second.id}"),
                     child: _buildNewsCard(
                       title: second.title,
                       date: second.date,

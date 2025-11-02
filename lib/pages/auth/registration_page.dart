@@ -882,6 +882,17 @@ class _DatePickerTextFieldState extends State<DatePickerTextField> {
       firstDate: DateTime(1940),
       lastDate: DateTime.now(),
       locale: const Locale('ru'),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: Palette.primaryLime.toMaterialColor(),
+              errorColor: Palette.error,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (pickedDate != null) {
       widget.controller.text = _dateFormat.format(pickedDate);

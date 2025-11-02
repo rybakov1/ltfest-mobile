@@ -464,8 +464,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                   opacity: _showHeader ? 1 : 0,
                   duration: const Duration(milliseconds: 200),
                   child: Container(
-                    padding: const EdgeInsets.only(
-                      top: 24,
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top,
                       bottom: 16,
                     ),
                     decoration: BoxDecoration(

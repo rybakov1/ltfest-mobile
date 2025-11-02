@@ -52,13 +52,24 @@ class _ShopPageState extends ConsumerState<ShopPage> {
             SliverToBoxAdapter(
               child: LTAppBar(
                 title: "LT Shop",
-                postfixWidget: IconButton(
-                  onPressed: () => context.push(AppRoutes.cart),
-                  icon: Icon(
-                    cartIsNotEmpty > 0
-                        ? Icons.shopping_cart
-                        : Icons.shopping_cart_outlined,
-                    color: Palette.white,
+                postfixWidget:
+
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Palette.primaryLime,
+                  ),
+                  child: IconButton(
+                    onPressed: () => context.push(AppRoutes.cart),
+                    icon: Icon(
+                      cartIsNotEmpty > 0
+                          ? Icons.shopping_cart
+                          : Icons.shopping_cart_outlined,
+                      color: Palette.white,
+                      size: 24,
+                    ),
                   ),
                 ),
               ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,196 +13,6 @@ import '../../providers/user_provider.dart';
 
 class MorePage extends ConsumerWidget {
   const MorePage({super.key});
-
-  //final PriorityLevel? _selectedPriority;
-
-  // Future<void> _launchUrl(String urlString) async {
-  //   final uri = Uri.parse(urlString);
-  //   await launchUrl(uri, mode: LaunchMode.externalApplication);
-  // }
-
-  // void _showLTPriorityPopup(BuildContext context, WidgetRef ref) {
-  //   showModalBottomSheet(
-  //     useRootNavigator: true,
-  //     context: context,
-  //     isScrollControlled: true,
-  //     backgroundColor: Palette.white,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-  //     ),
-  //     builder: (BuildContext context) {
-  //       return Container(
-  //         padding: const EdgeInsets.all(16)
-  //             .copyWith(bottom: 16 + MediaQuery.of(context).padding.bottom),
-  //         child: FractionallySizedBox(
-  //           heightFactor: 0.8,
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Container(
-  //                 width: 40,
-  //                 height: 4,
-  //                 decoration: BoxDecoration(
-  //                     color: Palette.stroke,
-  //                     borderRadius: BorderRadius.circular(2)),
-  //               ),
-  //               const SizedBox(height: 24),
-  //               Text('LT Priority', style: Styles.h3),
-  //               const SizedBox(height: 16),
-  //               // Text('Вы уверены, что хотите выйти из аккаунта?',
-  //               //     style: Styles.b2, textAlign: TextAlign.center),
-  //               Expanded(
-  //                 child: SingleChildScrollView(
-  //                   child: Column(
-  //                     children: [
-  //                       PriorityCard(
-  //                         title: 'LT Silver',
-  //                         discount: 'Скидка 5%',
-  //                         price: '35 000 ₽/год',
-  //                         features: const [
-  //                           '+10 минут дополнительной репетиции на сцене во время театрального фестиваля.',
-  //                           '+1 минута на каждый номер во время хореографического конкурса.',
-  //                         ],
-  //                         value: PriorityLevel.silver,
-  //                         groupValue: null,
-  //                         //_selectedPriority,
-  //                         onChanged: (value) {
-  //                           // setState(() {
-  //                           //   _selectedPriority = value;
-  //                           // });
-  //                         },
-  //                       ),
-  //                       const SizedBox(height: 8),
-  //                       PriorityCard(
-  //                         title: 'LT Gold',
-  //                         discount: 'Скидка 10%',
-  //                         price: '45 000 ₽/год',
-  //                         features: const [
-  //                           '+15 минут дополнительной репетиции на сцене во время театрального фестиваля.',
-  //                           '+2 минуты на каждый номер во время хореографического конкурса.',
-  //                           'Возврат 15% от стоимости трансфера (автобус от ж/д вокзала или аэропорта до отеля и обратно).',
-  //                           'Возврат 15% от стоимости ж/д билетов и 10% от стоимости авиабилетов для руководителя коллектива в город проведения фестиваля и обратно.',
-  //                         ],
-  //                         value: PriorityLevel.gold,
-  //                         groupValue: null,
-  //                         //_selectedPriority,
-  //                         onChanged: (value) {
-  //                           // setState(() {
-  //                           //   _selectedPriority = value;
-  //                           // });
-  //                         },
-  //                       ),
-  //                       const SizedBox(height: 8),
-  //                       PriorityCard(
-  //                         title: 'LT Platinum',
-  //                         discount: 'Скидка 15%',
-  //                         price: '59 900 ₽/год',
-  //                         features: const [
-  //                           '+20 минут дополнительной репетиции на сцене во время тетарального фестиваля.',
-  //                           '+3 минуты на каждый номер во время хореографического конкурса.',
-  //                           'Возврат 25% от стоимости трансфера (автобус от ж/д вокзала или аэропорта до отеля и обратно).',
-  //                           'Возврат 25% от стоимости ж/д билетов и 15% от стоимости авиабилетов для руководителя коллектива в город проведения фестиваля и обратно.',
-  //                           'Приоритет в выборе даты и времени показа спектакля/танцевального номера (до официального опубликования программы фестиваля).',
-  //                         ],
-  //                         value: PriorityLevel.platinum,
-  //                         groupValue: null,
-  //                         //_selectedPriority,
-  //                         onChanged: (value) {
-  //                           // setState(() {
-  //                           //   _selectedPriority = value;
-  //                           // });
-  //                         },
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 16),
-  //               // LTButtons.elevatedButton(
-  //               //   onPressed: () {},
-  //               //   child: Text("Выберите карту", style: Styles.button1),
-  //               // ),
-  //               // const SizedBox(height: 10),
-  //               LTButtons.elevatedButton(
-  //                 onPressed: () {
-  //                   _launchUrl('https://ltfest.ru/priority');
-  //                 },
-  //                 foregroundColor: Palette.secondary,
-  //                 backgroundColor: Palette.white,
-  //                 child: Text("Подробнее на сайте",
-  //                     style: Styles.button1.copyWith(color: Palette.secondary)),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
-  // void _showExitPopup(BuildContext context, WidgetRef ref) {
-  //   showModalBottomSheet(
-  //     useRootNavigator: true,
-  //     context: context,
-  //     backgroundColor: Palette.white,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-  //     ),
-  //     builder: (BuildContext context) {
-  //       return Container(
-  //         padding: const EdgeInsets.all(16)
-  //             .copyWith(bottom: 16 + MediaQuery.of(context).padding.bottom),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Container(
-  //               width: 40,
-  //               height: 4,
-  //               decoration: BoxDecoration(
-  //                   color: Palette.stroke,
-  //                   borderRadius: BorderRadius.circular(2)),
-  //             ),
-  //             const SizedBox(height: 24),
-  //             Text('Выход из аккаунта', style: Styles.h4),
-  //             const SizedBox(height: 16),
-  //             Text('Вы уверены, что хотите выйти из аккаунта?',
-  //                 style: Styles.b2, textAlign: TextAlign.center),
-  //             const SizedBox(height: 32),
-  //             Row(
-  //               children: [
-  //                 Expanded(
-  //                   child: LTButtons.elevatedButton(
-  //                     onPressed: () {
-  //                       Navigator.pop(context);
-  //                       ref.read(authNotifierProvider.notifier).logout();
-  //                     },
-  //                     backgroundColor: Palette.error,
-  //                     foregroundColor: Palette.white,
-  //                     child: Text("Выйти", style: Styles.button1),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(width: 8),
-  //                 Expanded(
-  //                   child: OutlinedButton(
-  //                     onPressed: () => Navigator.pop(context),
-  //                     style: OutlinedButton.styleFrom(
-  //                       side: BorderSide(color: Palette.stroke),
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(12)),
-  //                       padding: const EdgeInsets.symmetric(vertical: 14),
-  //                     ),
-  //                     child: Text("Отмена",
-  //                         style: Styles.button1.copyWith(color: Palette.black)),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -232,9 +44,9 @@ class MorePage extends ConsumerWidget {
               ),
             ),
             if (user.activity!.title == "Руководитель коллектива")
-              const Padding(
-                padding: EdgeInsets.all(4),
-                child: ProfileCard(),
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: ProfileCard(status: user.ltpriority),
               ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -265,7 +77,7 @@ class MorePage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: _MenuTile(
                   iconPath: 'assets/icons/news.svg',
@@ -281,7 +93,7 @@ class MorePage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: _MenuTile(
                   iconPath: 'assets/icons/favourite.svg',
@@ -295,7 +107,7 @@ class MorePage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: Column(
                   children: [
@@ -322,7 +134,7 @@ class MorePage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: Column(
                   children: [
@@ -333,13 +145,14 @@ class MorePage extends ConsumerWidget {
                         context.push(AppRoutes.user);
                       },
                     ),
-                    _MenuTile(
-                      iconPath: 'assets/icons/settings.svg',
-                      title: "Настройки приложения",
-                      onTap: () {
-                        context.push(AppRoutes.settings);
-                      },
-                    ),
+                    // TODO: Notification
+                    // _MenuTile(
+                    //   iconPath: 'assets/icons/settings.svg',
+                    //   title: "Настройки приложения",
+                    //   onTap: () {
+                    //     context.push(AppRoutes.settings);
+                    //   },
+                    // ),
                     _MenuTile(
                       iconPath: 'assets/icons/info.svg',
                       title: "О приложении",
@@ -358,137 +171,71 @@ class MorePage extends ConsumerWidget {
   }
 }
 
-enum PriorityLevel { silver, gold, platinum }
+enum PriorityLevel { base, silver, gold, platinum }
 
 class ProfileCard extends ConsumerWidget {
-  const ProfileCard({super.key});
+  final String? status;
+
+  const ProfileCard({super.key, required this.status});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return InkWell(
-      onTap: () => context.push(AppRoutes.ltPriority),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-        decoration: BoxDecoration(
-            color: Palette.primaryLime,
-            borderRadius: BorderRadius.circular(12)),
-        child: Row(
-          children: [
-            Text("LT Priority",
-                style: Styles.h4.copyWith(color: Palette.white)),
-            const Spacer(),
-            Text("Подключить",
-                style: Styles.button1.copyWith(color: Palette.white)),
-            const SizedBox(width: 8),
-            SvgPicture.asset('assets/icons/arrow_right.svg',
-                colorFilter: ColorFilter.mode(Palette.white, BlendMode.srcIn)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PriorityCard extends StatelessWidget {
-  final String title;
-  final String discount;
-  final String price;
-  final List<String> features;
-  final PriorityLevel value;
-  final PriorityLevel? groupValue;
-  final ValueChanged<PriorityLevel?> onChanged;
-
-  const PriorityCard({
-    super.key,
-    required this.title,
-    required this.discount,
-    required this.price,
-    required this.features,
-    required this.value,
-    required this.groupValue,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // final bool isSelected = value == groupValue;
-    // const Color selectedColor = Color(0xFFF9A825); // Оранжевый для выделения
-
-    return InkWell(
-      // Делаем всю карточку кликабельной
-      onTap: () => onChanged(value),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Palette.stroke,
-            // isSelected ? selectedColor.withOpacity(0.7) :
-            width: 1.0, // isSelected ? 2.0 :
-          ),
-          // boxShadow: isSelected
-          //     ? [
-          //         BoxShadow(
-          //           color: selectedColor.withOpacity(0.1),
-          //           blurRadius: 8,
-          //           offset: const Offset(0, 4),
-          //         )
-          //       ]
-          //     : [],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Styles.h6,
+    return switch (status) {
+      "Silver" || "Gold" || "Platinum" =>
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              height: 77,
+              decoration: BoxDecoration(
+                color: Palette.black.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Stack(
+                children: [
+                  Image.asset("assets/images/${status!}.png", width: double.infinity, fit: BoxFit.fitWidth,),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        children: [
+                          Text("LT Priority",
+                              style: Styles.h4.copyWith(color: Palette.white)),
+                          const Spacer(),
+                          Text(status!, style: Styles.h6.copyWith(color: Palette.white))
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      discount,
-                      style: Styles.b2,
-                    ),
-                  ],
-                ),
-                // Radio<PriorityLevel>(
-                //   value: value,
-                //   groupValue: groupValue,
-                //   onChanged: onChanged,
-                //   activeColor: selectedColor,
-                //   // Увеличим область нажатия для Radio
-                //   materialTapTargetSize: MaterialTapTargetSize.padded,
-                // ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Список преимуществ
-            ...features.map((feature) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: Text(
-                    feature,
-                    style: Styles.b2,
                   ),
-                )),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                price,
-                style: Styles.h3,
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+      'Base' || null || _ =>
+          InkWell(
+            onTap: () => context.push(AppRoutes.ltPriority),
+            child: Container(
+              height: 72,
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+              decoration: BoxDecoration(
+                color: Palette.primaryLime,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Text("LT Priority",
+                      style: Styles.h4.copyWith(color: Palette.white)),
+                  const Spacer(),
+                  Text("Подключить",
+                      style: Styles.button1.copyWith(color: Palette.white)),
+                  const SizedBox(width: 8),
+                  SvgPicture.asset('assets/icons/arrow_right.svg',
+                      colorFilter:
+                      ColorFilter.mode(Palette.white, BlendMode.srcIn)),
+                ],
+              ),
+            ),
+          ),
+    };
   }
 }
 

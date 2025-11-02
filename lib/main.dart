@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/router/router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-
 // 11.10 build
 Future<void> main() async {
   await SentryFlutter.init(

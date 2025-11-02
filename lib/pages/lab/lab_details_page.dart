@@ -285,7 +285,8 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                 opacity: _showHeader ? 1 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: Container(
-                  padding: const EdgeInsets.only(top: 24, bottom: 16),
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top, bottom: 16),
                   decoration: BoxDecoration(
                     color: Palette.background,
                     borderRadius: const BorderRadius.only(

@@ -302,6 +302,7 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
 
     return Scaffold(
       backgroundColor: Palette.background,
+        resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: CustomScrollView(
           physics: const NeverScrollableScrollPhysics(),

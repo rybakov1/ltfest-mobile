@@ -25,15 +25,22 @@ class AsyncItemsListView extends StatelessWidget {
       child: asyncValue.when(
         data: (_) {
           if (items.isEmpty) {
-            // Состояние, когда данные загрузились, но после фильтрации список пуст
-            return Column(
+            return Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 128),
-                  Center(child: Image.asset("assets/icons/states/nothing.png", width: 192)),
+                  Center(
+                      child: Image.asset(
+                    "assets/icons/states/nothing.png",
+                    width: 192,
+                    fit: BoxFit.contain,
+                  )),
                   const SizedBox(height: 20),
-                  Text("По вашему запросу ничего не найдено", style: Styles.b3.copyWith(color: Palette.gray)),
+                  Text("По вашему запросу ничего не найдено",
+                      style: Styles.b2.copyWith(color: Palette.gray)),
                 ],
+              ),
             );
           }
           // Успешная загрузка и есть данные для отображения
@@ -53,7 +60,8 @@ class AsyncItemsListView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Произошла ошибка', style: TextStyle(color: Palette.black)),
+                Text('Произошла ошибка',
+                    style: TextStyle(color: Palette.black)),
                 const SizedBox(height: 16),
 
                 // TODO: error handler

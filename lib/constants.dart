@@ -2,6 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
+extension ColorsExt on Color {
+  MaterialColor toMaterialColor() {
+    // Получаем целочисленные компоненты (0-255) из float (0.0-1.0)
+    final int r = (this.r * 255.0).round() & 0xff;
+    final int g = (this.g * 255.0).round() & 0xff;
+    final int b = (this.b * 255.0).round() & 0xff;
+    final int a = (this.a * 255.0).round() & 0xff;
+
+    // Основной цвет как ARGB int (без .value)
+    final int primaryValue = (a << 24) | (r << 16) | (g << 8) | b;
+
+    final Map<int, Color> shades = <int, Color>{};
+
+    // Силы для оттенков: 50 (очень светлый) до 900 (очень тёмный)
+    final List<double> strengths = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+
+    for (int i = 0; i < strengths.length; i++) {
+      final double strength = strengths[i];
+      final double ds = 0.5 - strength;  // Для осветления/затемнения
+
+      final int shadeR = (r + ((ds < 0 ? r : (255 - r)) * ds).round()).round() & 0xff;
+      final int shadeG = (g + ((ds < 0 ? g : (255 - g)) * ds).round()).round() & 0xff;
+      final int shadeB = (b + ((ds < 0 ? b : (255 - b)) * ds).round()).round() & 0xff;
+
+      // Индекс оттенка: 50, 100, ..., 900
+      final int shadeIndex = ((strength * 1000).round() / 100 * 100).round();  // Упрощённо: 50,100,...,900
+      shades[shadeIndex] = Color.fromARGB(a, shadeR, shadeG, shadeB);
+    }
+
+    // 500 — это основной цвет
+    shades[500] = this;
+
+    return MaterialColor(primaryValue, shades);
+  }
+}
+
 class Utils {
   static final phoneFormatter = MaskTextInputFormatter(
     mask: '+# (###) ###-##-##',

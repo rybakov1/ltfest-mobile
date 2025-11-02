@@ -2,10 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/data/models/user.dart';
 import 'package:ltfest/providers/auth_state.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -13,26 +17,12 @@ import 'package:shimmer/shimmer.dart';
 import '../../data/models/direction.dart';
 import '../../data/services/api_service.dart';
 
-
-final directionsProvider =
-FutureProvider.autoDispose<List<Direction>>((ref) async {
-  final api = ref.watch(apiServiceProvider);
-  try {
-    // Добавляем таймаут на 10 секунд
-    final directions = await api.getDirections().timeout(
-      const Duration(seconds: 10),
-      onTimeout: () {
-        throw TimeoutException(
-            'Запрос к API directions превысил время ожидания');
-      },
-    );
-    print('Directions loaded: ${directions.length}'); // Отладка
-    return directions;
-  } catch (e, stackTrace) {
-    print('Error in directionsProvider: $e\n$stackTrace'); // Отладка
-    rethrow; // Пробрасываем ошибку для обработки в asyncValue.when
-  }
-});
+final directionsProvider = FutureProvider.autoDispose<List<Direction>>(
+  (ref) async {
+    final api = ref.watch(apiServiceProvider);
+    return await api.getDirections();
+  },
+);
 
 class AccountSettingsPage extends ConsumerStatefulWidget {
   const AccountSettingsPage({super.key});
@@ -49,6 +39,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
   // Контроллеры для всех полей
   final _emailController = TextEditingController();
+  final _birthdayController = TextEditingController();
   final _cityController = TextEditingController();
   final _educationController = TextEditingController();
   final _masterFioController = TextEditingController();
@@ -63,11 +54,11 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
   }
 
   void _loadInitialData() {
-    // Получаем текущего пользователя и заполняем поля
     final authState = ref.read(authNotifierProvider);
     if (authState.value is Authenticated) {
       final user = (authState.value as Authenticated).user;
 
+      _birthdayController.text = user.birthdate!.toString().split(" ")[0];
       _emailController.text = user.email!;
       _cityController.text = user.residence!;
       _educationController.text = user.educationPlace ?? '';
@@ -82,6 +73,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
   @override
   void dispose() {
+    _birthdayController.dispose();
     _emailController.dispose();
     _cityController.dispose();
     _educationController.dispose();
@@ -111,7 +103,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
           lastName: user.lastname!,
           firstName: user.firstname!,
           email: _emailController.text.trim(),
-          birthDate: user.birthdate.toString(),
+          birthDate: _birthdayController.text.toString(),
           residence: _cityController.text.trim(),
           directionId: _selectedDirection!.id,
           activityId: user.activity?.id ?? 0,
@@ -344,6 +336,69 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
     );
   }
 
+  void _showExitPopup(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      backgroundColor: Palette.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          height: 300,
+          padding: const EdgeInsets.all(16)
+              .copyWith(bottom: 16 + MediaQuery.of(context).padding.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 41,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Palette.stroke,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text('Выход из аккаунта', style: Styles.h4),
+              const SizedBox(height: 32),
+              Text('Вы уверены, что хотите выйти из аккаунта?',
+                  style: Styles.b1.copyWith(color: Palette.gray),
+                  textAlign: TextAlign.center),
+              const Spacer(),
+              Row(
+                children: [
+                  Expanded(
+                    child: LTButtons.elevatedButton(
+                      onPressed: () {
+                        context.pop();
+                        ref.read(authNotifierProvider.notifier).logout();
+                      },
+                      backgroundColor: Palette.error,
+                      foregroundColor: Palette.white,
+                      child: Text("Выйти", style: Styles.button1),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: LTButtons.outlinedButton(
+                      onPressed: () => context.pop(),
+                      child: Text(
+                        "Отмена",
+                        style: Styles.button1.copyWith(color: Palette.black),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
@@ -352,138 +407,128 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         : null;
 
     return Scaffold(
-      backgroundColor: Palette.black,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      top: 24 + MediaQuery.of(context).padding.top,
-                      bottom: 16),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Настройки аккаунта",
-                          style: Styles.h3.copyWith(color: Palette.white),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          height: 43,
-                          width: 43,
-                          decoration:
-                              Decor.base.copyWith(color: Palette.primaryLime),
-                          child: IconButton(
-                            onPressed: () => context.pop(),
-                            icon: Icon(Icons.arrow_back, color: Palette.white),
+      backgroundColor: Palette.background,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  const LTAppBar(title: "Настройки аккаунта"),
+                  _buildReadOnlySection(user!),
+                  const SizedBox(height: 2),
+                  Container(
+                    width: double.infinity,
+                    decoration: Decor.base,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Column(
+                      children: [
+                        if (user.activity!.title == "Руководитель коллектива")
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: _CustomSegmentedControl(
+                              selectedIndex: _selectedIndex,
+                              onTap: _onTabTapped,
+                            ),
+                          ),
+                        const SizedBox(height: 12),
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: Column(
+                            children: [
+                              Visibility(
+                                visible: _selectedIndex == 0,
+                                maintainState: true,
+                                child: _AboutMeForm(
+                                  birthdayController: _birthdayController,
+                                  emailController: _emailController,
+                                  cityController: _cityController,
+                                  educationController: _educationController,
+                                  masterFioController: _masterFioController,
+                                ),
+                              ),
+                              Visibility(
+                                visible: _selectedIndex == 1,
+                                maintainState: true,
+                                child: _CollectiveForm(
+                                  collectiveNameController:
+                                      _collectiveNameController,
+                                  collectiveDirectionController:
+                                      _collectiveDirectionController,
+                                  collectiveCityController:
+                                      _collectiveCityController,
+                                  showDirectionPicker: _showDirectionPicker,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 22),
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  width: double.infinity,
-                  decoration: Decor.base,
-                  margin: const EdgeInsets.only(top: 16),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 16.0, right: 16, top: 22, bottom: 26),
-                        child: _CustomSegmentedControl(
-                          selectedIndex: _selectedIndex,
-                          onTap: _onTabTapped,
-                        ),
+                  const SizedBox(height: 2),
+                  GestureDetector(
+                    onTap: () => _showExitPopup(context, ref),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.only(
+                          top: 24, bottom: 27, right: 12, left: 12),
+                      decoration: Decor.base,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Выйти из аккаунта",
+                              style:
+                                  Styles.button2.copyWith(color: Palette.gray)),
+                          SvgPicture.asset("assets/icons/exit_from_app.svg"),
+                        ],
                       ),
-                      // const SizedBox(height: 24),
-                      AnimatedSize(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        child: Column(
-                          children: [
-                            Visibility(
-                              visible: _selectedIndex == 0,
-                              maintainState: true,
-                              child: _AboutMeForm(
-                                emailController: _emailController,
-                                cityController: _cityController,
-                                educationController: _educationController,
-                                masterFioController: _masterFioController,
-                              ),
-                            ),
-                            Visibility(
-                              visible: _selectedIndex == 1,
-                              maintainState: true,
-                              child: _CollectiveForm(
-                                collectiveNameController:
-                                    _collectiveNameController,
-                                collectiveDirectionController:
-                                    _collectiveDirectionController,
-                                collectiveCityController:
-                                    _collectiveCityController,
-                                showDirectionPicker: _showDirectionPicker,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 22),
-                    ],
+                    ),
                   ),
-                ),
-                _buildReadOnlySection(user),
-                SizedBox(
-                  height: 97 + MediaQuery.of(context).padding.bottom,
-                ), // TODO: WTF WITH HEIGHT?
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            left: 0,
-            child: Container(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).padding.bottom,
-                top: 24,
-                left: 20,
-                right: 20,
+                  SizedBox(
+                    height: 70 + MediaQuery.of(context).padding.bottom,
+                  ), // TODO: WTF WITH HEIGHT?
+                ],
               ),
-              decoration: const BoxDecoration(
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              left: 0,
+              child: Container(
+                padding: const EdgeInsets.only(
+                    bottom: 0, top: 24, left: 20, right: 20),
+                decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(12),
-                      topLeft: Radius.circular(12)),
-                  color: Colors.white),
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 24.0),
-                child: LTButtons.elevatedButton(
-                  onPressed: _isLoading ? null : _saveSettings,
-                  child: _isLoading
-                      ? SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Palette.black,
+                    topRight: Radius.circular(12),
+                    topLeft: Radius.circular(12),
+                  ),
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
+                  child: LTButtons.elevatedButton(
+                    onPressed: _isLoading ? null : _saveSettings,
+                    child: _isLoading
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Palette.black,
+                            ),
+                          )
+                        : Text(
+                            'Сохранить',
+                            style: Styles.button1,
                           ),
-                        )
-                      : Text(
-                          'Сохранить',
-                          style: Styles.button1,
-                        ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -500,7 +545,7 @@ class _CustomSegmentedControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
+      height: 45,
       decoration: BoxDecoration(
         color: Palette.background, // Светло-серый фон
         borderRadius: BorderRadius.circular(8),
@@ -530,8 +575,8 @@ class _CustomSegmentedControl extends StatelessWidget {
           child: Text(
             title,
             style: isSelected
-                ? Styles.button2.copyWith(color: Palette.white)
-                : Styles.button2.copyWith(color: Palette.gray),
+                ? Styles.h5.copyWith(color: Palette.white)
+                : Styles.b2.copyWith(color: Palette.gray),
           ),
         ),
       ),
@@ -641,6 +686,8 @@ class CitySearchField extends StatelessWidget {
 // --- Форма "Обо мне" ---
 class _AboutMeForm extends StatelessWidget {
   final TextEditingController emailController;
+  final TextEditingController birthdayController;
+
   final TextEditingController cityController;
   final TextEditingController educationController;
   final TextEditingController masterFioController;
@@ -650,6 +697,7 @@ class _AboutMeForm extends StatelessWidget {
     required this.cityController,
     required this.educationController,
     required this.masterFioController,
+    required this.birthdayController,
   });
 
   @override
@@ -658,6 +706,11 @@ class _AboutMeForm extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Column(
         children: [
+          DatePickerTextField(
+            controller: birthdayController,
+            label: 'Дата рождения*',
+          ),
+          const SizedBox(height: 16),
           _buildEditableField(label: 'Email', controller: emailController),
           const SizedBox(height: 16),
           CitySearchField(
@@ -832,48 +885,127 @@ Widget _buildEditableField({
   );
 }
 
-Widget _buildReadOnlySection(dynamic user) {
+Widget _buildReadOnlySection(User user) {
   return Container(
     padding: const EdgeInsets.all(16),
+    margin: const EdgeInsets.symmetric(horizontal: 4),
+    width: double.infinity,
     decoration: Decor.base,
     child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('Основная информация',
-            style: Styles.h5.copyWith(color: Palette.gray)),
-        const SizedBox(height: 16),
-        _buildReadOnlyField(
-            'ФИО', '${user?.lastname ?? ''}'.trim()), //${user?.firstname ?? ''}
-         Divider(color: Palette.stroke),
-        _buildReadOnlyField('Номер телефона', formatPhoneNumber(user?.phone)),
-        Divider(color: Palette.stroke),
-        _buildReadOnlyField('Дата рождения',
-            DateFormat('dd.MM.yyyy', 'ru').format(user?.birthdate)),
-        Divider(color: Palette.stroke),
-        _buildReadOnlyField('Сфера деятельности',
-            user?.activity?.title.toString() ?? 'Не указана'),
+        Text(
+          user.activity!.title,
+          style: Styles.h5.copyWith(color: Palette.gray),
+        ),
+        const SizedBox(height: 12),
+        Text(user.lastname!, style: Styles.h3),
+        const SizedBox(height: 4),
+        Text(
+          Utils.phoneFormatter.maskText(user.phone!),
+          style: Styles.b2.copyWith(color: Palette.gray),
+        ),
       ],
     ),
   );
 }
 
-String formatPhoneNumber(String? phone) {
-  if (phone == null || phone.isEmpty) {
-    return 'Не указан';
+
+
+class DatePickerTextField extends StatefulWidget {
+  final String label;
+  final TextEditingController controller;
+
+  const DatePickerTextField(
+      {super.key, required this.label, required this.controller});
+
+  @override
+  State<DatePickerTextField> createState() => _DatePickerTextFieldState();
+}
+
+class _DatePickerTextFieldState extends State<DatePickerTextField> {
+  late DateFormat _dateFormat;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting('ru');
+    _dateFormat = DateFormat('yyyy-MM-dd', 'ru');
   }
 
-  return Utils.phoneFormatter.maskText(phone);
-}
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000, 1, 1),
+      firstDate: DateTime(1940),
+      lastDate: DateTime.now(),
+      locale: const Locale('ru'),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: Palette.primaryLime.toMaterialColor(),
+              errorColor: Palette.error,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (pickedDate != null) {
+      widget.controller.text = _dateFormat.format(pickedDate);
+    }
+  }
 
-Widget _buildReadOnlyField(String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 12.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Styles.b3.copyWith(color: Palette.gray)),
-        Text(value, style: Styles.b2.copyWith(color: Palette.black)),
+        Text(widget.label, style: Styles.b3.copyWith(color: Palette.gray)),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: widget.controller,
+          readOnly: true,
+          style: Styles.b2.copyWith(color: Palette.black),
+          decoration: InputDecoration(
+            isDense: true,
+            hintText: 'Выберите дату',
+            hintStyle: Styles.b2.copyWith(color: Palette.gray),
+            suffixIcon: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: SvgPicture.asset('assets/icons/calendar.svg')),
+            ),
+            suffixIconConstraints: const BoxConstraints(
+              minHeight: 24,
+              minWidth: 24,
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.stroke, width: 1)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.stroke, width: 1)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.primaryLime, width: 1.5)),
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.error, width: 1)),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.error, width: 1.5)),
+          ),
+          onTap: () => _selectDate(context),
+          validator: (value) =>
+              (value == null || value.isEmpty) ? 'Выберите дату' : null,
+        ),
       ],
-    ),
-  );
+    );
+  }
 }

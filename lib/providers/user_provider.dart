@@ -83,7 +83,7 @@ class AuthNotifier extends _$AuthNotifier {
           "Пользователь не аутентифицирован для завершения регистрации.");
     }
 
-    state = const AsyncLoading();
+    // state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       try {
         final updatedUser = await _apiService.updateProfile(

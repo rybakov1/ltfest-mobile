@@ -32,6 +32,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
   bool _showHeader = false;
 
   int _selectedTabIndex = 0;
+
   void _onTabTapped(int index) => setState(() => _selectedTabIndex = index);
 
   @override
@@ -333,8 +334,8 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                 opacity: _showHeader ? 1 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: Container(
-                  padding: const EdgeInsets.only(
-                    top: 24,
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top,
                     bottom: 16,
                   ),
                   decoration: BoxDecoration(
