@@ -48,9 +48,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isAuthRoute = currentLocation == AppRoutes.login ||
           currentLocation == AppRoutes.verification ||
-          currentLocation == AppRoutes.registration ||
-          currentLocation == AppRoutes.splash;
-
+          currentLocation == AppRoutes.registration;
       if (authState.isLoading || authState.isReloading) {
         if (!isAuthRoute && currentLocation != AppRoutes.splash) {
           return AppRoutes.splash;
@@ -82,8 +80,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           case Unauthenticated():
             final isGoingToAuthFlow = currentLocation == AppRoutes.login ||
                 currentLocation == AppRoutes.verification ||
-                currentLocation == AppRoutes.registration ||
-                currentLocation == AppRoutes.splash;
+                currentLocation == AppRoutes.registration;
             if (!isGoingToAuthFlow) {
               return AppRoutes.login;
             }

@@ -14,23 +14,36 @@ class AuthNotifier extends _$AuthNotifier {
 
   @override
   FutureOr<AuthState> build() async {
+    final start = DateTime.now();
     final accessToken = await _tokenStorage.getJwt();
 
+    AuthState state;
+
     if (accessToken == null) {
-      return const AuthState.unauthenticated();
+      state = const AuthState.unauthenticated();
+    } else {
+      try {
+        final user = await _apiService.getMe();
+
+        if (user.firstname == user.phone || user.firstname == "Unknown") {
+          state = AuthState.needsRegistration(user: user);
+        } else {
+          state = AuthState.authenticated(user: user);
+        }
+      } catch (e) {
+        await _tokenStorage.clearToken();
+        state = const AuthState.unauthenticated();
+      }
     }
 
-    try {
-      final user = await _apiService.getMe();
-      if (user.firstname == user.phone || user.firstname == "Unknown") {
-        return AuthState.needsRegistration(user: user);
-      } else {
-        return AuthState.authenticated(user: user);
-      }
-    } catch (e) {
-      await _tokenStorage.clearToken();
-      return const AuthState.unauthenticated();
+    // ⏳ Минимальное время показа splash (например, 800 мс)
+    final elapsed = DateTime.now().difference(start);
+    const minSplashTime = Duration(milliseconds: 800);
+    if (elapsed < minSplashTime) {
+      await Future.delayed(minSplashTime - elapsed);
     }
+
+    return state;
   }
 
   Future<void> requestOtp(String phone) async {
