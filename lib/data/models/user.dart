@@ -1,8 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'age_category.dart';
 import 'direction.dart';
 import 'activity.dart';
-import 'festival.dart';
-import 'laboratory.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';
@@ -24,6 +23,8 @@ abstract class User with _$User {
     String? ltpriority,
     String? educationPlace,
     String? masterName,
+    int? count_participant,
+    AgeCategory? age_category,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

@@ -14,6 +14,7 @@ import 'package:ltfest/constants.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../data/models/festival.dart';
 import '../../router/app_routes.dart';
 
 class FestivalDetailPage extends ConsumerStatefulWidget {
@@ -500,76 +501,101 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
         ),
         const SizedBox(height: 16),
         if (festival.persons!.isEmpty)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              'assets/images/jury_placeholder.png',
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/images/jury_placeholder.png',
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Column(
+                children: [
+                  Text(
+                    "Состав жюри еще утверждается",
+                    style: Styles.h3.copyWith(color: Palette.gray),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Совсем скоро здесь повится информация о членах жюри",
+                    textAlign: TextAlign.center,
+                    style: Styles.b2.copyWith(color: Palette.gray),
+                  ),
+                ],
+              ),
+            ],
           )
         else
-          Row(
-            children: [
-              ...festival.persons!
-                  .expand(
-                    (person) => [
-                      SizedBox(
-                        width: 170,
-                        child: InkWell(
-                          onTap: () => _showJuryInfo(context, person),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
-                                    height: 150,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Image.asset(
-                                      'assets/images/jury_placeholder.png',
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                ...festival.persons!
+                    .expand(
+                      (person) => [
+                        SizedBox(
+                          width: 170,
+                          child: InkWell(
+                            onTap: () => _showJuryInfo(context, person),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
                                       height: 150,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Image.asset(
+                                        'assets/images/jury_placeholder.png',
+                                        height: 150,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${person.firstname}\n${person.lastname}',
-                                      style: Styles.h4,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Подробнее',
-                                      style: Styles.b3
-                                          .copyWith(color: Palette.secondary),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                  const SizedBox(height: 12),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${person.firstname} ${person.lastname}',
+                                        style: Styles.h4,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Подробнее',
+                                        style: Styles.b3
+                                            .copyWith(color: Palette.secondary),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-                  )
-                  .toList()
-                ..removeLast(),
-            ],
+                        const SizedBox(width: 12),
+                      ],
+                    )
+                    .toList()
+                  ..removeLast(),
+              ],
+            ),
           ),
         const SizedBox(height: 24),
         Row(
@@ -591,7 +617,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
     );
   }
 
-  Widget festivalTariffInfo(festival) {
+  Widget festivalTariffInfo(Festival festival) {
     final user = ref.watch(userProvider);
 
     return Column(
@@ -603,10 +629,18 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
           "Перед оплатой фестиваля необходимо чтобы руководитель заполнил заявку на участие. Только после заполнения заявки и подтверждения от организатора, родители приступают к оплате фестиваля.",
           style: Styles.b1,
         ),
-        if (user!.activity!.title != "Руководитель коллектива") ...[
+        if (user!.activity!.title == "Руководитель коллектива") ...[
           const SizedBox(height: 16),
           LTButtons.elevatedButton(
-            onPressed: () {},
+            onPressed: () async {
+              final Uri uri = Uri.parse(
+                festival.entryurl!,
+              );
+              await launchUrl(
+                uri,
+                mode: LaunchMode.externalApplication,
+              );
+            },
             child: Text("Заполнить заявку", style: Styles.button1),
             backgroundColor: widget.category == "Театр"
                 ? Palette.primaryLime
@@ -737,7 +771,10 @@ class _LTTariffState extends State<LTTariff>
                   for (int i = 0; i < widget.bonuses.length; i++) ...[
                     Row(
                       children: [
-                        Icon(Icons.check_circle, color: Palette.primaryLime),
+                        Icon(Icons.check_circle,
+                            color: widget.category == "Театр"
+                                ? Palette.primaryLime
+                                : Palette.primaryPink),
                         const SizedBox(width: 8),
                         Text(widget.bonuses[i], style: Styles.b2)
                       ],
@@ -752,7 +789,7 @@ class _LTTariffState extends State<LTTariff>
                     style: Styles.h2),
                 const SizedBox(height: 16),
                 LTButtons.elevatedButton(
-                    onPressed: () {},
+                    onPressed: () => context.push("${AppRoutes.order}/festival"),
                     child: Text("Купить", style: Styles.button1),
                     backgroundColor: widget.category == "Театр"
                         ? Palette.primaryLime

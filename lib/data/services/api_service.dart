@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ltfest/data/models/age_category.dart';
 import 'package:ltfest/data/models/ltstory.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../pages/cart/models/cart.dart';
@@ -95,6 +96,7 @@ class ApiService {
       final response = await _dio.get(ApiEndpoints.me, queryParameters: {
         'populate[0]': 'direction',
         'populate[1]': 'activity',
+        'populate[2]': 'age_category',
       });
       return User.fromJson(response.data);
     } catch (e) {
@@ -111,6 +113,8 @@ class ApiService {
     required String residence,
     int? directionId,
     int? activityId,
+    int? ageCategoryId,
+    int? count_participant,
     String? collectiveName,
     String? collectiveCity,
     String? educationPlace,
@@ -130,6 +134,8 @@ class ApiService {
         'collectiveName': collectiveName,
         'collectiveCity': collectiveCity,
         'educationPlace': educationPlace,
+        'count_participant': count_participant,
+        'age_category': ageCategoryId,
         'masterName': masterName,
       };
 
@@ -177,6 +183,9 @@ class ApiService {
 
   Future<List<Direction>> getDirections() =>
       _fetchCollection(ApiEndpoints.directions, Direction.fromJson);
+
+  Future<List<AgeCategory>> getAgeCategories() =>
+      _fetchCollection(ApiEndpoints.ageCategory, AgeCategory.fromJson);
 
   Future<List<Festival>> getFestivals() =>
       _fetchCollection(ApiEndpoints.festivals, Festival.fromJson);
@@ -275,6 +284,20 @@ class ApiService {
         throw ApiException(message: 'News with id $id not found');
       }
       return News.fromJson(dataList.first as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<List<LTStory>> getLTStoriesByDirection(String direction) async {
+    try {
+      final response = await _dio.get(ApiEndpoints.stories,
+          queryParameters: {
+            'filters[direction][title][\$eq]': direction,
+            'populate': '*'
+          });
+      final List<dynamic> data = response.data['data'];
+      return data.map((json) => LTStory.fromJson(json)).toList();
     } catch (e) {
       _handleError(e);
     }

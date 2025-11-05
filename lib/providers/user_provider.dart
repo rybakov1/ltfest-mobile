@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/models/user.dart';
 import '../data/services/api_service.dart';
@@ -16,29 +17,30 @@ class AuthNotifier extends _$AuthNotifier {
   FutureOr<AuthState> build() async {
     final start = DateTime.now();
     final accessToken = await _tokenStorage.getJwt();
-
     AuthState state;
 
     if (accessToken == null) {
       state = const AuthState.unauthenticated();
-    } else {
-      try {
-        final user = await _apiService.getMe();
+    }
 
-        if (user.firstname == user.phone || user.firstname == "Unknown") {
-          state = AuthState.needsRegistration(user: user);
-        } else {
-          state = AuthState.authenticated(user: user);
-        }
-      } catch (e) {
+    try {
+      final user = await _apiService.getMe();
+      if (user.firstname == user.phone || user.firstname == "Unknown") {
+        state = AuthState.needsRegistration(user: user);
+      } else {
+        state = AuthState.authenticated(user: user);
+      }
+    } catch (e) {
+      if (e is DioException && e.response?.statusCode == 401) {
         await _tokenStorage.clearToken();
+        state = const AuthState.unauthenticated();
+      } else {
         state = const AuthState.unauthenticated();
       }
     }
 
-    // ⏳ Минимальное время показа splash (например, 800 мс)
     final elapsed = DateTime.now().difference(start);
-    const minSplashTime = Duration(milliseconds: 800);
+    const minSplashTime = Duration(milliseconds: 1500);
     if (elapsed < minSplashTime) {
       await Future.delayed(minSplashTime - elapsed);
     }
@@ -69,7 +71,7 @@ class AuthNotifier extends _$AuthNotifier {
         }
       } catch (e) {
         print('Error verifying OTP or loading user: ${e.toString()}');
-        await _tokenStorage.clearToken(); // Очистка токена при ошибке
+        //await _tokenStorage.clearToken(); // Очистка токена при ошибке
         return const AuthState
             .unauthenticated(); // Возвращаем дефолтное состояние
       }
@@ -88,6 +90,9 @@ class AuthNotifier extends _$AuthNotifier {
     String? collectiveCity,
     String? masterName,
     String? educationPlace,
+    int? count_participant,
+    int? ageCategoryId,
+
   }) async {
     final currentState = state.value;
     final userId = await _tokenStorage.getUserId();
@@ -111,6 +116,8 @@ class AuthNotifier extends _$AuthNotifier {
           collectiveCity: collectiveCity,
           masterName: masterName,
           educationPlace: educationPlace,
+          count_participant: count_participant,
+          ageCategoryId: ageCategoryId,
           userId: userId!,
         );
         return AuthState.authenticated(user: updatedUser);

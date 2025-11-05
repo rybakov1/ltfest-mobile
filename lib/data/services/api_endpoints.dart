@@ -3,8 +3,10 @@ abstract class ApiEndpoints {
   static const String verifyOtp = '/api/otp/verify';
   static const String users = '/api/users';
   static const String me = '/api/users/me';
+
   static String userById(int id) => '/api/users/$id';
   static const String favorites = '/api/favorites';
+
   static String favoriteById(int id) => '/api/favorites/$id';
 
   static const String products = '/api/products';
@@ -14,6 +16,7 @@ abstract class ApiEndpoints {
 
   static const String activities = '/api/activities';
   static const String directions = '/api/directions';
+  static const String ageCategory = '/api/age-categories';
   static const String festivals = '/api/festivals';
   static const String laboratories = '/api/laboratories';
   static const String upcomingEvents = '/api/upcoming-events';
@@ -22,15 +25,23 @@ abstract class ApiEndpoints {
   static const String stories = '/api/stories';
 
   static String productById(String id) => '/api/products?filters[id][\$eq]=$id';
+
   static String newsById(String id) => '/api/news?filters[id][\$eq]=$id';
-  static String festivalById(String id) => '/api/festivals?filters[id][\$eq]=$id';
-  static String laboratoryById(String id) => '/api/laboratories?filters[id][\$eq]=$id';
+
+  static String festivalById(String id) =>
+      '/api/festivals?filters[id][\$eq]=$id';
+
+  static String laboratoryById(String id) =>
+      '/api/laboratories?filters[id][\$eq]=$id';
 
   static String festivalsByDirection(String direction) =>
       '/api/festivals?filters[direction][title][\$eq]=$direction';
+
   static String laboratoriesByDirection(String direction) =>
       '/api/laboratories?filters[direction][title][\$eq]=$direction';
 
+  static String storiesByDirection(String direction) =>
+      '/api/stories?filters[direction][title][\$eq]=$direction';
 
   static const String paymentsInit = '/api/payments/init';
   static const String paymentsState = '/api/payments/state';

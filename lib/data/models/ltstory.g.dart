@@ -16,6 +16,9 @@ _LTStory _$LTStoryFromJson(Map<String, dynamic> json) => _LTStory(
       preview: json['preview'] == null
           ? null
           : ImageData.fromJson(json['preview'] as Map<String, dynamic>),
+      direction: json['direction'] == null
+          ? null
+          : Direction.fromJson(json['direction'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$LTStoryToJson(_LTStory instance) => <String, dynamic>{
@@ -24,4 +27,5 @@ Map<String, dynamic> _$LTStoryToJson(_LTStory instance) => <String, dynamic>{
       'url': instance.url,
       'media': instance.media,
       'preview': instance.preview,
+      'direction': instance.direction,
     };

@@ -7,6 +7,7 @@ import 'package:ltfest/constants.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 
+import '../../providers/favorites_provider.dart';
 import 'models/cart_item.dart';
 
 class CartPage extends ConsumerWidget {
@@ -127,8 +128,19 @@ class CartItemCard extends ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter modalSetState) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final favorites = ref.watch(favoritesProvider);
+            final notifier = ref.read(favoritesProvider.notifier);
+
+            final productId = cartItem.productInStock!.product!.id;
+            final isFavorite = favorites.maybeWhen(
+              data: (value) => value.any(
+                (f) => f.type == "product" && f.id == productId,
+              ),
+              orElse: () => false,
+            );
+
             return Container(
               height: 320,
               padding: EdgeInsets.only(
@@ -148,20 +160,37 @@ class CartItemCard extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: Palette.primaryLime.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8)),
-                        child: Icon(Icons.favorite_outline,
-                            color: Palette.primaryLime),
-                      ),
-                      const SizedBox(width: 16),
-                      Text("Перенести в избранное", style: Styles.b1),
-                    ],
+                  InkWell(
+                    onTap: isFavorite
+                        ? () {}
+                        : () async => await notifier.toggleFavorite(
+                            EventType.product, productId),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              color: isFavorite
+                                  ? Palette.primaryLime
+                                  : Palette.primaryLime.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Icon(
+                            isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_outline,
+                            color: isFavorite
+                                ? Palette.white
+                                : Palette.primaryLime,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          isFavorite ? "В избранном" : "Перенести в избранное",
+                          style: Styles.b1,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 26),
                   InkWell(
@@ -341,7 +370,7 @@ class CartSummary extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           LTButtons.elevatedButton(
-            onPressed: () => context.push(AppRoutes.order),
+            onPressed: () => context.push("${AppRoutes.order}/products"),
             child: Text(
               "Оформить заказ",
               style: Styles.button1,

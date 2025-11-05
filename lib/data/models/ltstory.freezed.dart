@@ -19,6 +19,7 @@ mixin _$LTStory {
   String? get url;
   List<ImageData>? get media;
   ImageData? get preview;
+  Direction? get direction;
 
   /// Create a copy of LTStory
   /// with the given fields replaced by the non-null parameter values.
@@ -39,17 +40,19 @@ mixin _$LTStory {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.url, url) || other.url == url) &&
             const DeepCollectionEquality().equals(other.media, media) &&
-            (identical(other.preview, preview) || other.preview == preview));
+            (identical(other.preview, preview) || other.preview == preview) &&
+            (identical(other.direction, direction) ||
+                other.direction == direction));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, title, url,
-      const DeepCollectionEquality().hash(media), preview);
+      const DeepCollectionEquality().hash(media), preview, direction);
 
   @override
   String toString() {
-    return 'LTStory(id: $id, title: $title, url: $url, media: $media, preview: $preview)';
+    return 'LTStory(id: $id, title: $title, url: $url, media: $media, preview: $preview, direction: $direction)';
   }
 }
 
@@ -63,9 +66,11 @@ abstract mixin class $LTStoryCopyWith<$Res> {
       String? title,
       String? url,
       List<ImageData>? media,
-      ImageData? preview});
+      ImageData? preview,
+      Direction? direction});
 
   $ImageDataCopyWith<$Res>? get preview;
+  $DirectionCopyWith<$Res>? get direction;
 }
 
 /// @nodoc
@@ -85,6 +90,7 @@ class _$LTStoryCopyWithImpl<$Res> implements $LTStoryCopyWith<$Res> {
     Object? url = freezed,
     Object? media = freezed,
     Object? preview = freezed,
+    Object? direction = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -107,6 +113,10 @@ class _$LTStoryCopyWithImpl<$Res> implements $LTStoryCopyWith<$Res> {
           ? _self.preview
           : preview // ignore: cast_nullable_to_non_nullable
               as ImageData?,
+      direction: freezed == direction
+          ? _self.direction
+          : direction // ignore: cast_nullable_to_non_nullable
+              as Direction?,
     ));
   }
 
@@ -121,6 +131,20 @@ class _$LTStoryCopyWithImpl<$Res> implements $LTStoryCopyWith<$Res> {
 
     return $ImageDataCopyWith<$Res>(_self.preview!, (value) {
       return _then(_self.copyWith(preview: value));
+    });
+  }
+
+  /// Create a copy of LTStory
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DirectionCopyWith<$Res>? get direction {
+    if (_self.direction == null) {
+      return null;
+    }
+
+    return $DirectionCopyWith<$Res>(_self.direction!, (value) {
+      return _then(_self.copyWith(direction: value));
     });
   }
 }
@@ -219,15 +243,15 @@ extension LTStoryPatterns on LTStory {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(int id, String? title, String? url, List<ImageData>? media,
-            ImageData? preview)?
+            ImageData? preview, Direction? direction)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _LTStory() when $default != null:
-        return $default(
-            _that.id, _that.title, _that.url, _that.media, _that.preview);
+        return $default(_that.id, _that.title, _that.url, _that.media,
+            _that.preview, _that.direction);
       case _:
         return orElse();
     }
@@ -249,14 +273,14 @@ extension LTStoryPatterns on LTStory {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(int id, String? title, String? url, List<ImageData>? media,
-            ImageData? preview)
+            ImageData? preview, Direction? direction)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _LTStory():
-        return $default(
-            _that.id, _that.title, _that.url, _that.media, _that.preview);
+        return $default(_that.id, _that.title, _that.url, _that.media,
+            _that.preview, _that.direction);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -277,14 +301,14 @@ extension LTStoryPatterns on LTStory {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(int id, String? title, String? url,
-            List<ImageData>? media, ImageData? preview)?
+            List<ImageData>? media, ImageData? preview, Direction? direction)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _LTStory() when $default != null:
-        return $default(
-            _that.id, _that.title, _that.url, _that.media, _that.preview);
+        return $default(_that.id, _that.title, _that.url, _that.media,
+            _that.preview, _that.direction);
       case _:
         return null;
     }
@@ -299,7 +323,8 @@ class _LTStory implements LTStory {
       this.title,
       this.url,
       final List<ImageData>? media,
-      this.preview})
+      this.preview,
+      this.direction})
       : _media = media;
   factory _LTStory.fromJson(Map<String, dynamic> json) =>
       _$LTStoryFromJson(json);
@@ -322,6 +347,8 @@ class _LTStory implements LTStory {
 
   @override
   final ImageData? preview;
+  @override
+  final Direction? direction;
 
   /// Create a copy of LTStory
   /// with the given fields replaced by the non-null parameter values.
@@ -347,17 +374,19 @@ class _LTStory implements LTStory {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.url, url) || other.url == url) &&
             const DeepCollectionEquality().equals(other._media, _media) &&
-            (identical(other.preview, preview) || other.preview == preview));
+            (identical(other.preview, preview) || other.preview == preview) &&
+            (identical(other.direction, direction) ||
+                other.direction == direction));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, title, url,
-      const DeepCollectionEquality().hash(_media), preview);
+      const DeepCollectionEquality().hash(_media), preview, direction);
 
   @override
   String toString() {
-    return 'LTStory(id: $id, title: $title, url: $url, media: $media, preview: $preview)';
+    return 'LTStory(id: $id, title: $title, url: $url, media: $media, preview: $preview, direction: $direction)';
   }
 }
 
@@ -372,10 +401,13 @@ abstract mixin class _$LTStoryCopyWith<$Res> implements $LTStoryCopyWith<$Res> {
       String? title,
       String? url,
       List<ImageData>? media,
-      ImageData? preview});
+      ImageData? preview,
+      Direction? direction});
 
   @override
   $ImageDataCopyWith<$Res>? get preview;
+  @override
+  $DirectionCopyWith<$Res>? get direction;
 }
 
 /// @nodoc
@@ -395,6 +427,7 @@ class __$LTStoryCopyWithImpl<$Res> implements _$LTStoryCopyWith<$Res> {
     Object? url = freezed,
     Object? media = freezed,
     Object? preview = freezed,
+    Object? direction = freezed,
   }) {
     return _then(_LTStory(
       id: null == id
@@ -417,6 +450,10 @@ class __$LTStoryCopyWithImpl<$Res> implements _$LTStoryCopyWith<$Res> {
           ? _self.preview
           : preview // ignore: cast_nullable_to_non_nullable
               as ImageData?,
+      direction: freezed == direction
+          ? _self.direction
+          : direction // ignore: cast_nullable_to_non_nullable
+              as Direction?,
     ));
   }
 
@@ -431,6 +468,20 @@ class __$LTStoryCopyWithImpl<$Res> implements _$LTStoryCopyWith<$Res> {
 
     return $ImageDataCopyWith<$Res>(_self.preview!, (value) {
       return _then(_self.copyWith(preview: value));
+    });
+  }
+
+  /// Create a copy of LTStory
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DirectionCopyWith<$Res>? get direction {
+    if (_self.direction == null) {
+      return null;
+    }
+
+    return $DirectionCopyWith<$Res>(_self.direction!, (value) {
+      return _then(_self.copyWith(direction: value));
     });
   }
 }

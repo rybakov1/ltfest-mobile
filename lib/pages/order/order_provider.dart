@@ -9,12 +9,13 @@ import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 
-// Enum для удобного выбора способа доставки
 enum DeliveryMethod { onFestival, cdek }
+enum OrderType { products, festival, laboratory, ltpriority }
 
-// Класс состояния для нашей формы
 @immutable
 class OrderState {
+  final OrderType orderType;
+
   final String payerName;
   final String email;
   final String phone;
@@ -22,7 +23,7 @@ class OrderState {
   final DeliveryMethod deliveryMethod;
   final Festival? selectedFestival;
   final String deliveryAddress;
-  final bool isLoading; // для индикатора загрузки на кнопке
+  final bool isLoading;
 
   const OrderState({
     this.payerName = '',
@@ -33,6 +34,7 @@ class OrderState {
     this.selectedFestival,
     this.deliveryAddress = '',
     this.isLoading = false,
+    this.orderType = OrderType.products,
   });
 
   OrderState copyWith({
@@ -44,6 +46,7 @@ class OrderState {
     Festival? selectedFestival,
     String? deliveryAddress,
     bool? isLoading,
+    OrderType? orderType,
   }) {
     return OrderState(
       payerName: payerName ?? this.payerName,
@@ -61,6 +64,7 @@ class OrderState {
               ? ''
               : deliveryAddress ?? this.deliveryAddress,
       isLoading: isLoading ?? this.isLoading,
+      orderType: orderType ?? this.orderType,
     );
   }
 }
@@ -92,6 +96,18 @@ class OrderNotifier extends StateNotifier<OrderState> {
         collectiveName: user.collectiveName,
       );
     }
+  }
+
+  void setOrderType(OrderType type) {
+    state = state.copyWith(orderType: type);
+  }
+
+  void reset(OrderType type) {
+    // Сначала сбросим всё
+    state = const OrderState();
+    // Затем установим тип и заполним пользователя
+    setOrderType(type);
+    _prefillUserData();
   }
 
   void updatePayerName(String value) =>

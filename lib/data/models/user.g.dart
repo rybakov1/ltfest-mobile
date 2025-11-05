@@ -27,6 +27,10 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
       ltpriority: json['ltpriority'] as String?,
       educationPlace: json['educationPlace'] as String?,
       masterName: json['masterName'] as String?,
+      count_participant: (json['count_participant'] as num?)?.toInt(),
+      age_category: json['age_category'] == null
+          ? null
+          : AgeCategory.fromJson(json['age_category'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -44,4 +48,6 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
       'ltpriority': instance.ltpriority,
       'educationPlace': instance.educationPlace,
       'masterName': instance.masterName,
+      'count_participant': instance.count_participant,
+      'age_category': instance.age_category,
     };

@@ -10,19 +10,14 @@ import 'package:intl/intl.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/user.dart';
+import 'package:ltfest/providers/age_category_provider.dart';
 import 'package:ltfest/providers/auth_state.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../data/models/age_category.dart';
 import '../../data/models/direction.dart';
-import '../../data/services/api_service.dart';
-
-final directionsProvider = FutureProvider.autoDispose<List<Direction>>(
-  (ref) async {
-    final api = ref.watch(apiServiceProvider);
-    return await api.getDirections();
-  },
-);
+import '../../providers/direction_provider.dart';
 
 class AccountSettingsPage extends ConsumerStatefulWidget {
   const AccountSettingsPage({super.key});
@@ -36,8 +31,8 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
   int _selectedIndex = 0;
   bool _isLoading = false;
   Direction? _selectedDirection;
+  AgeCategory? _selectedAgeCategory;
 
-  // Контроллеры для всех полей
   final _emailController = TextEditingController();
   final _birthdayController = TextEditingController();
   final _cityController = TextEditingController();
@@ -46,6 +41,8 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
   final _collectiveNameController = TextEditingController();
   final _collectiveDirectionController = TextEditingController();
   final _collectiveCityController = TextEditingController();
+  final _collectiveAgeCategoryController = TextEditingController();
+  final _collectiveCountParticipateController = TextEditingController();
 
   @override
   void initState() {
@@ -66,8 +63,11 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       _collectiveNameController.text = user.collectiveName ?? '';
       _collectiveDirectionController.text = user.direction?.title ?? '';
       _collectiveCityController.text = user.collectiveCity ?? '';
-      _collectiveDirectionController.text = user.direction?.title ?? '';
+      _collectiveAgeCategoryController.text = user.age_category?.title ?? '';
+      _collectiveCountParticipateController.text =
+          user.count_participant!.toString();
       _selectedDirection = user.direction;
+      _selectedAgeCategory = user.age_category;
     }
   }
 
@@ -81,6 +81,8 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
     _collectiveNameController.dispose();
     _collectiveDirectionController.dispose();
     _collectiveCityController.dispose();
+    _collectiveAgeCategoryController.dispose();
+    _collectiveCountParticipateController.dispose();
     super.dispose();
   }
 
@@ -100,17 +102,20 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       final user = (authState.value as Authenticated).user;
 
       await authNotifier.updateProfileInfo(
-          lastName: user.lastname!,
-          firstName: user.firstname!,
-          email: _emailController.text.trim(),
-          birthDate: _birthdayController.text.toString(),
-          residence: _cityController.text.trim(),
-          directionId: _selectedDirection!.id,
-          activityId: user.activity?.id ?? 0,
-          collectiveName: _collectiveNameController.text.trim(),
-          collectiveCity: _collectiveCityController.text.trim(),
-          educationPlace: _educationController.text.trim(),
-          masterName: _masterFioController.text.trim());
+        lastName: user.lastname!,
+        firstName: user.firstname!,
+        email: _emailController.text.trim(),
+        birthDate: _birthdayController.text.toString(),
+        residence: _cityController.text.trim(),
+        directionId: _selectedDirection!.id,
+        activityId: user.activity?.id ?? 0,
+        collectiveName: _collectiveNameController.text.trim(),
+        collectiveCity: _collectiveCityController.text.trim(),
+        educationPlace: _educationController.text.trim(),
+        masterName: _masterFioController.text.trim(),
+        count_participant: int.parse(_collectiveCountParticipateController.text.trim()),
+        ageCategoryId: _selectedAgeCategory!.id,
+      );
     }
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -154,7 +159,6 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // --- Шапка модального окна ---
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 4, 0),
                       child: Row(
@@ -326,11 +330,23 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       title: 'Направление',
       provider: directionsProvider,
       itemBuilder: (direction) => direction.title,
-      // Передаем текущее выбранное значение для инициализации
       initialValue: _selectedDirection,
       onConfirm: (direction) {
-        // Обновляем состояние страницы, когда пользователь нажимает "Выбрать"
         setState(() => _selectedDirection = direction);
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  void _showAgeCategoryPicker() {
+    _showModalPicker<AgeCategory>(
+      context: context,
+      title: 'Возрастная категория',
+      provider: ageCategoryProvider,
+      itemBuilder: (ageCategory) => ageCategory.title,
+      initialValue: _selectedAgeCategory,
+      onConfirm: (ageCategory) {
+        setState(() => _selectedAgeCategory = ageCategory);
         Navigator.pop(context);
       },
     );
@@ -459,6 +475,11 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                                   collectiveCityController:
                                       _collectiveCityController,
                                   showDirectionPicker: _showDirectionPicker,
+                                  showAgeCategoryPicker: _showAgeCategoryPicker,
+                                  collectiveAgeCategoryController:
+                                      _collectiveAgeCategoryController,
+                                  collectiveCountParticipateController:
+                                      _collectiveCountParticipateController,
                                 ),
                               ),
                             ],
@@ -785,19 +806,28 @@ class _CollectiveForm extends StatelessWidget {
   final TextEditingController collectiveNameController;
   final TextEditingController collectiveDirectionController;
   final TextEditingController collectiveCityController;
+  final TextEditingController collectiveAgeCategoryController;
+  final TextEditingController collectiveCountParticipateController;
+
   final VoidCallback showDirectionPicker; // Добавляем параметр
+  final VoidCallback showAgeCategoryPicker; // Добавляем параметр
 
   const _CollectiveForm({
     required this.collectiveNameController,
     required this.collectiveDirectionController,
     required this.collectiveCityController,
     required this.showDirectionPicker,
+    required this.collectiveAgeCategoryController,
+    required this.collectiveCountParticipateController,
+    required this.showAgeCategoryPicker,
   });
 
   @override
   Widget build(BuildContext context) {
     final state = context.findAncestorStateOfType<_AccountSettingsPageState>();
     final selectedDirection = state?._selectedDirection;
+    final selectedAgeCategory = state?._selectedAgeCategory;
+
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -816,6 +846,21 @@ class _CollectiveForm extends StatelessWidget {
             onTap: showDirectionPicker,
             validator: (_) =>
                 selectedDirection == null ? 'Выберите направление' : null,
+          ),
+          const SizedBox(height: 16),
+          _buildEditableField(
+            label: 'Количество участников коллектива',
+            controller: collectiveCountParticipateController,
+            isRequired: false,
+          ),
+          const SizedBox(height: 16),
+          _buildModalSelectorField(
+            label: 'Возрастная категория',
+            value: selectedAgeCategory?.title,
+            hint: 'Выберите категорию',
+            onTap: showAgeCategoryPicker,
+            validator: (_) =>
+                selectedAgeCategory == null ? 'Выберите категорию' : null,
           ),
           const SizedBox(height: 16),
           CitySearchField(
@@ -909,8 +954,6 @@ Widget _buildReadOnlySection(User user) {
     ),
   );
 }
-
-
 
 class DatePickerTextField extends StatefulWidget {
   final String label;

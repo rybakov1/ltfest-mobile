@@ -14,7 +14,8 @@ Future<void> main() async {
     },
     appRunner: () => runApp(SentryWidget(child: const ProviderScope(child: MyApp()))),
   );
-  // runApp(const ProviderScope(child: MyApp()));
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {

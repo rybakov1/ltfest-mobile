@@ -274,9 +274,9 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                       child: SizeTransition(
                         axisAlignment: -1.0,
                         sizeFactor: _storiesAnimation,
-                        child: const Padding(
-                          padding: EdgeInsets.only(bottom: 24.0),
-                          child: StoryWidget(),
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 24.0),
+                          child: StoryWidget(category: widget.category),
                         ),
                       ),
                     ),

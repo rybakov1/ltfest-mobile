@@ -7,11 +7,13 @@ import '../constants.dart';
 import '../providers/story_provider.dart';
 
 class StoryWidget extends ConsumerWidget {
-  const StoryWidget({super.key});
+  final String category;
+
+  const StoryWidget({super.key, required this.category});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final storiesAsync = ref.watch(storyProvider);
+    final storiesAsync = ref.watch(storyProvider(category));
 
     return SizedBox(
       height: 96,

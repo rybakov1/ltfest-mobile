@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/components/lt_appbar.dart';
@@ -13,6 +14,7 @@ import '../../components/custom_tab_control.dart';
 import '../../components/share_button.dart';
 import '../../data/models/laboratory.dart';
 import '../../data/models/person.dart';
+import '../../router/app_routes.dart';
 
 final learningTypeIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -363,16 +365,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                 left: 16,
               ),
               child: LTButtons.elevatedButton(
-                onPressed: () async {
-                  final Uri uri = Uri.parse(
-                    laboratoryAsync
-                        .value!.websiteurl!, //TODO: not weburl its entryurl
-                  );
-                  await launchUrl(
-                    uri,
-                    mode: LaunchMode.externalApplication,
-                  );
-                },
+                onPressed: () => context.push("${AppRoutes.order}/laboratory"),
                 child: Text("Оплатить", style: Styles.button1),
               ),
             ),

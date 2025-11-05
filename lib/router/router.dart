@@ -5,7 +5,9 @@ import 'package:ltfest/pages/more/about_app_page.dart';
 import 'package:ltfest/pages/more/account_settings_page.dart';
 import 'package:ltfest/pages/more/app_settings_page.dart';
 import 'package:ltfest/pages/news/news_details_page.dart';
-import 'package:ltfest/pages/order/order_page.dart';
+import 'package:ltfest/pages/order/presenter/festival_order_page.dart';
+import 'package:ltfest/pages/order/presenter/laboratory_order_page.dart';
+import 'package:ltfest/pages/order/presenter/product_order_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_details_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_page.dart';
 import 'package:ltfest/router/app_routes.dart';
@@ -19,10 +21,6 @@ import 'package:ltfest/pages/lab/lab_details_page.dart';
 import 'package:ltfest/pages/lab/lab_page.dart';
 import 'package:ltfest/pages/main_screen.dart';
 import 'package:ltfest/pages/more/more_page.dart';
-import 'package:ltfest/pages/more/lt_coin_page.dart';
-import 'package:ltfest/pages/more/lt_winner_page.dart';
-import 'package:ltfest/pages/more/lt_pay_page.dart';
-import 'package:ltfest/pages/more/lt_concierge_page.dart';
 import 'package:ltfest/pages/home/more_items_page.dart';
 import '../pages/auth/input_code_page.dart';
 import '../pages/cart/cart_page.dart';
@@ -31,6 +29,10 @@ import '../pages/payment/payment_failure_screen.dart';
 import '../pages/payment/payment_init_screen.dart';
 import '../pages/payment/payment_provider.dart';
 import '../pages/payment/payment_success_screen.dart';
+import '../pages/reference/presenter/lt_coin_page.dart';
+import '../pages/reference/presenter/lt_concierge_page.dart';
+import '../pages/reference/presenter/lt_pay_page.dart';
+import '../pages/reference/presenter/lt_winner_page.dart';
 import '../pages/splash_page.dart';
 import '../providers/auth_state.dart';
 import '../providers/user_provider.dart';
@@ -49,6 +51,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthRoute = currentLocation == AppRoutes.login ||
           currentLocation == AppRoutes.verification ||
           currentLocation == AppRoutes.registration;
+
       if (authState.isLoading || authState.isReloading) {
         if (!isAuthRoute && currentLocation != AppRoutes.splash) {
           return AppRoutes.splash;
@@ -285,9 +288,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: AppRoutes.order,
+        path: '/order/festival',
         pageBuilder: (context, state) => const NoTransitionPage(
-          child: OrderPage(),
+          child: FestivalOrderPage(),
+        ),
+      ),
+      GoRoute(
+        path: '/order/laboratory',
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: LaboratoryOrderPage(),
+        ),
+      ),
+      GoRoute(
+        path: '/order/products',
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: ProductOrderPage(),
         ),
       ),
       GoRoute(
