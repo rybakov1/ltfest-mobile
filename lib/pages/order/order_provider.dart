@@ -1,96 +1,168 @@
 // lib/pages/order/order_provider.dart
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/data/models/festival.dart';
+import 'package:ltfest/data/services/api_exception.dart';
 import 'package:ltfest/data/services/api_service.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
+import 'package:ltfest/providers/promocode_provider.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 
+import '../../data/models/festival_tariff.dart';
+import '../payment/payment_provider.dart';
+
 enum DeliveryMethod { onFestival, cdek }
+
 enum OrderType { products, festival, laboratory, ltpriority }
 
 @immutable
 class OrderState {
+  // --- Общие поля для всех заказов ---
   final OrderType orderType;
-
   final String payerName;
   final String email;
   final String phone;
-  final String collectiveName;
+  final bool isLoading;
+
+  // --- Поля для заказа ТОВАРОВ (Products) ---
   final DeliveryMethod deliveryMethod;
   final Festival? selectedFestival;
   final String deliveryAddress;
-  final bool isLoading;
+
+  // --- Поля для заказа на ФЕСТИВАЛЬ (Festival) ---
+  final String collectiveName; // Название коллектива
+  final String participantNames; // Имена участников через запятую
+  final int seatCount; // Количество мест
+
+  final dynamic payableItem;
 
   const OrderState({
+    // Общие
+    this.orderType = OrderType.products,
     this.payerName = '',
     this.email = '',
     this.phone = '',
-    this.collectiveName = '',
+    this.isLoading = false,
+
+    // Товары
     this.deliveryMethod = DeliveryMethod.onFestival,
     this.selectedFestival,
     this.deliveryAddress = '',
-    this.isLoading = false,
-    this.orderType = OrderType.products,
+
+    // Фестиваль
+    this.collectiveName = '',
+    this.participantNames = '',
+    this.seatCount = 1,
+    this.payableItem,
   });
 
-  OrderState copyWith({
-    String? payerName,
-    String? email,
-    String? phone,
-    String? collectiveName,
-    DeliveryMethod? deliveryMethod,
-    Festival? selectedFestival,
-    String? deliveryAddress,
-    bool? isLoading,
-    OrderType? orderType,
-  }) {
+  OrderState copyWith(
+      {OrderType? orderType,
+      String? payerName,
+      String? email,
+      String? phone,
+      bool? isLoading,
+      DeliveryMethod? deliveryMethod,
+      Festival? selectedFestival,
+      String? deliveryAddress,
+      String? collectiveName,
+      String? participantNames,
+      int? seatCount,
+      dynamic payableItem}) {
     return OrderState(
+      orderType: orderType ?? this.orderType,
       payerName: payerName ?? this.payerName,
       email: email ?? this.email,
       phone: phone ?? this.phone,
-      collectiveName: collectiveName ?? this.collectiveName,
-      deliveryMethod: deliveryMethod ?? this.deliveryMethod,
-      // Если меняется метод доставки, сбрасываем связанные с ним поля
-      selectedFestival:
-          deliveryMethod != null && deliveryMethod != DeliveryMethod.onFestival
-              ? null
-              : selectedFestival ?? this.selectedFestival,
-      deliveryAddress:
-          deliveryMethod != null && deliveryMethod != DeliveryMethod.cdek
-              ? ''
-              : deliveryAddress ?? this.deliveryAddress,
       isLoading: isLoading ?? this.isLoading,
-      orderType: orderType ?? this.orderType,
+      deliveryMethod: deliveryMethod ?? this.deliveryMethod,
+      selectedFestival: selectedFestival ?? this.selectedFestival,
+      deliveryAddress: deliveryAddress ?? this.deliveryAddress,
+      collectiveName: collectiveName ?? this.collectiveName,
+      participantNames: participantNames ?? this.participantNames,
+      seatCount: seatCount ?? this.seatCount,
+      payableItem: payableItem ?? this.payableItem,
     );
   }
 }
 
-// Провайдер для фестивалей (чтобы не зависеть от категории)
 final allFestivalsProvider = FutureProvider<List<Festival>>((ref) {
   return ref.watch(apiServiceProvider).getFestivals();
 });
 
-// Notifier для управления состоянием заказа
+final orderBasePriceProvider = Provider<int>((ref) {
+  final orderState = ref.watch(orderProvider);
+
+  int basePrice = 0;
+
+  switch (orderState.orderType) {
+    case OrderType.products:
+      basePrice = ref.watch(cartTotalPriceProvider);
+      break;
+    case OrderType.festival:
+      if (orderState.payableItem is FestivalTariff) {
+        final tariff = orderState.payableItem as FestivalTariff;
+        basePrice = tariff.price.toInt() * orderState.seatCount;
+      }
+      break;
+    case OrderType.laboratory:
+    // Логика для лаборатории
+      break;
+    case OrderType.ltpriority:
+    // Логика для карты лояльности
+      break;
+  }
+  return basePrice;
+});
+
+// МОДИФИЦИРОВАННЫЙ СТАРЫЙ ПРОВАЙДЕР
+final orderTotalPriceProvider = Provider<int>((ref) {
+  // Теперь мы берем базовую цену из нового провайдера
+  final basePrice = ref.watch(orderBasePriceProvider);
+  final promoState = ref.watch(promoCodeNotifierProvider);
+
+  // Применяем скидку от промокода
+  return promoState.maybeMap(
+    orElse: () => basePrice,
+    success: (successState) {
+      final promo = successState.promoCode;
+      double discountAmount = 0.0;
+      if (promo.discountType == 'percentage') {
+        discountAmount = basePrice * (promo.discountValue / 100);
+      } else {
+        discountAmount =
+            min(promo.discountValue.toDouble(), basePrice.toDouble());
+      }
+      final finalPrice = basePrice - discountAmount;
+      return finalPrice.isNegative ? 0 : finalPrice.round();
+    },
+  );
+});
+
 class OrderNotifier extends StateNotifier<OrderState> {
   final Ref _ref;
 
-  OrderNotifier(this._ref) : super(const OrderState()) {
+  OrderNotifier(this._ref) : super(const OrderState());
+
+  void startOrder({required OrderType type, required dynamic item}) {
+    state = const OrderState().copyWith(
+      orderType: type,
+      payableItem: item,
+      seatCount: 1,
+    );
     _prefillUserData();
   }
 
-  // Предзаполнение данных из профиля пользователя
   void _prefillUserData() {
-    // Используем наш новый, удобный userProvider!
     final user = _ref.read(userProvider);
-
-    // Проверяем, что пользователь не null (т.е. он авторизован)
     if (user != null) {
       state = state.copyWith(
-        payerName: (user.lastname ?? '').trim(),
+        payerName: user.lastname!.trim(),
         email: user.email,
         phone: user.phone,
         collectiveName: user.collectiveName,
@@ -98,14 +170,10 @@ class OrderNotifier extends StateNotifier<OrderState> {
     }
   }
 
-  void setOrderType(OrderType type) {
-    state = state.copyWith(orderType: type);
-  }
+  void setOrderType(OrderType type) => state = state.copyWith(orderType: type);
 
   void reset(OrderType type) {
-    // Сначала сбросим всё
     state = const OrderState();
-    // Затем установим тип и заполним пользователя
     setOrderType(type);
     _prefillUserData();
   }
@@ -119,6 +187,11 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
   void updateCollectiveName(String value) =>
       state = state.copyWith(collectiveName: value);
+
+  void updateParticipantNames(String value) =>
+      state = state.copyWith(participantNames: value);
+
+  void updateSeatCount(int value) => state = state.copyWith(seatCount: value);
 
   void updateDeliveryAddress(String value) =>
       state = state.copyWith(deliveryAddress: value);
@@ -134,29 +207,116 @@ class OrderNotifier extends StateNotifier<OrderState> {
     }
   }
 
-  Future<void> placeOrderAndPay(BuildContext context) async {
-    try {
-      final totalAmount = _ref.read(cartTotalPriceProvider);
-      final orderId = 'LTFEST_${DateTime.now().millisecondsSinceEpoch}';
+  String _mapOrderTypeToStrapi(OrderType type) {
+    switch (type) {
+      case OrderType.products:
+        return 'product';
+      case OrderType.festival:
+        return 'festival';
+      case OrderType.laboratory:
+        return 'laboratory';
+      case OrderType.ltpriority:
+        return 'loyalty';
+    }
+  }
 
-      final paymentData = {
-        'amount': totalAmount, // Сумма в копейках
-        'orderId': orderId,
-        'description': 'Оплата заказа №$orderId',
-        'email': state.email,
-      };
-      if (context.mounted) {
-        context.push(AppRoutes.paymentInit, extra: paymentData);
+  Future<void> placeOrderAndPay(BuildContext context, int totalAmount) async {
+    if (state.isLoading) return;
+    state = state.copyWith(isLoading: true);
+
+    final apiService = _ref.read(apiServiceProvider);
+    final user = _ref.read(userProvider);
+
+    try {
+      final promoState = _ref.read(promoCodeNotifierProvider);
+      await promoState.whenOrNull(
+        success: (promoCode) async {
+          await apiService.applyPromoCode(promoCode);
+        },
+      );
+
+      final Map<String, dynamic> details = {};
+
+
+      switch (state.orderType) {
+        case OrderType.products:
+          details['collectiveName'] = state.collectiveName;
+          details['deliveryMethod'] = state.deliveryMethod.name;
+          details['deliveryAddress'] = state.deliveryAddress;
+          break;
+        case OrderType.festival:
+          details['collectiveName'] = state.collectiveName;
+          details['participantNames'] = state.participantNames;
+          details['seatCount'] = state.seatCount;
+          break;
+        case OrderType.laboratory:
+          throw UnimplementedError();
+        case OrderType.ltpriority:
+          throw UnimplementedError();
       }
-    } catch (e) {
+
+      details.removeWhere((key, value) =>
+          value == null || value == '' || (value is int && value == 0));
+
+      final orderData = {
+        'name': state.payerName,
+        'email': state.email,
+        'phone': state.phone,
+        'amount': totalAmount,
+        'type': _mapOrderTypeToStrapi(state.orderType),
+        'details': details,
+        'users_permissions_user': user?.id,
+        'festival': state.selectedFestival?.id,
+      };
+
+      orderData.removeWhere((key, value) => value == null);
+
+      final paymentResponse = await apiService.initPayment(
+        orderData: orderData,
+        paymentData: {
+          'amount': totalAmount,
+          'description': 'Оплата заказа от ${state.payerName}',
+          'successUrl': 'ltfestapp://payment/success/{PaymentId}',
+          'failUrl': 'ltfestapp://payment/fail/{PaymentId}',
+        },
+      );
+
+      if (paymentResponse.success && paymentResponse.paymentUrl != null) {
+        if (paymentResponse.paymentId != null) {
+          final paymentNotifier = _ref.read(paymentNotifierProvider.notifier);
+          paymentNotifier.updatePaymentId(paymentResponse.paymentId.toString());
+        }
+
+        if (context.mounted) {
+          context.push(AppRoutes.paymentInit, extra: {
+            'paymentUrl': paymentResponse.paymentUrl!,
+            'orderId': paymentResponse.orderId ?? '',
+          });
+        }
+      } else {
+        throw ApiException(
+            message: paymentResponse.message ??
+                'Не удалось получить ссылку на оплату');
+      }
+    } on ApiException catch (e) {
+      debugPrint('Ошибка API при оформлении заказа: ${e.message}');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка при подготовке к оплате: $e')));
+          SnackBar(content: Text('Ошибка: ${e.message}')),
+        );
       }
+    } catch (e, st) {
+      debugPrint('Неизвестная ошибка при оформлении заказа: $e\n$st');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Произошла неизвестная ошибка')),
+        );
+      }
+    } finally {
+      state = state.copyWith(isLoading: false);
     }
   }
 }
-
 
 final orderProvider = StateNotifierProvider<OrderNotifier, OrderState>(
     (ref) => OrderNotifier(ref));

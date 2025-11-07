@@ -7,6 +7,7 @@ import 'package:ltfest/pages/more/app_settings_page.dart';
 import 'package:ltfest/pages/news/news_details_page.dart';
 import 'package:ltfest/pages/order/presenter/festival_order_page.dart';
 import 'package:ltfest/pages/order/presenter/laboratory_order_page.dart';
+import 'package:ltfest/pages/order/presenter/lt_priority_order_page.dart';
 import 'package:ltfest/pages/order/presenter/product_order_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_details_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_page.dart';
@@ -22,6 +23,7 @@ import 'package:ltfest/pages/lab/lab_page.dart';
 import 'package:ltfest/pages/main_screen.dart';
 import 'package:ltfest/pages/more/more_page.dart';
 import 'package:ltfest/pages/home/more_items_page.dart';
+import '../data/models/festival_tariff.dart';
 import '../pages/auth/input_code_page.dart';
 import '../pages/cart/cart_page.dart';
 import '../pages/more/favorites_page.dart';
@@ -32,6 +34,7 @@ import '../pages/payment/payment_success_screen.dart';
 import '../pages/reference/presenter/lt_coin_page.dart';
 import '../pages/reference/presenter/lt_concierge_page.dart';
 import '../pages/reference/presenter/lt_pay_page.dart';
+import '../pages/reference/presenter/lt_priority_page.dart';
 import '../pages/reference/presenter/lt_winner_page.dart';
 import '../pages/splash_page.dart';
 import '../providers/auth_state.dart';
@@ -278,7 +281,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.ltPriority,
         pageBuilder: (context, state) => const NoTransitionPage(
-          child: LtConciergePage(),
+          child: LtPriorityPage(),
         ),
       ),
       GoRoute(
@@ -288,10 +291,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: '/order/festival',
-        pageBuilder: (context, state) => const NoTransitionPage(
-          child: FestivalOrderPage(),
-        ),
+        path: AppRoutes.festivalOrder,
+        pageBuilder: (context, state) {
+          final tariff = state.extra as FestivalTariff;
+          return NoTransitionPage(child: FestivalOrderPage(tariff: tariff));
+        },
       ),
       GoRoute(
         path: '/order/laboratory',
@@ -306,10 +310,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
+        path: '/order/ltpriority',
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: LtPriorityOrderPage(),
+        ),
+      ),
+      GoRoute(
         path: AppRoutes.paymentInit,
-        builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>;
-          return PaymentInitScreen(paymentData: data);
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return NoTransitionPage(
+            child: PaymentInitScreen(
+              paymentUrl: extra["paymentUrl"],
+              orderId: extra["orderId"],
+            ),
+          );
         },
       ),
       GoRoute(

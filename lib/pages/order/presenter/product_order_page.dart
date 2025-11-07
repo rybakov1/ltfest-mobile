@@ -5,11 +5,12 @@ import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/festival.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/pages/order/order_provider.dart';
-import 'package:ltfest/providers/festival_provider.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:ltfest/providers/promocode_provider.dart';
 
+import '../../../components/modal.dart';
 import '../../../data/models/user.dart';
 import '../../../providers/user_provider.dart';
+import '../components/loyalty_promo_section.dart';
 
 class ProductOrderPage extends ConsumerStatefulWidget {
   const ProductOrderPage({super.key});
@@ -32,16 +33,23 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
   @override
   void initState() {
     super.initState();
-    ref.read(orderProvider.notifier).reset(OrderType.products);
-    final state = ref.read(orderProvider);
-    _nameController = TextEditingController(text: state.payerName);
-    _emailController = TextEditingController(text: state.email);
-    _phoneController = TextEditingController(text: state.phone);
-    _collectiveNameController =
-        TextEditingController(text: state.collectiveName);
-    _addressController = TextEditingController(text: state.deliveryAddress);
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _collectiveNameController = TextEditingController();
+    _addressController = TextEditingController();
     loyaltyCardController = TextEditingController();
     promocodeController = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(orderProvider.notifier).reset(OrderType.products);
+      final state = ref.read(orderProvider);
+      _nameController.text = state.payerName;
+      _emailController.text = state.email;
+      _phoneController.text = state.phone;
+      _collectiveNameController.text = state.collectiveName;
+      _addressController.text = state.deliveryAddress;
+    });
   }
 
   @override
@@ -61,7 +69,7 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
       BuildContext context, OrderNotifier orderNotifier) {
     final currentFestival = ref.read(orderProvider).selectedFestival;
 
-    _showModalPicker<Festival>(
+    showModalPicker<Festival>(
       context: context,
       title: "Выбор фестиваля",
       provider: allFestivalsProvider,
@@ -76,210 +84,23 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
     );
   }
 
-  Widget _buildShimmerList() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxHeight: 300.0,
-        ),
-        child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: 6,
-          itemBuilder: (_, __) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 48.0,
-                  height: 48.0,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        height: 8.0,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 150.0,
-                        height: 8.0,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showModalPicker<T>({
-    required BuildContext context,
-    required String title,
-    required FutureProvider<List<T>> provider,
-    required String Function(T) itemBuilder,
-    T? initialValue,
-    required ValueChanged<T?> onConfirm,
-  }) {
-    T? tempSelectedItem = initialValue;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Palette.white,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (modalContext) {
-        return Consumer(builder: (context, ref, child) {
-          return SizedBox(
-            height: 500,
-            child: StatefulBuilder(
-              builder: (context, setModalState) {
-                final asyncValue = ref.watch(provider);
-
-                final bool isItemSelected = tempSelectedItem != null;
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 4, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(width: 40),
-                            Expanded(
-                              child: Text(title,
-                                  textAlign: TextAlign.center,
-                                  style: Styles.h4),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.close, color: Palette.gray),
-                              onPressed: () => Navigator.pop(modalContext),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Flexible(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: asyncValue.when(
-                            loading: () => _buildShimmerList(),
-                            error: (err, st) =>
-                                Center(child: Text('Ошибка: $err')),
-                            data: (items) {
-                              if (items.isEmpty) {
-                                return const Center(
-                                    child: Text("Нет данных для выбора"));
-                              }
-                              // ListView теперь сам по себе, без shrinkWrap, т.к. Flexible дает ему границы
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                // Оставляем shrinkWrap для работы внутри Column + Flexible
-                                itemCount: items.length,
-                                itemBuilder: (context, index) {
-                                  final item = items[index];
-                                  return _buildRadioListTile<T>(
-                                    title: itemBuilder(item),
-                                    value: item,
-                                    groupValue: tempSelectedItem,
-                                    onChanged: (newValue) {
-                                      setModalState(() {
-                                        tempSelectedItem = newValue;
-                                      });
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-
-                      // --- Футер модального окна (кнопка) ---
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16.0, right: 16),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: LTButtons.elevatedButton(
-                            onPressed: isItemSelected
-                                ? () => onConfirm(tempSelectedItem)
-                                : null,
-                            child: Text(
-                              'Выбрать',
-                              style: Styles.button1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          );
-        });
-      },
-    );
-  }
-
-// --- НОВЫЙ ХЕЛПЕР ДЛЯ СТИЛИЗОВАННОЙ RADIO-КНОПКИ ---
-
-  Widget _buildRadioListTile<T>({
-    required String title,
-    required T value,
-    required T? groupValue,
-    required ValueChanged<T?> onChanged,
-  }) {
-    return InkWell(
-      onTap: () => onChanged(value),
-      child: Row(
-        children: [
-          Radio<T>(
-            value: value,
-            groupValue: groupValue,
-            onChanged: onChanged,
-            activeColor: Palette.secondary,
-            fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-              if (states.contains(WidgetState.selected)) {
-                return Palette.secondary;
-              }
-              return Palette.stroke;
-            }),
-          ),
-          const SizedBox(width: 0.0),
-          // Контролируем расстояние между Radio и текстом
-          Expanded(
-            child: Text(title, style: Styles.b2),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final orderState = ref.watch(orderProvider);
     final orderNotifier = ref.read(orderProvider.notifier);
-    final totalPrice = ref.watch(cartTotalPriceProvider);
     final user = ref.watch(userProvider);
+
+    ref.listen<OrderState>(orderProvider, (previous, next) {
+      if (previous?.payerName != next.payerName)
+        _nameController.text = next.payerName;
+      if (previous?.email != next.email) _emailController.text = next.email;
+      if (previous?.phone != next.phone) _phoneController.text = next.phone;
+      if (previous?.collectiveName != next.collectiveName)
+        _collectiveNameController.text = next.collectiveName;
+    });
+
+    final baseTotal = ref.watch(orderBasePriceProvider); // <--- Начальная цена
+    final finalTotal = ref.watch(orderTotalPriceProvider); // <--- Итоговая цена со скидкой
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -354,98 +175,29 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      _buildLoyaltyOrPromoSection(user!, totalPrice),
+                      Container(
+                        decoration: Decor.base,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        child: buildLoyaltyOrPromoSection(
+                          context,
+                          user!,
+                          ref,
+                          loyaltyCardController,
+                          promocodeController,
+                          cartTotal: baseTotal,
+                          finalTotal: finalTotal,
+                        ),
+                      ),
                       const SizedBox(height: 2),
                     ],
                   ),
                 ),
               ),
-              _buildPayButton(totalPrice, orderState),
+              _buildPayButton(orderState),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildLoyaltyOrPromoSection(User user, totalPrice) {
-    return Container(
-      decoration: Decor.base,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (user.activity!.title == "Руководитель коллектива") ...[
-                Expanded(
-                  child: _buildTextField(
-                    controller: loyaltyCardController,
-                    label: "Карта лояльности",
-                    hint: "Введите номер карты",
-                    onChanged: (val) {
-                      // TODO: обработка промокода — пока не реализована
-                    },
-                  ),
-                ),
-              ] else ...[
-                Expanded(
-                  child: _buildTextField(
-                    controller: promocodeController,
-                    label: "Промокод",
-                    hint: "Введите промокод",
-                    onChanged: (val) {
-                      // TODO: обработка промокода — пока не реализована
-                    },
-                  ),
-                ),
-              ],
-              const SizedBox(width: 8),
-              InkWell(
-                onTap: () {
-                  // TODO: применить промокод/карту
-                },
-                child: Container(
-                  width: 43,
-                  height: 43,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Palette.stroke,
-                  ),
-                  child: Icon(Icons.arrow_forward_outlined,
-                      color: Palette.white, size: 24),
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Стоимость заказа", style: Styles.b2),
-              Text(Utils.formatMoney(totalPrice), style: Styles.h4),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Скидка",
-                  style: Styles.b2.copyWith(color: Palette.secondary)),
-              Text(Utils.formatMoney(0), style: Styles.h4),
-              // пока без скидки
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Итого:", style: Styles.h4),
-              Text(Utils.formatMoney(totalPrice), style: Styles.h3),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -496,13 +248,13 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
         children: [
           Text("Получение заказа", style: Styles.b2),
           const SizedBox(height: 16),
-          _buildRadioListTile(
+          buildRadioListTile(
             title: 'На фестивале',
             value: DeliveryMethod.onFestival,
             groupValue: orderState.deliveryMethod,
             onChanged: (value) => orderNotifier.setDeliveryMethod(value!),
           ),
-          _buildRadioListTile(
+          buildRadioListTile(
             title: 'Доставкой CDEK',
             value: DeliveryMethod.cdek,
             groupValue: orderState.deliveryMethod,
@@ -600,7 +352,9 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
     );
   }
 
-  Widget _buildPayButton(int totalPrice, OrderState orderState) {
+  Widget _buildPayButton(OrderState orderState) {
+    final finalTotal = ref.watch(orderTotalPriceProvider);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -608,48 +362,33 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       ),
       child: LTButtons.elevatedButton(
-        onPressed: () {
-          if (!_formKey.currentState!.validate()) return;
-          if (orderState.deliveryMethod == DeliveryMethod.onFestival &&
-              orderState.selectedFestival == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Выберите фестиваль')));
-            return;
-          }
-          ref.read(orderProvider.notifier).placeOrderAndPay(context);
-        },
-        child: Text("Оплатить", style: Styles.button1),
+        // Блокируем кнопку, если идет загрузка
+        onPressed: orderState.isLoading
+            ? null
+            : () {
+                if (!_formKey.currentState!.validate()) return;
+                if (orderState.deliveryMethod == DeliveryMethod.onFestival &&
+                    orderState.selectedFestival == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Выберите фестиваль')));
+                  return;
+                }
+                ref
+                    .read(orderProvider.notifier)
+                    .placeOrderAndPay(context, finalTotal);
+              },
+        // Показываем индикатор загрузки
+        child: orderState.isLoading
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Text("Оплатить", style: Styles.button1),
       ),
-    );
-  }
-}
-
-class FestivalsList extends ConsumerWidget {
-  const FestivalsList({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(festivalsNotifierProvider());
-
-    return state.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Ошибка: $err')),
-      data: (data) {
-        if (data.filteredFestivals.isEmpty) {
-          return const Center(child: Text('Нет фестивалей'));
-        }
-        return RefreshIndicator(
-          onRefresh: () =>
-              ref.read(festivalsNotifierProvider().notifier).refresh(),
-          child: ListView.builder(
-            itemCount: data.filteredFestivals.length,
-            itemBuilder: (_, i) {
-              final f = data.filteredFestivals[i];
-              return ListTile(title: Text(f.title));
-            },
-          ),
-        );
-      },
     );
   }
 }

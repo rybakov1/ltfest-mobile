@@ -14,10 +14,9 @@ class ReferencePage extends ConsumerStatefulWidget {
   final String imageAsset;
   final String shareLink;
   final List<Widget> contentBlocks;
-  final String ctaLabel;
+  final String? ctaLabel;
   final VoidCallback? onCtaPressed;
   final String? telegramLink;
-  final LinearGradient? gradient;
 
   const ReferencePage({
     super.key,
@@ -25,10 +24,9 @@ class ReferencePage extends ConsumerStatefulWidget {
     required this.imageAsset,
     required this.shareLink,
     required this.contentBlocks,
-    required this.ctaLabel,
+    this.ctaLabel,
     this.onCtaPressed,
     this.telegramLink,
-    this.gradient,
   });
 
   @override
@@ -74,27 +72,6 @@ class _ReferencePageState extends ConsumerState<ReferencePage> {
             controller: _scrollController,
             child: Stack(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: 360,
-                  decoration: BoxDecoration(
-                    color: Palette.error,
-                    gradient: widget.gradient,
-                    borderRadius: const BorderRadius.vertical(
-                      bottom: Radius.circular(12),
-                    ),
-                  ),
-                ),
-                Container(
-                  width: double.infinity,
-                  height: 360,
-                  decoration: BoxDecoration(
-                    color: Palette.white.withValues(alpha: 0.5),
-                    borderRadius: const BorderRadius.vertical(
-                      bottom: Radius.circular(12),
-                    ),
-                  ),
-                ),
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(12),
@@ -117,7 +94,8 @@ class _ReferencePageState extends ConsumerState<ReferencePage> {
                       SizedBox(
                           height: 270 - MediaQuery.of(context).padding.top),
                       ...widget.contentBlocks,
-                      const SizedBox(height: 82),
+
+                       SizedBox(height: widget.ctaLabel != null ? 82 : 8),
                     ],
                   ),
                 ),
@@ -157,29 +135,31 @@ class _ReferencePageState extends ConsumerState<ReferencePage> {
               ),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                16,
-                16,
-                MediaQuery.of(context).padding.bottom + 16,
-              ),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: LTButtons.elevatedButton(
-                onPressed: widget.telegramLink != null
-                    ? _openTelegram
-                    : widget.onCtaPressed ?? () => context.push(AppRoutes.more),
-                child: Text(widget.ctaLabel, style: Styles.button1),
+          if (widget.ctaLabel != null)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  16,
+                  16,
+                  MediaQuery.of(context).padding.bottom + 16,
+                ),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: LTButtons.elevatedButton(
+                  onPressed: widget.telegramLink != null
+                      ? _openTelegram
+                      : widget.onCtaPressed ??
+                          () => context.push(AppRoutes.more),
+                  child: Text(widget.ctaLabel!, style: Styles.button1),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

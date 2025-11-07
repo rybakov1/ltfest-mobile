@@ -4,6 +4,8 @@ class AppRoutes {
   static const String verification = '/verification';
   static const String home = '/home';
   static const String festivals = '/festivals';
+  static const String festivalOrder = '/order/festival';
+
   static const String laboratories = '/laboratories';
   static const String news = '/news';
 

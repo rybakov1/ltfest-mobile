@@ -1,16 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/models/age_category.dart';
 import 'package:ltfest/data/models/ltstory.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../pages/cart/models/cart.dart';
 import '../models/favorite.dart';
+import '../models/festival_tariff.dart';
 import '../models/ltbanner.dart';
+import '../models/order.dart';
 import '../models/payment.dart';
 import '../models/product/product.dart';
-import '../models/product/product_details.dart';
 import '../models/product/product_in_stock.dart';
+import '../models/promocode.dart';
 import 'dio_provider.dart';
 import '../models/news.dart';
 import '../models/upcoming_events.dart';
@@ -42,11 +45,22 @@ class ApiService {
 
   Never _handleError(Object e) {
     if (e is DioException) {
-      debugPrint(e.stackTrace.toString());
+      final msg = e.response?.data?['error']?['message'] ??
+          e.message ??
+          'Network request failed';
+      debugPrint('[ApiService] Dio error: $msg');
       throw ApiException.fromDioError(e);
     }
-    debugPrint(e.toString());
+    debugPrint('[ApiService] Unexpected error: $e');
     throw ApiException(message: e.toString());
+  }
+
+  void _logRequest(String method, String endpoint,
+      [Map<String, dynamic>? data]) {
+    if (kDebugMode) {
+      debugPrint('📡 [$method] $endpoint');
+      if (data != null) debugPrint('Body: $data');
+    }
   }
 
   Future<void> requestOtp(String phone) async {
@@ -291,11 +305,10 @@ class ApiService {
 
   Future<List<LTStory>> getLTStoriesByDirection(String direction) async {
     try {
-      final response = await _dio.get(ApiEndpoints.stories,
-          queryParameters: {
-            'filters[direction][title][\$eq]': direction,
-            'populate': '*'
-          });
+      final response = await _dio.get(ApiEndpoints.stories, queryParameters: {
+        'filters[direction][title][\$eq]': direction,
+        'populate': '*'
+      });
       final List<dynamic> data = response.data['data'];
       return data.map((json) => LTStory.fromJson(json)).toList();
     } catch (e) {
@@ -330,7 +343,8 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> addFavorite(String eventType, int eventId) async {
+  Future<Map<String, dynamic>> addFavorite(
+      String eventType, int eventId) async {
     try {
       final response = await _dio.post(
         ApiEndpoints.favorites,
@@ -345,7 +359,6 @@ class ApiService {
       _handleError(e);
     }
   }
-
 
 // --- ЭТОТ МЕТОД ОСТАЕТСЯ ВЕРНЫМ ---
 // Он принимает ID самого "избранного" и передает его в URL, что правильно для вашего бэкенда.
@@ -436,6 +449,44 @@ class ApiService {
 //       _handleError(e);
 //     }
 //   }
+
+  Future<List<FestivalTariff>> getTariffsForFestival(int festivalId) async {
+    try {
+      final response = await _dio.get(
+        ApiEndpoints.festivalTariffs,
+        queryParameters: {
+          'filters[festival][id][\$eq]': festivalId,
+          'populate': 'festival,feature',
+        },
+      );
+
+      final List<dynamic> data = response.data['data'];
+      return data
+          .map((json) => FestivalTariff.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<List<FestivalTariff>> getFestivalTariffs() async {
+    try {
+      final response = await _dio.get(
+        ApiEndpoints.festivalTariffs,
+          queryParameters: {
+            'populate[0]': 'festival',
+            'populate[1]': 'feature',
+          });
+
+      final List<dynamic> data = response.data['data'];
+
+      return data
+          .map((json) => FestivalTariff.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
 
   // --- SHOP & CART ---
 
@@ -542,23 +593,15 @@ class ApiService {
   }
 
   Future<PaymentInitResponse> initPayment({
-    required int amount,
-    required String orderId,
-    required String successUrl,
-    required String failUrl,
-    String description = 'Оплата',
-    String? customerEmail,
+    required Map<String, dynamic> orderData,
+    required Map<String, dynamic> paymentData,
   }) async {
     try {
       final response = await _dio.post(
         ApiEndpoints.paymentsInit,
         data: {
-          'amount': amount,
-          'orderId': orderId,
-          'successUrl': successUrl,
-          'failUrl': failUrl,
-          'description': description,
-          'customerEmail': customerEmail,
+          'orderData': orderData,
+          'paymentData': paymentData,
         },
       );
       return PaymentInitResponse.fromJson(response.data);
@@ -586,6 +629,165 @@ class ApiService {
         data: {'paymentId': paymentId},
       );
       return PaymentStateResponse.fromJson(response.data);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // Получить промокод по его строке (например, "WINTER25")
+  Future<PromoCode> getPromoCodeByCode(String code) async {
+    try {
+      final response = await _dio.get(
+        ApiEndpoints.promoCodes,
+        queryParameters: {
+          'filters[code][\$eq]': code,
+          'populate': '*',
+        },
+      );
+
+      print(response.data);
+
+      final List<dynamic> data = response.data['data'];
+
+      print(data.first);
+
+      if (data.isEmpty) {
+        throw ApiException(message: 'Промокод не найден');
+      }
+
+      return PromoCode.fromJson(data.first as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // Применить промокод (увеличить current_uses на 1)
+  Future<PromoCode> applyPromoCode(PromoCode promoCode) async {
+    try {
+      if (promoCode.currentUses >= promoCode.maxUses) {
+        throw ApiException(
+            message:
+                'Промокод уже был использован максимальное количество раз');
+      }
+
+      final response = await _dio.put(
+        '${ApiEndpoints.promoCodes}/${promoCode.documentId}',
+        data: {
+          'data': {
+            'currentUses': promoCode.currentUses + 1,
+          }
+        },
+      );
+      return PromoCode.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // Вспомогательный метод — получить промокод по ID (для apply)
+  Future<PromoCode> getPromoCodeById(int id) async {
+    try {
+      final response = await _dio.get('${ApiEndpoints.promoCodes}/$id');
+      return PromoCode.fromJson(response.data['data'] as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // -------------------------------
+  // ORDERS
+  // -------------------------------
+  /// Создать заказ (создаётся запись в Strapi)
+  Future<Order> createOrder(Order order) async {
+    final data = {
+      'data': {
+        'name': order.name,
+        'email': order.email,
+        'phone': order.phone,
+        'amount': order.amount,
+        'type': order.type,
+        'details': order.details,
+        'paymentId': order.paymentId,
+        'paymentStatus': order.paymentStatus,
+
+        // if (order.user?.id != null) 'user': {'connect': order.user!.id},
+
+        // ✅ Для остальных — connect:[id]
+        if (order.festival?.id != null)
+          'festival': {'connect': [order.festival!.id]},
+        if (order.laboratory?.id != null)
+          'laboratory': {'connect': [order.laboratory!.id]},
+        if (order.productInStock?.id != null)
+          'product_in_stock': {'connect': [order.productInStock!.id]},
+      },
+    };
+
+    _logRequest('POST', ApiEndpoints.orders, data);
+
+    try {
+      final response = await _dio.post(ApiEndpoints.orders, data: data);
+      return Order.fromJson(response.data['data']);
+    } catch (e) {
+      _handleError(e);
+      rethrow;
+    }
+  }
+
+
+  /// Получить все заказы текущего пользователя
+  Future<List<Order>> getOrdersByUser(int userId) async {
+    final query = {
+      'filters[user][id][\$eq]': userId,
+      'populate': '*',
+    };
+
+    _logRequest('GET', ApiEndpoints.orders, query);
+
+    try {
+      final response = await _dio.get(ApiEndpoints.orders, queryParameters: query);
+      final data = response.data['data'] as List<dynamic>;
+      return data.map((e) => Order.fromJson(e)).toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  /// Получить заказ по ID
+  Future<Order> getOrderById(String id) async {
+    final query = {'populate': '*'};
+    final endpoint = '${ApiEndpoints.orders}/$id';
+
+    _logRequest('GET', endpoint);
+
+    try {
+      final response = await _dio.get(endpoint, queryParameters: query);
+      return Order.fromJson(response.data['data']);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  /// Обновить статус оплаты (или любые другие поля)
+  Future<Order> updateOrder({
+    required String id,
+    String? paymentStatus,
+    String? paymentId,
+    Map<String, dynamic>? details,
+  }) async {
+    final data = {
+      'data': {
+        if (paymentStatus != null) 'paymentStatus': paymentStatus,
+        if (paymentId != null) 'paymentId': paymentId,
+        if (details != null) 'details': details,
+      },
+    };
+
+    final endpoint = '${ApiEndpoints.orders}/$id';
+    _logRequest('PUT', endpoint, data);
+
+    try {
+      final response = await _dio.put(endpoint, data: data);
+      return Order.fromJson(response.data['data']);
     } catch (e) {
       _handleError(e);
     }

@@ -550,7 +550,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                 const SnackBar(content: Text('Пожалуйста, выберите фестиваль')),
               );
               // TODO: сохранить дополнительные поля (участники, дата рождения и т.д.)
-              ref.read(orderProvider.notifier).placeOrderAndPay(context);
+              ref.read(orderProvider.notifier).placeOrderAndPay(context, totalPrice);
             },
             child: Text("Оплатить", style: Styles.button1),
           ),

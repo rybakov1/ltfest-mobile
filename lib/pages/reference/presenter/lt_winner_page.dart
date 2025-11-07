@@ -9,16 +9,8 @@ class LtWinnerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReferencePage(
       title: 'LT Winner',
-      imageAsset: 'assets/images/lt_winner.png',
+      imageAsset: 'assets/images/lt_winner_full.png',
       shareLink: 'https://ltfest.ru',
-      gradient: const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          Color(0xFFFEE064),
-          Color(0xFFE982D3),
-        ],
-      ),
       ctaLabel: 'Перейти в Telegram',
       telegramLink: 'https://ltfest.ru',
       contentBlocks: [

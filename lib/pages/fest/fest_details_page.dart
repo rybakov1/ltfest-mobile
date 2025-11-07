@@ -11,6 +11,7 @@ import 'package:ltfest/pages/shop/presenter/shop_widget.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/providers/festival_tariff_provider.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -619,14 +620,15 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
 
   Widget festivalTariffInfo(Festival festival) {
     final user = ref.watch(userProvider);
-
+    // 1. Вызываем новый provider с ID текущего фестиваля
+    final tariffsAsync = ref.watch(festivalTariffsProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Важно", style: Styles.h3),
         const SizedBox(height: 16),
         Text(
-          "Перед оплатой фестиваля необходимо чтобы руководитель заполнил заявку на участие. Только после заполнения заявки и подтверждения от организатора, родители приступают к оплате фестиваля.",
+          "Перед оплатой фестиваля необходимо чтобы руководитель заполнил заявку на участие...",
           style: Styles.b1,
         ),
         if (user!.activity!.title == "Руководитель коллектива") ...[
@@ -650,32 +652,105 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
         const SizedBox(height: 24),
         Text("Тарифы", style: Styles.h3),
         const SizedBox(height: 16),
-        LTTariff(
-          title: "Местный",
-          price: 7500,
-          category: widget.category,
-          description: "Стоимость тарифа включает один спектакль",
-          bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
-        ),
-        const SizedBox(height: 8),
-        LTTariff(
-          title: "Самостоятельный",
-          price: 15000,
-          category: widget.category,
-          description: "Стоимость тарифа включает один спектакль",
-          bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
-        ),
-        const SizedBox(height: 8),
-        LTTariff(
-          title: "Всё включено",
-          price: 26950,
-          description: "Стоимость тарифа включает один спектакль",
-          category: widget.category,
-          bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
+
+        // 2. Используем .when для обработки состояний загрузки/ошибки/данных
+        tariffsAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Не удалось загрузить тарифы: $err')),
+          data: (tariffs) {
+            if (tariffs.isEmpty) {
+              return const Center(child: Text('Для этого фестиваля пока нет тарифов.'));
+            }
+
+            // 3. Строим список виджетов LTTariff в цикле
+            return ListView.separated(
+              physics: const NeverScrollableScrollPhysics(), // Отключаем скролл у вложенного списка
+              shrinkWrap: true, // Сжимаем список до размера его содержимого
+              itemCount: tariffs.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final tariff = tariffs[index];
+
+                return LTTariff(
+                  title: tariff.title,
+                  price: tariff.price.toInt(), // Конвертируем double в int
+                  description: tariff.description,
+                  category: widget.category,
+                  // Преобразуем компоненты "feature" в список бонусов
+                  bonuses: tariff.feature.map((feature) => feature.title).toList(),
+                  onBuyPressed: () {
+                    // 4. При нажатии "Купить" переходим на страницу заказа,
+                    // передавая ВЕСЬ ОБЪЕКТ тарифа.
+                    context.push(AppRoutes.festivalOrder, extra: tariff);
+                  },
+                );
+              },
+            );
+          },
         ),
       ],
     );
   }
+//
+//   Widget festivalTariffInfo(Festival festival) {
+//     final user = ref.watch(userProvider);
+//
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text("Важно", style: Styles.h3),
+//         const SizedBox(height: 16),
+//         Text(
+//           "Перед оплатой фестиваля необходимо чтобы руководитель заполнил заявку на участие. Только после заполнения заявки и подтверждения от организатора, родители приступают к оплате фестиваля.",
+//           style: Styles.b1,
+//         ),
+//         if (user!.activity!.title == "Руководитель коллектива") ...[
+//           const SizedBox(height: 16),
+//           LTButtons.elevatedButton(
+//             onPressed: () async {
+//               final Uri uri = Uri.parse(
+//                 festival.entryurl!,
+//               );
+//               await launchUrl(
+//                 uri,
+//                 mode: LaunchMode.externalApplication,
+//               );
+//             },
+//             child: Text("Заполнить заявку", style: Styles.button1),
+//             backgroundColor: widget.category == "Театр"
+//                 ? Palette.primaryLime
+//                 : Palette.primaryPink,
+//           ),
+//         ],
+//         const SizedBox(height: 24),
+//         Text("Тарифы", style: Styles.h3),
+//         const SizedBox(height: 16),
+//         LTTariff(
+//           title: "Местный",
+//           price: 7500,
+//           category: widget.category,
+//           description: "Стоимость тарифа включает один спектакль",
+//           bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
+//         ),
+//         const SizedBox(height: 8),
+//         LTTariff(
+//           title: "Самостоятельный",
+//           price: 15000,
+//           category: widget.category,
+//           description: "Стоимость тарифа включает один спектакль",
+//           bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
+//         ),
+//         const SizedBox(height: 8),
+//         LTTariff(
+//           title: "Всё включено",
+//           price: 26950,
+//           description: "Стоимость тарифа включает один спектакль",
+//           category: widget.category,
+//           bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
+//         ),
+//       ],
+//     );
+//   }
 }
 
 class LTTariff extends StatefulWidget {
@@ -683,6 +758,7 @@ class LTTariff extends StatefulWidget {
   final int price;
   final String description;
   final String category;
+  final VoidCallback onBuyPressed;
   final List<String> bonuses;
 
   final List<Widget> children;
@@ -696,6 +772,7 @@ class LTTariff extends StatefulWidget {
     required this.price,
     required this.description,
     required this.category,
+    required this.onBuyPressed,
     this.children = const [],
     this.bonuses = const [],
     this.initiallyExpanded = false,
@@ -789,14 +866,14 @@ class _LTTariffState extends State<LTTariff>
                     style: Styles.h2),
                 const SizedBox(height: 16),
                 LTButtons.elevatedButton(
-                    onPressed: () => context.push("${AppRoutes.order}/festival"),
+                    onPressed: widget.onBuyPressed,
                     child: Text("Купить", style: Styles.button1),
                     backgroundColor: widget.category == "Театр"
                         ? Palette.primaryLime
                         : Palette.primaryPink),
                 const SizedBox(height: 8),
                 LTButtons.elevatedButton(
-                    onPressed: () {},
+                    onPressed: widget.onBuyPressed,
                     child: Text("В рассрочку от 3 мес.",
                         style: Styles.button1.copyWith(color: Palette.black)),
                     backgroundColor: Palette.secondaryGray)

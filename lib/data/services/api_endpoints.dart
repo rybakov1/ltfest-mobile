@@ -13,11 +13,12 @@ abstract class ApiEndpoints {
   static const String productInStocks = '/api/product-in-stocks';
   static const String myCart = '/api/carts/me';
   static const String cartItems = '/api/cart-items';
-
   static const String activities = '/api/activities';
   static const String directions = '/api/directions';
   static const String ageCategory = '/api/age-categories';
   static const String festivals = '/api/festivals';
+  static const String festivalTariffs = '/api/festival-tariffs';
+
   static const String laboratories = '/api/laboratories';
   static const String upcomingEvents = '/api/upcoming-events';
   static const String news = '/api/news';
@@ -43,8 +44,13 @@ abstract class ApiEndpoints {
   static String storiesByDirection(String direction) =>
       '/api/stories?filters[direction][title][\$eq]=$direction';
 
+  static const String orders = '/api/orders';
+
   static const String paymentsInit = '/api/payments/init';
   static const String paymentsState = '/api/payments/state';
   static const String paymentsConfirm = '/api/payments/confirm';
+
+  static const String promoCodes = '/api/promocodes';
+
   static const String baseStrapiUrl = 'http://37.46.132.144:1337';
 }

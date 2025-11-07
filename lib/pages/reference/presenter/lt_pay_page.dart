@@ -12,14 +12,6 @@ class LtPayPage extends StatelessWidget {
       imageAsset: 'assets/images/lt_pay_full.png',
       shareLink: 'https://ltfest.ru',
       ctaLabel: 'Перейти в Telegram',
-      gradient: const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          Color(0xFFBCE69B),
-          Color(0xFF79B6FF),
-        ],
-      ),
       contentBlocks: [
         buildTextBlock(title: 'Добро пожаловать в LT Pay!', text: 'LT Pay — новый продукт от LT FEST, который позволяет оформить участие в наших проектах — фестивалях, конкурсах, лабораториях и других творческих программах — с оплатой в рассрочку напрямую, без банков, проверок и кредитов. \nВсё просто: выбери срок, подтверди заявку — и путь к событию открыт.\nПервый платёж — через месяц.\nЭто удобно, прозрачно и честно. Как и должно быть.'),
         const SizedBox(height: 2),

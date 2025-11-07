@@ -1,7 +1,9 @@
 class PaymentInitResponse {
   final bool success;
   final String? paymentUrl;
-  final String? paymentId;
+  final int? paymentId;
+  final String? orderId;
+  final int? amount;
   final String? message;
   final String? status;
   final String? errorCode;
@@ -10,32 +12,34 @@ class PaymentInitResponse {
     required this.success,
     this.paymentUrl,
     this.paymentId,
+    this.orderId,
+    this.amount,
     this.message,
     this.status,
     this.errorCode,
   });
 
   factory PaymentInitResponse.fromJson(Map<String, dynamic> json) {
-    // --- ДОБАВЛЯЕМ ЛОГ ЗДЕСЬ ---
-    print('--- PARSING PaymentInitResponse ---');
-    print('Received JSON: $json');
-    // --- КОНЕЦ ЛОГА ---
+    // Вспомогательная функция для безопасного парсинга в int
+    int? parseToInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value);
+      return null;
+    }
 
-    final response = PaymentInitResponse(
+    return PaymentInitResponse(
       success: json['Success'] ?? false,
       paymentUrl: json['PaymentURL'],
-      paymentId: json['PaymentId']?.toString(),
+      // ИСПОЛЬЗУЕМ БЕЗОПАСНЫЙ ПАРСИНГ
+      paymentId: parseToInt(json['PaymentId']),
+      orderId: json['OrderId']?.toString(), // OrderId лучше всегда хранить как String
+      // ИСПОЛЬЗУЕМ БЕЗОПАСНЫЙ ПАРСИНГ
+      amount: parseToInt(json['Amount']),
       message: json['Message'],
       status: json['Status'],
       errorCode: json['ErrorCode']?.toString(),
     );
-
-    // --- ДОБАВЛЯЕМ ЛОГ РЕЗУЛЬТАТА ---
-    print('Parsed paymentUrl: ${response.paymentUrl}');
-    print('--- PARSING FINISHED ---');
-    // --- КОНЕЦ ЛОГА ---
-
-    return response;
   }
 }
 

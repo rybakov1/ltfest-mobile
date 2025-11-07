@@ -1,56 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ltfest/components/lt_appbar.dart';
+import 'package:ltfest/constants.dart';
+import 'package:ltfest/pages/cart/provider/cart_provider.dart';
+import 'package:ltfest/pages/order/order_provider.dart';
 
-import '../../../components/lt_appbar.dart';
-import '../../../constants.dart';
-import '../../../data/models/festival_tariff.dart';
 import '../../../data/models/user.dart';
 import '../../../providers/user_provider.dart';
-import '../components/loyalty_promo_section.dart';
-import '../order_provider.dart';
 
-class FestivalOrderPage extends ConsumerStatefulWidget {
-  final FestivalTariff tariff;
-
-  const FestivalOrderPage({super.key, required this.tariff});
+class LtPriorityOrderPage extends ConsumerStatefulWidget {
+  const LtPriorityOrderPage({super.key});
 
   @override
-  ConsumerState<FestivalOrderPage> createState() => _FestivalOrderPageState();
+  ConsumerState<LtPriorityOrderPage> createState() =>
+      _LtPriorityOrderPageState();
 }
 
-class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
+class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
+  late final TextEditingController _passportController;
+
   late final TextEditingController _collectiveNameController;
-  late final TextEditingController _participantsNameController;
-  late final TextEditingController loyaltyCardController;
-  late final TextEditingController promocodeController;
+  late final TextEditingController _addressController;
+
+  late final TextEditingController _loyaltyCardController;
+  late final TextEditingController _promocodeController;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(orderProvider.notifier).startOrder(
-          type: OrderType.festival,
-          item: widget.tariff,
-        ));
+    ref.read(orderProvider.notifier).reset(OrderType.ltpriority);
     final state = ref.read(orderProvider);
-
     _nameController = TextEditingController(text: state.payerName);
     _emailController = TextEditingController(text: state.email);
     _phoneController = TextEditingController(text: state.phone);
     _collectiveNameController =
         TextEditingController(text: state.collectiveName);
-    _participantsNameController = TextEditingController();
-    loyaltyCardController = TextEditingController();
-    promocodeController = TextEditingController();
+    _addressController = TextEditingController(text: state.deliveryAddress);
+    _loyaltyCardController = TextEditingController();
+    _promocodeController = TextEditingController();
+    _passportController = TextEditingController();
   }
 
   @override
   void dispose() {
-    loyaltyCardController.dispose();
-    promocodeController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _collectiveNameController.dispose();
+    _addressController.dispose();
+    _passportController.dispose();
+    _loyaltyCardController.dispose();
+    _promocodeController.dispose();
     super.dispose();
   }
 
@@ -58,10 +62,8 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
   Widget build(BuildContext context) {
     final orderState = ref.watch(orderProvider);
     final orderNotifier = ref.read(orderProvider.notifier);
+    final totalPrice = ref.watch(cartTotalPriceProvider);
     final user = ref.watch(userProvider);
-
-    final baseTotal = ref.watch(orderBasePriceProvider); // <--- Начальная цена
-    final finalTotal = ref.watch(orderTotalPriceProvider); // <--- Итоговая цена со скидкой
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -74,7 +76,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      const LTAppBar(title: "Оплата участия"),
+                      const LTAppBar(title: "Оплата"),
                       Container(
                         decoration: Decor.base,
                         padding: const EdgeInsets.symmetric(
@@ -122,72 +124,45 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
+                              controller: _passportController,
+                              label: "Паспортные данные*",
+                              hint: "Серия, Номер и Дата выдачи",
+                              onChanged: orderNotifier.updatePayerName,
+                              validator: (val) =>
+                                  val!.isEmpty ? 'Обязательное поле' : null,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
                               controller: _collectiveNameController,
-                              label: "Название коллектива",
-                              hint: "Лопушки",
+                              label: "Название коллектива*",
+                              hint: "Введите название",
                               onChanged: orderNotifier.updateCollectiveName,
                               validator: (val) =>
                                   val!.isEmpty ? 'Обязательное поле' : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
-                              controller: _participantsNameController,
-                              label: "Имя участника*",
-                              hint: "Иван,",
-                              onChanged: orderNotifier.updateParticipantNames,
+                              controller: _nameController,
+                              label: "Город проживания*",
+                              hint: "Иванов Иван Иванович",
+                              onChanged: orderNotifier.updatePayerName,
                               validator: (val) =>
                                   val!.isEmpty ? 'Обязательное поле' : null,
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              "Если участников несколько, напишите имена через запятую",
-                              style: Styles.b3.copyWith(color: Palette.gray),
-                            )
+                            const SizedBox(height: 16),
+                            _buildDeliverySection(
+                                orderState, orderNotifier, _addressController),
                           ],
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Container(
-                        decoration: Decor.base,
-                        padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 20)
-                            .copyWith(top: 12),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Column(
-                          children: [
-                            _buildSeatsCounter(
-                              label: "Количество мест",
-                              count: orderState.seatCount,
-                              onIncrease: () => orderNotifier
-                                  .updateSeatCount(orderState.seatCount + 1),
-                              onDecrease: () {
-                                if (orderState.seatCount > 1) {
-                                  orderNotifier.updateSeatCount(
-                                      orderState.seatCount - 1);
-                                }
-                              },
-                            ),
-                            const SizedBox(height: 24),
-                            buildLoyaltyOrPromoSection(
-                              context,
-                              user!,
-                              ref,
-                              loyaltyCardController,
-                              promocodeController,
-                              cartTotal: baseTotal,
-                              finalTotal: finalTotal,
-                            ),
-                          ],
-                        ),
-                      ),
-                      // _buildLoyaltyOrPromoSection(
-                      //     user!, totalPrice, orderState, orderNotifier),
+                      _buildLoyaltyOrPromoSection(user!, totalPrice),
+                      const SizedBox(height: 2),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 2),
-              _buildSummarySection(finalTotal, orderNotifier),
+              _buildPayButton(totalPrice, orderState),
             ],
           ),
         ),
@@ -195,83 +170,20 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
     );
   }
 
-  Widget _buildSeatsCounter({
-    required String label,
-    required int count,
-    required VoidCallback onIncrease,
-    required VoidCallback onDecrease,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(label, style: Styles.h4),
-        const Spacer(),
-        IconButton(
-          icon: Icon(Icons.remove_circle, size: 32, color: Palette.primaryLime),
-          onPressed: onDecrease,
-        ),
-        const SizedBox(width: 10),
-        Text('$count', style: Styles.h4),
-        const SizedBox(width: 10),
-        IconButton(
-          icon: Icon(Icons.add_circle, size: 32, color: Palette.primaryLime),
-          onPressed: onIncrease,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummarySection(int totalPrice, OrderNotifier orderNotifier) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Palette.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-      ),
-      child: Column(
-        children: [
-          LTButtons.elevatedButton(
-            onPressed: () {
-              if (!_formKey.currentState!.validate()) {
-                return;
-              }
-              orderNotifier.placeOrderAndPay(context, totalPrice);
-            },
-            child: Text("Оплатить ${Utils.formatMoney(totalPrice)}",
-                style: Styles.button1),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoyaltyOrPromoSection(User user, int totalPrice,
-      OrderState orderState, OrderNotifier orderNotifier) {
+  Widget _buildLoyaltyOrPromoSection(User user, totalPrice) {
     return Container(
       decoration: Decor.base,
-      padding: const EdgeInsets.only(right: 12, left: 12, top: 12, bottom: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
       margin: const EdgeInsets.symmetric(horizontal: 4),
       child: Column(
         children: [
-          _buildSeatsCounter(
-            label: "Количество мест",
-            count: orderState.seatCount,
-            onIncrease: () =>
-                orderNotifier.updateSeatCount(orderState.seatCount + 1),
-            onDecrease: () {
-              if (orderState.seatCount > 1) {
-                orderNotifier.updateSeatCount(orderState.seatCount - 1);
-              }
-            },
-          ),
-          const SizedBox(height: 24),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               if (user.activity!.title == "Руководитель коллектива") ...[
                 Expanded(
                   child: _buildTextField(
-                    controller: loyaltyCardController,
+                    controller: _loyaltyCardController,
                     label: "Карта лояльности",
                     hint: "Введите номер карты",
                     onChanged: (val) {
@@ -282,7 +194,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
               ] else ...[
                 Expanded(
                   child: _buildTextField(
-                    controller: promocodeController,
+                    controller: _promocodeController,
                     label: "Промокод",
                     hint: "Введите промокод",
                     onChanged: (val) {
@@ -303,8 +215,11 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                     borderRadius: BorderRadius.circular(8),
                     color: Palette.stroke,
                   ),
-                  child: Icon(Icons.arrow_forward_outlined,
-                      color: Palette.white, size: 24),
+                  child: Icon(
+                    Icons.arrow_forward_outlined,
+                    color: Palette.white,
+                    size: 24,
+                  ),
                 ),
               )
             ],
@@ -337,6 +252,54 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCdekDelivery() {
+    final orderNotifier = ref.read(orderProvider.notifier);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Доставка CDEK", style: Styles.b2),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Palette.primaryLime.withValues(alpha: 0.1),
+            border: Border.all(color: Palette.primaryLime),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.info, color: Palette.primaryLime),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  "Стоимость доставки оплачивается отдельно во время получения.",
+                  style: Styles.b2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildTextField(
+          controller: _addressController,
+          label: 'Адрес пункта выдачи CDEK*',
+          hint: 'Введите ближайший к вам адрес',
+          onChanged: orderNotifier.updateDeliveryAddress,
+          validator: (val) => val!.isEmpty ? 'Укажите адрес' : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDeliverySection(OrderState orderState,
+      OrderNotifier orderNotifier, TextEditingController addressController) {
+    return Container(
+      decoration: Decor.base,
+      child: _buildCdekDelivery(),
     );
   }
 
@@ -381,6 +344,29 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPayButton(int totalPrice, OrderState orderState) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Palette.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      child: LTButtons.elevatedButton(
+        onPressed: () {
+          if (!_formKey.currentState!.validate()) return;
+          if (orderState.deliveryMethod == DeliveryMethod.onFestival &&
+              orderState.selectedFestival == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Выберите фестиваль')));
+            return;
+          }
+          ref.read(orderProvider.notifier).placeOrderAndPay(context, totalPrice);
+        },
+        child: Text("Оплатить", style: Styles.button1),
+      ),
     );
   }
 }
