@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants.dart';
 import '../../../data/models/user.dart';
 import '../../../providers/promocode_provider.dart';
+import 'custom_text_fields.dart';
 
 Widget buildLoyaltyOrPromoSection(
     BuildContext context,
@@ -128,50 +129,6 @@ Widget buildLoyaltyOrPromoSection(
           Text("Итого:", style: Styles.h4),
           Text(Utils.formatMoney(finalTotal), style: Styles.h3),
         ],
-      ),
-    ],
-  );
-}
-
-Widget buildTextField({
-  required TextEditingController controller,
-  required String label,
-  required String hint,
-  required ValueChanged<String> onChanged,
-  TextInputType? keyboardType,
-  String? Function(String?)? validator,
-}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(label, style: Styles.b3),
-      const SizedBox(height: 6),
-      TextFormField(
-        controller: controller,
-        onChanged: onChanged,
-        keyboardType: keyboardType,
-        validator: validator,
-        style: Styles.b2,
-        decoration: InputDecoration(
-          hintText: hint,
-          constraints: const BoxConstraints(maxHeight: 43),
-          hintStyle: Styles.b2.copyWith(color: Palette.gray),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-          filled: true,
-          fillColor: Palette.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Palette.stroke, width: 1),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Palette.stroke, width: 1),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Palette.primaryLime, width: 1),
-          ),
-        ),
       ),
     ],
   );
