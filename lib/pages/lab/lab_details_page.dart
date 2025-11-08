@@ -365,7 +365,15 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                 left: 16,
               ),
               child: LTButtons.elevatedButton(
-                onPressed: () => context.push("${AppRoutes.order}/laboratory"),
+                onPressed: () {
+                  final selectedIndex = ref.read(learningTypeIndexProvider);
+                  final laboratory = laboratoryAsync.value;
+
+                  if (laboratory != null && laboratory.learningTypes != null && laboratory.learningTypes!.isNotEmpty) {
+                    final selectedLearningType = laboratory.learningTypes![selectedIndex];
+                    context.push(AppRoutes.laboratoryOrder, extra: selectedLearningType);
+                  }
+                },
                 child: Text("Оплатить", style: Styles.button1),
               ),
             ),

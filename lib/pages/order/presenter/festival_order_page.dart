@@ -60,8 +60,8 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
     final orderNotifier = ref.read(orderProvider.notifier);
     final user = ref.watch(userProvider);
 
-    final baseTotal = ref.watch(orderBasePriceProvider); // <--- Начальная цена
-    final finalTotal = ref.watch(orderTotalPriceProvider); // <--- Итоговая цена со скидкой
+    final baseTotal = ref.watch(orderBasePriceProvider);
+    final finalTotal = ref.watch(orderTotalPriceProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -171,6 +171,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                             buildLoyaltyOrPromoSection(
                               context,
                               user!,
+                              'Тариф "${widget.tariff.title}"',
                               ref,
                               loyaltyCardController,
                               promocodeController,
@@ -180,8 +181,6 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                           ],
                         ),
                       ),
-                      // _buildLoyaltyOrPromoSection(
-                      //     user!, totalPrice, orderState, orderNotifier),
                     ],
                   ),
                 ),
@@ -239,101 +238,6 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
             },
             child: Text("Оплатить ${Utils.formatMoney(totalPrice)}",
                 style: Styles.button1),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoyaltyOrPromoSection(User user, int totalPrice,
-      OrderState orderState, OrderNotifier orderNotifier) {
-    return Container(
-      decoration: Decor.base,
-      padding: const EdgeInsets.only(right: 12, left: 12, top: 12, bottom: 20),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: Column(
-        children: [
-          _buildSeatsCounter(
-            label: "Количество мест",
-            count: orderState.seatCount,
-            onIncrease: () =>
-                orderNotifier.updateSeatCount(orderState.seatCount + 1),
-            onDecrease: () {
-              if (orderState.seatCount > 1) {
-                orderNotifier.updateSeatCount(orderState.seatCount - 1);
-              }
-            },
-          ),
-          const SizedBox(height: 24),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (user.activity!.title == "Руководитель коллектива") ...[
-                Expanded(
-                  child: _buildTextField(
-                    controller: loyaltyCardController,
-                    label: "Карта лояльности",
-                    hint: "Введите номер карты",
-                    onChanged: (val) {
-                      // TODO: обработка промокода — пока не реализована
-                    },
-                  ),
-                ),
-              ] else ...[
-                Expanded(
-                  child: _buildTextField(
-                    controller: promocodeController,
-                    label: "Промокод",
-                    hint: "Введите промокод",
-                    onChanged: (val) {
-                      // TODO: обработка промокода — пока не реализована
-                    },
-                  ),
-                ),
-              ],
-              const SizedBox(width: 8),
-              InkWell(
-                onTap: () {
-                  // TODO: применить промокод/карту
-                },
-                child: Container(
-                  width: 43,
-                  height: 43,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Palette.stroke,
-                  ),
-                  child: Icon(Icons.arrow_forward_outlined,
-                      color: Palette.white, size: 24),
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Стоимость заказа", style: Styles.b2),
-              Text(Utils.formatMoney(totalPrice), style: Styles.h4),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Скидка",
-                  style: Styles.b2.copyWith(color: Palette.secondary)),
-              Text(Utils.formatMoney(0), style: Styles.h4),
-              // пока без скидки
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Итого:", style: Styles.h4),
-              Text(Utils.formatMoney(totalPrice), style: Styles.h3),
-            ],
           ),
         ],
       ),

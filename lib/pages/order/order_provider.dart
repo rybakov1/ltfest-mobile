@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/data/models/festival.dart';
+import 'package:ltfest/data/models/laboratory_learning_type.dart';
 import 'package:ltfest/data/services/api_exception.dart';
 import 'package:ltfest/data/services/api_service.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
@@ -111,10 +112,13 @@ final orderBasePriceProvider = Provider<int>((ref) {
       }
       break;
     case OrderType.laboratory:
-    // Логика для лаборатории
+      if (orderState.payableItem is LearningType) {
+        final learningType = orderState.payableItem as LearningType;
+        basePrice = learningType.price.toInt() * orderState.seatCount;
+      }
       break;
     case OrderType.ltpriority:
-    // Логика для карты лояльности
+      // Логика для карты лояльности
       break;
   }
   return basePrice;
@@ -237,7 +241,6 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
       final Map<String, dynamic> details = {};
 
-
       switch (state.orderType) {
         case OrderType.products:
           details['collectiveName'] = state.collectiveName;
@@ -250,7 +253,13 @@ class OrderNotifier extends StateNotifier<OrderState> {
           details['seatCount'] = state.seatCount;
           break;
         case OrderType.laboratory:
-          throw UnimplementedError();
+          if (state.payableItem is LearningType) {
+            final learningType = state.payableItem as LearningType;
+            details['learningId'] = learningType.id;
+            details['learningType'] = learningType.type;
+            details['seatCount'] = state.seatCount;
+          }
+          break;
         case OrderType.ltpriority:
           throw UnimplementedError();
       }
@@ -266,7 +275,8 @@ class OrderNotifier extends StateNotifier<OrderState> {
         'type': _mapOrderTypeToStrapi(state.orderType),
         'details': details,
         'users_permissions_user': user?.id,
-        'festival': state.selectedFestival?.id,
+        'festival_tariff': state.payableItem is FestivalTariff ? state.payableItem?.id : null,
+        'laboratory_learning_type': state.payableItem is LearningType ? state.payableItem?.id : null,
       };
 
       orderData.removeWhere((key, value) => value == null);
@@ -275,7 +285,8 @@ class OrderNotifier extends StateNotifier<OrderState> {
         orderData: orderData,
         paymentData: {
           'amount': totalAmount,
-          'description': 'Оплата заказа от ${state.payerName}',
+          'description':
+              'Оплата заказа от ${state.payerName} с мобильного приложения',
           'successUrl': 'ltfestapp://payment/success/{PaymentId}',
           'failUrl': 'ltfestapp://payment/fail/{PaymentId}',
         },

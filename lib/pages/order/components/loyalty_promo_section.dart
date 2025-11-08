@@ -4,12 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants.dart';
 import '../../../data/models/user.dart';
 import '../../../providers/promocode_provider.dart';
-import '../../cart/provider/cart_provider.dart';
-import '../order_provider.dart';
 
 Widget buildLoyaltyOrPromoSection(
     BuildContext context,
     User user,
+    String? type,
     WidgetRef ref,
     TextEditingController loyaltyCardController,
     TextEditingController promocodeController, {
@@ -104,7 +103,7 @@ Widget buildLoyaltyOrPromoSection(
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("Стоимость заказа", style: Styles.b2),
+          Text(type ?? "Стоимость заказа", style: Styles.b2),
           Text(Utils.formatMoney(cartTotal), style: Styles.h4),
         ],
       ),

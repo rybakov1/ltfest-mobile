@@ -182,6 +182,7 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
                         child: buildLoyaltyOrPromoSection(
                           context,
                           user!,
+                          null,
                           ref,
                           loyaltyCardController,
                           promocodeController,

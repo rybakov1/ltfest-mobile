@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ltfest/data/models/laboratory_learning_type.dart';
 import 'package:ltfest/pages/more/about_app_page.dart';
 import 'package:ltfest/pages/more/account_settings_page.dart';
 import 'package:ltfest/pages/more/app_settings_page.dart';
@@ -298,10 +299,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/order/laboratory',
-        pageBuilder: (context, state) => const NoTransitionPage(
-          child: LaboratoryOrderPage(),
-        ),
+        path: AppRoutes.laboratoryOrder,
+        pageBuilder: (context, state) {
+          final learningType = state.extra as LearningType;
+          return NoTransitionPage(child: LaboratoryOrderPage(learningType: learningType));
+        },
       ),
       GoRoute(
         path: '/order/products',
