@@ -9,7 +9,7 @@ Widget buildTextField({
   required ValueChanged<String> onChanged,
   Function? func,
   TextInputType? keyboardType,
-  bool isInvalid = false, // Новый параметр
+  bool isInvalid = false,
 }) {
   final borderColor = isInvalid ? Palette.error : Palette.stroke;
   final focusedBorderColor = isInvalid ? Palette.error : Palette.primaryLime;
@@ -22,11 +22,12 @@ Widget buildTextField({
       TextFormField(
         controller: controller,
         onChanged: (value) {
-          func; // Сброс ошибок при вводе
+          if (func != null) {
+            func();
+          }
           onChanged(value);
         },
         keyboardType: keyboardType,
-        // validator убран
         style: Styles.b2,
         decoration: InputDecoration(
           hintText: hint,

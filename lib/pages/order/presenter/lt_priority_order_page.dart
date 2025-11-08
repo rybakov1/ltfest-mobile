@@ -7,7 +7,42 @@ import 'package:ltfest/pages/order/order_provider.dart';
 
 import '../../../data/models/user.dart';
 import '../../../providers/user_provider.dart';
+import '../components/custom_text_fields.dart';
 import '../components/loyalty_promo_section.dart';
+
+@immutable
+class LtPriorityFormValidationState {
+  final bool isNameInvalid;
+  final bool isEmailInvalid;
+  final bool isPhoneInvalid;
+  final bool isPassportInvalid;
+  final bool isCollectiveNameInvalid;
+  final bool isCityInvalid;
+  final bool isAddressInvalid;
+
+  const LtPriorityFormValidationState({
+    this.isNameInvalid = false,
+    this.isEmailInvalid = false,
+    this.isPhoneInvalid = false,
+    this.isPassportInvalid = false,
+    this.isCollectiveNameInvalid = false,
+    this.isCityInvalid = false,
+    this.isAddressInvalid = false,
+  });
+
+  bool get hasErrors =>
+      isNameInvalid ||
+      isEmailInvalid ||
+      isPhoneInvalid ||
+      isPassportInvalid ||
+      isCollectiveNameInvalid ||
+      isCityInvalid ||
+      isAddressInvalid;
+}
+
+final ltPriorityFormValidationProvider =
+    StateProvider<LtPriorityFormValidationState>(
+        (ref) => const LtPriorityFormValidationState());
 
 class LtPriorityOrderPage extends ConsumerStatefulWidget {
   final PriorityTariff tariff;
@@ -20,7 +55,6 @@ class LtPriorityOrderPage extends ConsumerStatefulWidget {
 }
 
 class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
-  final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
@@ -48,7 +82,8 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
     _phoneController = TextEditingController(text: state.phone);
     _cityController = TextEditingController(text: user!.residence!);
 
-    _collectiveNameController = TextEditingController(text: state.collectiveName);
+    _collectiveNameController =
+        TextEditingController(text: state.collectiveName);
     _addressController = TextEditingController(text: state.deliveryAddress);
     _passportController = TextEditingController();
 
@@ -70,136 +105,163 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
     super.dispose();
   }
 
+  bool _validateForm() {
+    final validationNotifier =
+        ref.read(ltPriorityFormValidationProvider.notifier);
+
+    final newState = LtPriorityFormValidationState(
+      isNameInvalid: _nameController.text.isEmpty,
+      isEmailInvalid: _emailController.text.isEmpty,
+      isPhoneInvalid: _phoneController.text.isEmpty,
+      isPassportInvalid: _passportController.text.isEmpty,
+      isCollectiveNameInvalid: _collectiveNameController.text.isEmpty,
+      isCityInvalid: _cityController.text.isEmpty,
+      isAddressInvalid: _addressController.text.isEmpty,
+    );
+    validationNotifier.state = newState;
+    return !newState.hasErrors;
+  }
+
+  void _resetValidationState() {
+    if (ref.read(ltPriorityFormValidationProvider).hasErrors) {
+      ref.read(ltPriorityFormValidationProvider.notifier).state =
+          const LtPriorityFormValidationState();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final orderState = ref.watch(orderProvider);
     final orderNotifier = ref.read(orderProvider.notifier);
     final user = ref.watch(userProvider);
+    final validationState = ref.watch(ltPriorityFormValidationProvider);
 
     final baseTotal = ref.watch(orderBasePriceProvider);
     final finalTotal = ref.watch(orderTotalPriceProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
-      body: Form(
-        key: _formKey,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const LTAppBar(title: "Оплата"),
-                      Container(
-                        decoration: Decor.base,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 20),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Column(
-                          children: [
-                            _buildTextField(
-                              controller: _nameController,
-                              label: "Имя плательщика*",
-                              hint: "Иванов Иван Иванович",
-                              onChanged: orderNotifier.updatePayerName,
-                              validator: (val) =>
-                                  val!.isEmpty ? 'Обязательное поле' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: _emailController,
-                                    label: "Email*",
-                                    hint: "example@mail.com",
-                                    onChanged: orderNotifier.updateEmail,
-                                    keyboardType: TextInputType.emailAddress,
-                                    validator: (val) => val!.isEmpty
-                                        ? 'Обязательное поле'
-                                        : null,
-                                  ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const LTAppBar(title: "Оплата"),
+                    Container(
+                      decoration: Decor.base,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Column(
+                        children: [
+                          buildTextField(
+                            controller: _nameController,
+                            label: "Имя плательщика*",
+                            hint: "Иванов Иван Иванович",
+                            onChanged: orderNotifier.updatePayerName,
+                            func: _resetValidationState,
+                            isInvalid: validationState.isNameInvalid,
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: buildTextField(
+                                  controller: _emailController,
+                                  label: "Email*",
+                                  hint: "example@mail.com",
+                                  onChanged: orderNotifier.updateEmail,
+                                  keyboardType: TextInputType.emailAddress,
+                                  func: _resetValidationState,
+                                  isInvalid: validationState.isEmailInvalid,
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: _phoneController,
-                                    label: "Номер телефона*",
-                                    hint: "+7 (999) 999-99-99",
-                                    onChanged: orderNotifier.updatePhone,
-                                    keyboardType: TextInputType.phone,
-                                    validator: (val) => val!.isEmpty
-                                        ? 'Обязательное поле'
-                                        : null,
-                                  ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: buildTextField(
+                                  controller: _phoneController,
+                                  label: "Номер телефона*",
+                                  hint: "+7 (999) 999-99-99",
+                                  onChanged: orderNotifier.updatePhone,
+                                  keyboardType: TextInputType.phone,
+                                  func: _resetValidationState,
+                                  isInvalid: validationState.isPhoneInvalid,
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            controller: _passportController,
+                            label: "Паспортные данные*",
+                            hint: "Серия, Номер и Дата выдачи",
+                            func: _resetValidationState,
+                            onChanged: orderNotifier.updatePassport,
+                            isInvalid: validationState.isPassportInvalid,
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            controller: _collectiveNameController,
+                            label: "Название коллектива*",
+                            hint: "Введите название",
+                            onChanged: orderNotifier.updateCollectiveName,
+                            func: _resetValidationState,
+                            isInvalid: validationState.isCollectiveNameInvalid,
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            controller: _cityController,
+                            label: "Город проживания*",
+                            hint: "Иванов Иван Иванович",
+                            onChanged: orderNotifier.updateResidence,
+                            func: _resetValidationState,
+                            isInvalid: validationState.isCityInvalid,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildDeliverySection(
+                              validationState.isAddressInvalid),
+                          if (validationState.hasErrors)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 32),
+                              child: Text(
+                                "Заполните все обязательные поля",
+                                style: Styles.b2.copyWith(color: Palette.error),
+                              ),
                             ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              controller: _passportController,
-                              label: "Паспортные данные*",
-                              hint: "Серия, Номер и Дата выдачи",
-                              onChanged: orderNotifier.updatePassport,
-                              validator: (val) =>
-                                  val!.isEmpty ? 'Обязательное поле' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              controller: _collectiveNameController,
-                              label: "Название коллектива*",
-                              hint: "Введите название",
-                              onChanged: orderNotifier.updateCollectiveName,
-                              validator: (val) =>
-                                  val!.isEmpty ? 'Обязательное поле' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              controller: _cityController,
-                              label: "Город проживания*",
-                              hint: "Иванов Иван Иванович",
-                              onChanged: orderNotifier.updateResidence,
-                              validator: (val) =>
-                                  val!.isEmpty ? 'Обязательное поле' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildDeliverySection(
-                                orderState, orderNotifier, _addressController),
-                          ],
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Container(
-                        decoration: Decor.base,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 20),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: buildLoyaltyOrPromoSection(
-                          context,
-                          user!,
-                          widget.tariff.title,
-                          ref,
-                          _loyaltyCardController,
-                          _promocodeController,
-                          cartTotal: baseTotal,
-                          finalTotal: finalTotal,
-                        ),
+                    ),
+                    const SizedBox(height: 2),
+                    Container(
+                      decoration: Decor.base,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      child: buildLoyaltyOrPromoSection(
+                        context,
+                        user!,
+                        widget.tariff.title,
+                        ref,
+                        _loyaltyCardController,
+                        _promocodeController,
+                        cartTotal: baseTotal,
+                        finalTotal: finalTotal,
                       ),
-                      const SizedBox(height: 2),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 2),
+                  ],
                 ),
               ),
-              _buildPayButton(finalTotal, orderState),
-            ],
-          ),
+            ),
+            _buildPayButton(finalTotal),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCdekDelivery() {
+  Widget _buildCdekDelivery(bool isInvalid) {
     final orderNotifier = ref.read(orderProvider.notifier);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,70 +290,25 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
           ),
         ),
         const SizedBox(height: 16),
-        _buildTextField(
+        buildTextField(
           controller: _addressController,
           label: 'Адрес пункта выдачи CDEK*',
           hint: 'Введите ближайший к вам адрес',
           onChanged: orderNotifier.updateDeliveryAddress,
-          validator: (val) => val!.isEmpty ? 'Укажите адрес' : null,
+          isInvalid: isInvalid,
         ),
       ],
     );
   }
 
-  Widget _buildDeliverySection(OrderState orderState,
-      OrderNotifier orderNotifier, TextEditingController addressController) {
+  Widget _buildDeliverySection(bool isAddressInvalid) {
     return Container(
       decoration: Decor.base,
-      child: _buildCdekDelivery(),
+      child: _buildCdekDelivery(isAddressInvalid),
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required ValueChanged<String> onChanged,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: Styles.b3),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: controller,
-          onChanged: onChanged,
-          keyboardType: keyboardType,
-          validator: validator,
-          style: Styles.b2,
-          decoration: InputDecoration(
-            hintText: hint,
-            constraints: const BoxConstraints(maxHeight: 43),
-            hintStyle: Styles.b2.copyWith(color: Palette.gray),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            filled: true,
-            fillColor: Palette.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Palette.stroke, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Palette.stroke, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Palette.primaryLime, width: 1),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPayButton(int totalPrice, OrderState orderState) {
+  Widget _buildPayButton(int totalPrice) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -300,7 +317,7 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
       ),
       child: LTButtons.elevatedButton(
         onPressed: () {
-          if (!_formKey.currentState!.validate()) return;
+          if (!_validateForm()) return; // Используем новый метод валидации
           ref
               .read(orderProvider.notifier)
               .placeOrderAndPay(context, totalPrice);

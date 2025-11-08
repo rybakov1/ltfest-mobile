@@ -3,14 +3,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/festival.dart';
-import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/pages/order/order_provider.dart';
-import 'package:ltfest/providers/promocode_provider.dart';
 
 import '../../../components/modal.dart';
-import '../../../data/models/user.dart';
 import '../../../providers/user_provider.dart';
+import '../components/custom_text_fields.dart';
 import '../components/loyalty_promo_section.dart';
+
+@immutable
+class ProductFormValidationState {
+  final bool isNameInvalid;
+  final bool isEmailInvalid;
+  final bool isPhoneInvalid;
+  final bool isCollectiveNameInvalid;
+  final bool isAddressInvalid;
+  final bool isFestivalInvalid;
+
+  const ProductFormValidationState({
+    this.isNameInvalid = false,
+    this.isEmailInvalid = false,
+    this.isPhoneInvalid = false,
+    this.isCollectiveNameInvalid = false,
+    this.isAddressInvalid = false,
+    this.isFestivalInvalid = false,
+  });
+
+  bool get hasErrors =>
+      isNameInvalid ||
+      isEmailInvalid ||
+      isPhoneInvalid ||
+      isCollectiveNameInvalid ||
+      isAddressInvalid ||
+      isFestivalInvalid;
+}
+
+final productFormValidationProvider = StateProvider<ProductFormValidationState>(
+    (ref) => const ProductFormValidationState());
 
 class ProductOrderPage extends ConsumerStatefulWidget {
   const ProductOrderPage({super.key});
@@ -20,7 +48,6 @@ class ProductOrderPage extends ConsumerStatefulWidget {
 }
 
 class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
-  final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
@@ -84,11 +111,41 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
     );
   }
 
+  bool _validateForm() {
+    final orderState = ref.read(orderProvider);
+    final validationNotifier = ref.read(productFormValidationProvider.notifier);
+
+    final newState = ProductFormValidationState(
+      isNameInvalid: _nameController.text.isEmpty,
+      isEmailInvalid: _emailController.text.isEmpty,
+      isPhoneInvalid: _phoneController.text.isEmpty,
+      isCollectiveNameInvalid: _collectiveNameController.text.isEmpty,
+      // Адрес обязателен, только если выбран CDEK
+      isAddressInvalid: orderState.deliveryMethod == DeliveryMethod.cdek &&
+          _addressController.text.isEmpty,
+      // Фестиваль обязателен, только если выбран самовывоз
+      isFestivalInvalid:
+          orderState.deliveryMethod == DeliveryMethod.onFestival &&
+              orderState.selectedFestival == null,
+    );
+
+    validationNotifier.state = newState;
+    return !newState.hasErrors;
+  }
+
+  void _resetValidationState() {
+    if (ref.read(productFormValidationProvider).hasErrors) {
+      ref.read(productFormValidationProvider.notifier).state =
+          const ProductFormValidationState();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final orderState = ref.watch(orderProvider);
     final orderNotifier = ref.read(orderProvider.notifier);
     final user = ref.watch(userProvider);
+    final validationState = ref.watch(productFormValidationProvider);
 
     ref.listen<OrderState>(orderProvider, (previous, next) {
       if (previous?.payerName != next.payerName)
@@ -100,110 +157,115 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
     });
 
     final baseTotal = ref.watch(orderBasePriceProvider); // <--- Начальная цена
-    final finalTotal = ref.watch(orderTotalPriceProvider); // <--- Итоговая цена со скидкой
+    final finalTotal =
+        ref.watch(orderTotalPriceProvider); // <--- Итоговая цена со скидкой
 
     return Scaffold(
       backgroundColor: Palette.background,
-      body: Form(
-        key: _formKey,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const LTAppBar(title: "Оплата"),
-                      Container(
-                        decoration: Decor.base,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 20),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Column(
-                          children: [
-                            _buildTextField(
-                              controller: _nameController,
-                              label: "Имя плательщика*",
-                              hint: "Иванов Иван Иванович",
-                              onChanged: orderNotifier.updatePayerName,
-                              validator: (val) =>
-                                  val!.isEmpty ? 'Обязательное поле' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: _emailController,
-                                    label: "Email*",
-                                    hint: "example@mail.com",
-                                    onChanged: orderNotifier.updateEmail,
-                                    keyboardType: TextInputType.emailAddress,
-                                    validator: (val) => val!.isEmpty
-                                        ? 'Обязательное поле'
-                                        : null,
-                                  ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const LTAppBar(title: "Оплата"),
+                    Container(
+                      decoration: Decor.base,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Column(
+                        children: [
+                          buildTextField(
+                            controller: _nameController,
+                            label: "Имя плательщика*",
+                            hint: "Иванов Иван Иванович",
+                            onChanged: orderNotifier.updatePayerName,
+                            isInvalid: validationState.isNameInvalid,
+                            func: _resetValidationState,
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: buildTextField(
+                                  controller: _emailController,
+                                  label: "Email*",
+                                  hint: "example@mail.com",
+                                  onChanged: orderNotifier.updateEmail,
+                                  keyboardType: TextInputType.emailAddress,
+                                  isInvalid: validationState.isEmailInvalid,
+                                  func: _resetValidationState,
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: _phoneController,
-                                    label: "Номер телефона*",
-                                    hint: "+7 (999) 999-99-99",
-                                    onChanged: orderNotifier.updatePhone,
-                                    keyboardType: TextInputType.phone,
-                                    validator: (val) => val!.isEmpty
-                                        ? 'Обязательное поле'
-                                        : null,
-                                  ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: buildTextField(
+                                  controller: _phoneController,
+                                  label: "Номер телефона*",
+                                  hint: "+7 (999) 999-99-99",
+                                  onChanged: orderNotifier.updatePhone,
+                                  keyboardType: TextInputType.phone,
+                                  isInvalid: validationState.isPhoneInvalid,
+                                  func: _resetValidationState,
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            controller: _collectiveNameController,
+                            label: "Название коллектива*",
+                            hint: "Введите название",
+                            onChanged: orderNotifier.updateCollectiveName,
+                            isInvalid: validationState.isCollectiveNameInvalid,
+                            func: _resetValidationState,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildDeliverySection(
+                              orderState, orderNotifier, validationState),
+                          if (validationState.hasErrors)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 32),
+                              child: Text(
+                                "Заполните все обязательные поля",
+                                style: Styles.b2.copyWith(color: Palette.error),
+                              ),
                             ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              controller: _collectiveNameController,
-                              label: "Название коллектива*",
-                              hint: "Введите название",
-                              onChanged: orderNotifier.updateCollectiveName,
-                              validator: (val) =>
-                                  val!.isEmpty ? 'Обязательное поле' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildDeliverySection(
-                                orderState, orderNotifier, _addressController),
-                          ],
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Container(
-                        decoration: Decor.base,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: buildLoyaltyOrPromoSection(
-                          context,
-                          user!,
-                          null,
-                          ref,
-                          loyaltyCardController,
-                          promocodeController,
-                          cartTotal: baseTotal,
-                          finalTotal: finalTotal,
-                        ),
+                    ),
+                    const SizedBox(height: 2),
+                    Container(
+                      decoration: Decor.base,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      child: buildLoyaltyOrPromoSection(
+                        context,
+                        user!,
+                        null,
+                        ref,
+                        loyaltyCardController,
+                        promocodeController,
+                        cartTotal: baseTotal,
+                        finalTotal: finalTotal,
                       ),
-                      const SizedBox(height: 2),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 2),
+                  ],
                 ),
               ),
-              _buildPayButton(orderState),
-            ],
-          ),
+            ),
+            _buildPayButton(orderState, finalTotal),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCdekDelivery() {
+  Widget _buildCdekDelivery(bool isInvalid) {
     final orderNotifier = ref.read(orderProvider.notifier);
     return Column(
       children: [
@@ -229,19 +291,20 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
           ),
         ),
         const SizedBox(height: 16),
-        _buildTextField(
+        buildTextField(
           controller: _addressController,
           label: 'Адрес пункта выдачи CDEK*',
           hint: 'Введите ближайший к вам адрес',
           onChanged: orderNotifier.updateDeliveryAddress,
-          validator: (val) => val!.isEmpty ? 'Укажите адрес' : null,
+          isInvalid: isInvalid,
+          func: _resetValidationState,
         ),
       ],
     );
   }
 
   Widget _buildDeliverySection(OrderState orderState,
-      OrderNotifier orderNotifier, TextEditingController addressController) {
+      OrderNotifier orderNotifier, ProductFormValidationState validationState) {
     return Container(
       decoration: Decor.base,
       child: Column(
@@ -263,29 +326,34 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
           ),
           const SizedBox(height: 16),
           if (orderState.deliveryMethod == DeliveryMethod.onFestival)
-            _buildFestivalPicker(orderState, orderNotifier),
+            _buildFestivalPicker(
+                orderState, orderNotifier, validationState.isFestivalInvalid),
           if (orderState.deliveryMethod == DeliveryMethod.cdek)
-            _buildCdekDelivery()
+            _buildCdekDelivery(validationState.isAddressInvalid)
         ],
       ),
     );
   }
 
   Widget _buildFestivalPicker(
-      OrderState orderState, OrderNotifier orderNotifier) {
+      OrderState orderState, OrderNotifier orderNotifier, bool isInvalid) {
+    final borderColor = isInvalid ? Palette.error : Palette.stroke;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Выбор фестиваля*", style: Styles.b3),
         const SizedBox(height: 6),
         InkWell(
-          onTap: () => _showFestivalSelection(context, orderNotifier),
+          onTap: () {
+            _resetValidationState();
+            _showFestivalSelection(context, orderNotifier);
+          },
           child: Container(
             height: 43,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Palette.white,
-              border: Border.all(color: Palette.stroke),
+              border: Border.all(color: borderColor), // Используем цвет ошибки
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -309,53 +377,7 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required ValueChanged<String> onChanged,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: Styles.b3),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: controller,
-          onChanged: onChanged,
-          keyboardType: keyboardType,
-          validator: validator,
-          style: Styles.b2,
-          decoration: InputDecoration(
-            hintText: hint,
-            constraints: const BoxConstraints(maxHeight: 43),
-            hintStyle: Styles.b2.copyWith(color: Palette.gray),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            filled: true,
-            fillColor: Palette.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Palette.stroke, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Palette.stroke, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Palette.primaryLime, width: 1),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPayButton(OrderState orderState) {
-    final finalTotal = ref.watch(orderTotalPriceProvider);
-
+  Widget _buildPayButton(OrderState orderState, int finalTotal) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -363,22 +385,14 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       ),
       child: LTButtons.elevatedButton(
-        // Блокируем кнопку, если идет загрузка
         onPressed: orderState.isLoading
             ? null
             : () {
-                if (!_formKey.currentState!.validate()) return;
-                if (orderState.deliveryMethod == DeliveryMethod.onFestival &&
-                    orderState.selectedFestival == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Выберите фестиваль')));
-                  return;
-                }
+                if (!_validateForm()) return; // Используем новый метод
                 ref
                     .read(orderProvider.notifier)
                     .placeOrderAndPay(context, finalTotal);
               },
-        // Показываем индикатор загрузки
         child: orderState.isLoading
             ? const SizedBox(
                 height: 24,

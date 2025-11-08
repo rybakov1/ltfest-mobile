@@ -15,20 +15,30 @@ class LaboratoryFormValidationState {
   final bool isNameInvalid;
   final bool isEmailInvalid;
   final bool isPhoneInvalid;
+  final bool isBirthdateInvalid;
+  final bool isCollectiveNameInvalid;
   final bool isEducationInvalid;
 
   const LaboratoryFormValidationState({
     this.isNameInvalid = false,
     this.isEmailInvalid = false,
     this.isPhoneInvalid = false,
+    this.isCollectiveNameInvalid = false,
+    this.isBirthdateInvalid = false,
     this.isEducationInvalid = false,
   });
 
   bool get hasErrors =>
-      isNameInvalid || isEmailInvalid || isPhoneInvalid || isEducationInvalid;
+      isNameInvalid ||
+      isEmailInvalid ||
+      isPhoneInvalid ||
+      isCollectiveNameInvalid ||
+      isEducationInvalid ||
+      isBirthdateInvalid;
 }
 
-final laboratoryFormValidationProvider = StateProvider<LaboratoryFormValidationState>(
+final laboratoryFormValidationProvider =
+    StateProvider<LaboratoryFormValidationState>(
         (ref) => const LaboratoryFormValidationState());
 
 class LaboratoryOrderPage extends ConsumerStatefulWidget {
@@ -101,13 +111,15 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
 
   bool _validateForm() {
     final validationStateNotifier =
-    ref.read(laboratoryFormValidationProvider.notifier);
+        ref.read(laboratoryFormValidationProvider.notifier);
 
     final newState = LaboratoryFormValidationState(
       isNameInvalid: _nameController.text.isEmpty,
       isEmailInvalid: _emailController.text.isEmpty,
       isPhoneInvalid: _phoneController.text.isEmpty,
       isEducationInvalid: _educationController.text.isEmpty,
+      isBirthdateInvalid: _birthDateController.text.isEmpty,
+      isCollectiveNameInvalid: _collectiveNameController.text.isEmpty,
     );
 
     validationStateNotifier.state = newState;
@@ -117,7 +129,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
   void _resetValidationState() {
     if (ref.read(laboratoryFormValidationProvider).hasErrors) {
       ref.read(laboratoryFormValidationProvider.notifier).state =
-      const LaboratoryFormValidationState();
+          const LaboratoryFormValidationState();
     }
   }
 
@@ -192,7 +204,8 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                             label: "Дата рождения*",
                             hint: "дд.мм.гггг",
                             func: _resetValidationState,
-                            onChanged: (_) {}, // TODO: сохранить в state
+                            onChanged: (_) {},
+                            // TODO: сохранить в state
                             isInvalid: validationState.isPhoneInvalid,
                           ),
                           const SizedBox(height: 16),
@@ -265,8 +278,8 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                                 .updateSeatCount(orderState.seatCount + 1),
                             onDecrease: () {
                               if (orderState.seatCount > 1) {
-                                orderNotifier.updateSeatCount(
-                                    orderState.seatCount - 1);
+                                orderNotifier
+                                    .updateSeatCount(orderState.seatCount - 1);
                               }
                             },
                           ),

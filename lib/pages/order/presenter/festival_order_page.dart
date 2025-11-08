@@ -32,7 +32,6 @@ class FormValidationState {
       isParticipantsNameInvalid;
 }
 
-// Провайдер для состояния валидации
 final formValidationProvider =
     StateProvider<FormValidationState>((ref) => const FormValidationState());
 
@@ -46,7 +45,6 @@ class FestivalOrderPage extends ConsumerStatefulWidget {
 }
 
 class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
-  // final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
@@ -173,7 +171,6 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                             hint: "Лопушки",
                             onChanged: orderNotifier.updateCollectiveName,
                             isInvalid: validationState.isCollectiveNameInvalid,
-
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
