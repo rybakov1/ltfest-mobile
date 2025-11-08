@@ -43,7 +43,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
         ));
     final state = ref.read(orderProvider);
 
-    ref.read(orderProvider.notifier).reset(OrderType.laboratory);
+    // ref.read(orderProvider.notifier).reset(OrderType.laboratory);
     final user = ref.read(userProvider);
 
     _nameController = TextEditingController(text: state.payerName);

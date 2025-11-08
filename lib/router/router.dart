@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/data/models/laboratory_learning_type.dart';
+import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:ltfest/pages/more/about_app_page.dart';
 import 'package:ltfest/pages/more/account_settings_page.dart';
 import 'package:ltfest/pages/more/app_settings_page.dart';
@@ -306,15 +307,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: AppRoutes.priorityOrder,
+        pageBuilder: (context, state) {
+          final tariff = state.extra as PriorityTariff;
+          return NoTransitionPage(child: LtPriorityOrderPage(tariff: tariff));
+        },
+      ),
+      GoRoute(
         path: '/order/products',
         pageBuilder: (context, state) => const NoTransitionPage(
           child: ProductOrderPage(),
-        ),
-      ),
-      GoRoute(
-        path: '/order/ltpriority',
-        pageBuilder: (context, state) => const NoTransitionPage(
-          child: LtPriorityOrderPage(),
         ),
       ),
       GoRoute(

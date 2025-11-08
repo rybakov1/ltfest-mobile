@@ -1,16 +1,20 @@
 // lib/pages/lt_coin_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/providers/priority_tariff_provider.dart';
 
 import '../../../router/app_routes.dart';
 import 'ReferencePage.dart';
 
-class LtPriorityPage extends StatelessWidget {
+class LtPriorityPage extends ConsumerWidget {
   const LtPriorityPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tariffsAsync = ref.watch(priorityTariffsProvider);
+    
     return ReferencePage(
       title: 'LT Priority',
       imageAsset: 'assets/images/lt_priority_full.png',
@@ -40,37 +44,35 @@ class LtPriorityPage extends StatelessWidget {
             children: [
               Text("Как это работает", style: Styles.h3),
               const SizedBox(height: 24),
-              const LTPriorityTariff(
-                title: "LT Silver",
-                price: 35000,
-                description: "Скидка 5%",
-                bonuses: [
-                  "+10 минут дополнительной репетиции на сцене во время театрального фестиваля.\n+1 минута на каждый номер во время хореографического конкурса."
-                ],
+              tariffsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text('Не удалось загрузить тарифы: $err')),
+                data: (tariffs) {
+                  if (tariffs.isEmpty) {
+                    return const Center(child: Text('Для этого фестиваля пока нет тарифов.'));
+                  }
+
+                  return ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: tariffs.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final tariff = tariffs[index];
+
+                      return LTPriorityTariff(
+                        title: tariff.title,
+                        price: tariff.price.toInt(),
+                        description: tariff.description,
+                        bonuses: tariff.features.map((feature) => feature.title).toList(),
+                        onBuyPressed: () {
+                          context.push(AppRoutes.priorityOrder, extra: tariff);
+                        },
+                      );
+                    },
+                  );
+                },
               ),
-              const SizedBox(height: 8),
-              const LTPriorityTariff(
-                title: "LT Gold",
-                price: 45000,
-                description: "Скидка 10%",
-                bonuses: [
-                  "+15 минут дополнительной репетиции на сцене во время театрального фестиваля.\n2 минуты на каждый номер во время хореографического конкурса.",
-                  "Возврат 15% от стоимости трансфера (автобус от ж/д вокзала или аэропорта до отеля и обратно).",
-                  "Возврат 15% от стоимости ж/д билетов и 10% от стоимости авиабилетов для руководителя коллектива в город проведения фестиваля и обратно."
-                ],
-              ),
-              const SizedBox(height: 8),
-              const LTPriorityTariff(
-                title: "LT Platinum",
-                price: 59900,
-                description: "Скидка 15%",
-                bonuses: [
-                  "+20 минут дополнительной репетиции на сцене во время тетарального фестиваля.\n+3 минуты на каждый номер во время хореографического конкурса.",
-                  "Возврат 25% от стоимости трансфера (автобус от ж/д вокзала или аэропорта до отеля и обратно).",
-                  "Возврат 25% от стоимости ж/д билетов и 10% от стоимости авиабилетов для руководителя коллектива в город проведения фестиваля и обратно.",
-                  "Приоритет в выборе даты и времени показа спектакля/танцевального номера (до официального опубликования программы фестиваля)."
-                ],
-              )
             ],
           ),
         ),
@@ -204,6 +206,7 @@ class LTPriorityTariff extends StatefulWidget {
   final String title;
   final int price;
   final String description;
+  final VoidCallback onBuyPressed;
   final List<String> bonuses;
 
   final List<Widget> children;
@@ -216,6 +219,7 @@ class LTPriorityTariff extends StatefulWidget {
     required this.title,
     required this.price,
     required this.description,
+    required this.onBuyPressed,
     this.children = const [],
     this.bonuses = const [],
     this.initiallyExpanded = false,
@@ -302,8 +306,7 @@ class _LTPriorityTariffState extends State<LTPriorityTariff>
                   ],
                 const SizedBox(height: 8),
                 LTButtons.elevatedButton(
-                  onPressed: () =>
-                      context.push("${AppRoutes.order}/ltpriority"),
+                  onPressed: widget.onBuyPressed,
                   child: Text("Купить", style: Styles.button1),
                   backgroundColor: Palette.primaryLime,
                 ),

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/models/age_category.dart';
 import 'package:ltfest/data/models/ltstory.dart';
+import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../pages/cart/models/cart.dart';
 import '../models/favorite.dart';
@@ -463,6 +464,24 @@ class ApiService {
       final List<dynamic> data = response.data['data'];
       return data
           .map((json) => FestivalTariff.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<List<PriorityTariff>> getPriorityTariffs() async {
+    try {
+      final response = await _dio.get(
+          ApiEndpoints.priorityTariffs,
+          queryParameters: {
+            'populate': '*',
+          });
+
+      final List<dynamic> data = response.data['data'];
+
+      return data
+          .map((json) => PriorityTariff.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
       _handleError(e);

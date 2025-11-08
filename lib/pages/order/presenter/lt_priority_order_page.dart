@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
-import 'package:ltfest/pages/cart/provider/cart_provider.dart';
+import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:ltfest/pages/order/order_provider.dart';
 
 import '../../../data/models/user.dart';
 import '../../../providers/user_provider.dart';
+import '../components/loyalty_promo_section.dart';
 
 class LtPriorityOrderPage extends ConsumerStatefulWidget {
-  const LtPriorityOrderPage({super.key});
+  final PriorityTariff tariff;
+
+  const LtPriorityOrderPage({super.key, required this.tariff});
 
   @override
   ConsumerState<LtPriorityOrderPage> createState() =>
@@ -22,6 +25,7 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
   late final TextEditingController _passportController;
+  late final TextEditingController _cityController;
 
   late final TextEditingController _collectiveNameController;
   late final TextEditingController _addressController;
@@ -32,17 +36,24 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
   @override
   void initState() {
     super.initState();
-    ref.read(orderProvider.notifier).reset(OrderType.ltpriority);
+    Future.microtask(() => ref.read(orderProvider.notifier).startOrder(
+          type: OrderType.ltpriority,
+          item: widget.tariff,
+        ));
     final state = ref.read(orderProvider);
+    final user = ref.read(userProvider);
+
     _nameController = TextEditingController(text: state.payerName);
     _emailController = TextEditingController(text: state.email);
     _phoneController = TextEditingController(text: state.phone);
-    _collectiveNameController =
-        TextEditingController(text: state.collectiveName);
+    _cityController = TextEditingController(text: user!.residence!);
+
+    _collectiveNameController = TextEditingController(text: state.collectiveName);
     _addressController = TextEditingController(text: state.deliveryAddress);
+    _passportController = TextEditingController();
+
     _loyaltyCardController = TextEditingController();
     _promocodeController = TextEditingController();
-    _passportController = TextEditingController();
   }
 
   @override
@@ -50,6 +61,7 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _cityController.dispose();
     _collectiveNameController.dispose();
     _addressController.dispose();
     _passportController.dispose();
@@ -62,8 +74,10 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
   Widget build(BuildContext context) {
     final orderState = ref.watch(orderProvider);
     final orderNotifier = ref.read(orderProvider.notifier);
-    final totalPrice = ref.watch(cartTotalPriceProvider);
     final user = ref.watch(userProvider);
+
+    final baseTotal = ref.watch(orderBasePriceProvider);
+    final finalTotal = ref.watch(orderTotalPriceProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -127,7 +141,7 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
                               controller: _passportController,
                               label: "Паспортные данные*",
                               hint: "Серия, Номер и Дата выдачи",
-                              onChanged: orderNotifier.updatePayerName,
+                              onChanged: orderNotifier.updatePassport,
                               validator: (val) =>
                                   val!.isEmpty ? 'Обязательное поле' : null,
                             ),
@@ -142,10 +156,10 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
-                              controller: _nameController,
+                              controller: _cityController,
                               label: "Город проживания*",
                               hint: "Иванов Иван Иванович",
-                              onChanged: orderNotifier.updatePayerName,
+                              onChanged: orderNotifier.updateResidence,
                               validator: (val) =>
                                   val!.isEmpty ? 'Обязательное поле' : null,
                             ),
@@ -156,101 +170,31 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      _buildLoyaltyOrPromoSection(user!, totalPrice),
+                      Container(
+                        decoration: Decor.base,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 20),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        child: buildLoyaltyOrPromoSection(
+                          context,
+                          user!,
+                          widget.tariff.title,
+                          ref,
+                          _loyaltyCardController,
+                          _promocodeController,
+                          cartTotal: baseTotal,
+                          finalTotal: finalTotal,
+                        ),
+                      ),
                       const SizedBox(height: 2),
                     ],
                   ),
                 ),
               ),
-              _buildPayButton(totalPrice, orderState),
+              _buildPayButton(finalTotal, orderState),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildLoyaltyOrPromoSection(User user, totalPrice) {
-    return Container(
-      decoration: Decor.base,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (user.activity!.title == "Руководитель коллектива") ...[
-                Expanded(
-                  child: _buildTextField(
-                    controller: _loyaltyCardController,
-                    label: "Карта лояльности",
-                    hint: "Введите номер карты",
-                    onChanged: (val) {
-                      // TODO: обработка промокода — пока не реализована
-                    },
-                  ),
-                ),
-              ] else ...[
-                Expanded(
-                  child: _buildTextField(
-                    controller: _promocodeController,
-                    label: "Промокод",
-                    hint: "Введите промокод",
-                    onChanged: (val) {
-                      // TODO: обработка промокода — пока не реализована
-                    },
-                  ),
-                ),
-              ],
-              const SizedBox(width: 8),
-              InkWell(
-                onTap: () {
-                  // TODO: применить промокод/карту
-                },
-                child: Container(
-                  width: 43,
-                  height: 43,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Palette.stroke,
-                  ),
-                  child: Icon(
-                    Icons.arrow_forward_outlined,
-                    color: Palette.white,
-                    size: 24,
-                  ),
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Стоимость заказа", style: Styles.b2),
-              Text(Utils.formatMoney(totalPrice), style: Styles.h4),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Скидка",
-                  style: Styles.b2.copyWith(color: Palette.secondary)),
-              Text(Utils.formatMoney(0), style: Styles.h4),
-              // пока без скидки
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Итого:", style: Styles.h4),
-              Text(Utils.formatMoney(totalPrice), style: Styles.h3),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -357,13 +301,9 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
       child: LTButtons.elevatedButton(
         onPressed: () {
           if (!_formKey.currentState!.validate()) return;
-          if (orderState.deliveryMethod == DeliveryMethod.onFestival &&
-              orderState.selectedFestival == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Выберите фестиваль')));
-            return;
-          }
-          ref.read(orderProvider.notifier).placeOrderAndPay(context, totalPrice);
+          ref
+              .read(orderProvider.notifier)
+              .placeOrderAndPay(context, totalPrice);
         },
         child: Text("Оплатить", style: Styles.button1),
       ),

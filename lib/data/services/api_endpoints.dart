@@ -18,6 +18,7 @@ abstract class ApiEndpoints {
   static const String ageCategory = '/api/age-categories';
   static const String festivals = '/api/festivals';
   static const String festivalTariffs = '/api/festival-tariffs';
+  static const String priorityTariffs = '/api/priority-tariffs';
 
   static const String laboratories = '/api/laboratories';
   static const String upcomingEvents = '/api/upcoming-events';

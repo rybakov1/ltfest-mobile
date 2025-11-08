@@ -14,19 +14,13 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$LearningType {
-  @JsonKey(name: 'id')
   int get id;
-  @JsonKey(name: 'type')
   String get type;
-  @JsonKey(name: 'price')
   int get price;
   @JsonKey(name: 'date_info')
   String? get dateInfo;
-  @JsonKey(name: 'location')
   String? get location;
-  @JsonKey(name: 'duration')
   String? get duration;
-  @JsonKey(name: 'certificate')
   String? get certificate;
 
   /// Create a copy of LearningType
@@ -76,13 +70,13 @@ abstract mixin class $LearningTypeCopyWith<$Res> {
       _$LearningTypeCopyWithImpl;
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
-      @JsonKey(name: 'type') String type,
-      @JsonKey(name: 'price') int price,
+      {int id,
+      String type,
+      int price,
       @JsonKey(name: 'date_info') String? dateInfo,
-      @JsonKey(name: 'location') String? location,
-      @JsonKey(name: 'duration') String? duration,
-      @JsonKey(name: 'certificate') String? certificate});
+      String? location,
+      String? duration,
+      String? certificate});
 }
 
 /// @nodoc
@@ -232,13 +226,13 @@ extension LearningTypePatterns on LearningType {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            @JsonKey(name: 'id') int id,
-            @JsonKey(name: 'type') String type,
-            @JsonKey(name: 'price') int price,
+            int id,
+            String type,
+            int price,
             @JsonKey(name: 'date_info') String? dateInfo,
-            @JsonKey(name: 'location') String? location,
-            @JsonKey(name: 'duration') String? duration,
-            @JsonKey(name: 'certificate') String? certificate)?
+            String? location,
+            String? duration,
+            String? certificate)?
         $default, {
     required TResult orElse(),
   }) {
@@ -268,13 +262,13 @@ extension LearningTypePatterns on LearningType {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            @JsonKey(name: 'id') int id,
-            @JsonKey(name: 'type') String type,
-            @JsonKey(name: 'price') int price,
+            int id,
+            String type,
+            int price,
             @JsonKey(name: 'date_info') String? dateInfo,
-            @JsonKey(name: 'location') String? location,
-            @JsonKey(name: 'duration') String? duration,
-            @JsonKey(name: 'certificate') String? certificate)
+            String? location,
+            String? duration,
+            String? certificate)
         $default,
   ) {
     final _that = this;
@@ -302,13 +296,13 @@ extension LearningTypePatterns on LearningType {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            @JsonKey(name: 'id') int id,
-            @JsonKey(name: 'type') String type,
-            @JsonKey(name: 'price') int price,
+            int id,
+            String type,
+            int price,
             @JsonKey(name: 'date_info') String? dateInfo,
-            @JsonKey(name: 'location') String? location,
-            @JsonKey(name: 'duration') String? duration,
-            @JsonKey(name: 'certificate') String? certificate)?
+            String? location,
+            String? duration,
+            String? certificate)?
         $default,
   ) {
     final _that = this;
@@ -326,36 +320,30 @@ extension LearningTypePatterns on LearningType {
 @JsonSerializable()
 class _LearningType implements LearningType {
   const _LearningType(
-      {@JsonKey(name: 'id') required this.id,
-      @JsonKey(name: 'type') required this.type,
-      @JsonKey(name: 'price') required this.price,
+      {required this.id,
+      required this.type,
+      required this.price,
       @JsonKey(name: 'date_info') this.dateInfo,
-      @JsonKey(name: 'location') this.location,
-      @JsonKey(name: 'duration') this.duration,
-      @JsonKey(name: 'certificate') this.certificate});
+      this.location,
+      this.duration,
+      this.certificate});
   factory _LearningType.fromJson(Map<String, dynamic> json) =>
       _$LearningTypeFromJson(json);
 
   @override
-  @JsonKey(name: 'id')
   final int id;
   @override
-  @JsonKey(name: 'type')
   final String type;
   @override
-  @JsonKey(name: 'price')
   final int price;
   @override
   @JsonKey(name: 'date_info')
   final String? dateInfo;
   @override
-  @JsonKey(name: 'location')
   final String? location;
   @override
-  @JsonKey(name: 'duration')
   final String? duration;
   @override
-  @JsonKey(name: 'certificate')
   final String? certificate;
 
   /// Create a copy of LearningType
@@ -411,13 +399,13 @@ abstract mixin class _$LearningTypeCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
-      @JsonKey(name: 'type') String type,
-      @JsonKey(name: 'price') int price,
+      {int id,
+      String type,
+      int price,
       @JsonKey(name: 'date_info') String? dateInfo,
-      @JsonKey(name: 'location') String? location,
-      @JsonKey(name: 'duration') String? duration,
-      @JsonKey(name: 'certificate') String? certificate});
+      String? location,
+      String? duration,
+      String? certificate});
 }
 
 /// @nodoc

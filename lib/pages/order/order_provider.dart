@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/data/models/festival.dart';
 import 'package:ltfest/data/models/laboratory_learning_type.dart';
+import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:ltfest/data/services/api_exception.dart';
 import 'package:ltfest/data/services/api_service.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
@@ -40,6 +41,9 @@ class OrderState {
   final String participantNames; // Имена участников через запятую
   final int seatCount; // Количество мест
 
+  final String passport; // Имена участников через запятую
+  final String residence; // Имена участников через запятую
+
   final dynamic payableItem;
 
   const OrderState({
@@ -59,6 +63,8 @@ class OrderState {
     this.collectiveName = '',
     this.participantNames = '',
     this.seatCount = 1,
+    this.passport = '',
+    this.residence = '',
     this.payableItem,
   });
 
@@ -73,6 +79,8 @@ class OrderState {
       String? deliveryAddress,
       String? collectiveName,
       String? participantNames,
+      String? passport,
+      String? residence,
       int? seatCount,
       dynamic payableItem}) {
     return OrderState(
@@ -87,6 +95,8 @@ class OrderState {
       collectiveName: collectiveName ?? this.collectiveName,
       participantNames: participantNames ?? this.participantNames,
       seatCount: seatCount ?? this.seatCount,
+      passport: passport ?? this.passport,
+      residence: residence ?? this.residence,
       payableItem: payableItem ?? this.payableItem,
     );
   }
@@ -118,19 +128,19 @@ final orderBasePriceProvider = Provider<int>((ref) {
       }
       break;
     case OrderType.ltpriority:
-      // Логика для карты лояльности
+      if (orderState.payableItem is PriorityTariff) {
+        final tariff = orderState.payableItem as PriorityTariff;
+        basePrice = tariff.price.toInt();
+      }
       break;
   }
   return basePrice;
 });
 
-// МОДИФИЦИРОВАННЫЙ СТАРЫЙ ПРОВАЙДЕР
 final orderTotalPriceProvider = Provider<int>((ref) {
-  // Теперь мы берем базовую цену из нового провайдера
   final basePrice = ref.watch(orderBasePriceProvider);
   final promoState = ref.watch(promoCodeNotifierProvider);
 
-  // Применяем скидку от промокода
   return promoState.maybeMap(
     orElse: () => basePrice,
     success: (successState) {
@@ -189,6 +199,10 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
   void updatePhone(String value) => state = state.copyWith(phone: value);
 
+  void updatePassport(String value) => state = state.copyWith(passport: value);
+
+  void updateResidence(String value) => state = state.copyWith(residence: value);
+
   void updateCollectiveName(String value) =>
       state = state.copyWith(collectiveName: value);
 
@@ -216,11 +230,11 @@ class OrderNotifier extends StateNotifier<OrderState> {
       case OrderType.products:
         return 'product';
       case OrderType.festival:
-        return 'festival';
+        return 'festival-tariff';
       case OrderType.laboratory:
         return 'laboratory';
       case OrderType.ltpriority:
-        return 'loyalty';
+        return 'loyalty_card';
     }
   }
 
@@ -261,7 +275,10 @@ class OrderNotifier extends StateNotifier<OrderState> {
           }
           break;
         case OrderType.ltpriority:
-          throw UnimplementedError();
+          details['collectiveName'] = state.collectiveName;
+          details['deliveryAddress'] = state.deliveryAddress;
+          details['passport'] = state.passport;
+          break;
       }
 
       details.removeWhere((key, value) =>
@@ -275,8 +292,12 @@ class OrderNotifier extends StateNotifier<OrderState> {
         'type': _mapOrderTypeToStrapi(state.orderType),
         'details': details,
         'users_permissions_user': user?.id,
-        'festival_tariff': state.payableItem is FestivalTariff ? state.payableItem?.id : null,
-        'laboratory_learning_type': state.payableItem is LearningType ? state.payableItem?.id : null,
+        'festival_tariff':
+            state.payableItem is FestivalTariff ? state.payableItem?.id : null,
+        'laboratory_learning_type':
+            state.payableItem is LearningType ? state.payableItem?.id : null,
+        'priority_tariff':
+            state.payableItem is PriorityTariff ? state.payableItem?.id : null,
       };
 
       orderData.removeWhere((key, value) => value == null);

@@ -6,6 +6,7 @@ class AppRoutes {
   static const String festivals = '/festivals';
   static const String festivalOrder = '/order/festival';
   static const String laboratoryOrder = '/order/laboratory';
+  static const String priorityOrder = '/order/priority';
 
   static const String laboratories = '/laboratories';
   static const String news = '/news';
