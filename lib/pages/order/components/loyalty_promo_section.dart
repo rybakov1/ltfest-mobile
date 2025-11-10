@@ -58,6 +58,7 @@ Widget buildLoyaltyOrPromoSection(
       Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Поля ввода остаются как есть
           if (user.activity!.title == "Руководитель коллектива") ...[
             Expanded(
               child: buildTextField(
@@ -88,34 +89,47 @@ Widget buildLoyaltyOrPromoSection(
             ),
           ],
           const SizedBox(width: 8),
-          InkWell(
-            onTap: loyaltyCardController.text.isEmpty &&
-                    promocodeController.text.isEmpty
-                ? null
-                : () {
-                    FocusScope.of(context).unfocus();
-                    if (user.activity!.title == "Руководитель коллектива") {
-                      final cardNumber = loyaltyCardController.text.trim();
-                      loyaltyCardNotifier.getLoyaltyCard(cardNumber, user.id);
-                    } else {
-                      final code = promocodeController.text.trim();
-                      promoCodeNotifier.validatePromoCode(code);
-                    }
-                  },
-            child: Container(
-              width: 43,
-              height: 43,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: loyaltyCardController.text.isEmpty &&
-                        promocodeController.text.isEmpty
-                    ? Palette.stroke
-                    : Palette.primaryLime,
-              ),
-              child: Icon(Icons.arrow_forward_outlined,
-                  color: Palette.white, size: 24),
-            ),
-          )
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: loyaltyCardController,
+            builder: (context, loyaltyValue, child) {
+              return ValueListenableBuilder<TextEditingValue>(
+                valueListenable: promocodeController,
+                builder: (context, promoValue, child) {
+
+                  final bool isButtonActive = user.activity!.title == "Руководитель коллектива"
+                      ? loyaltyValue.text.isNotEmpty
+                      : promoValue.text.isNotEmpty;
+
+                  return InkWell(
+                    onTap: !isButtonActive
+                        ? null
+                        : () {
+                      FocusScope.of(context).unfocus();
+                      if (user.activity!.title == "Руководитель коллектива") {
+                        final cardNumber = loyaltyCardController.text.trim();
+                        loyaltyCardNotifier.getLoyaltyCard(cardNumber, user.id);
+                      } else {
+                        final code = promocodeController.text.trim();
+                        promoCodeNotifier.validatePromoCode(code);
+                      }
+                    },
+                    child: Container(
+                      width: 43,
+                      height: 43,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: isButtonActive
+                            ? Palette.primaryLime
+                            : Palette.stroke,
+                      ),
+                      child: Icon(Icons.arrow_forward_outlined,
+                          color: Palette.white, size: 24),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
       promoCodeState.maybeWhen(
