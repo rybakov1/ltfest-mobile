@@ -4,18 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:ltfest/providers/age_category_provider.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:shimmer/shimmer.dart';
 
+import '../../components/modal.dart';
 import '../../data/models/activity.dart';
+import '../../data/models/age_category.dart';
 import '../../data/models/direction.dart';
 import '../../data/services/api_service.dart';
 
-final directionsProvider =
-    FutureProvider.autoDispose<List<Direction>>((ref) async {
+final directionsProvider = FutureProvider<List<Direction>>((ref) async {
   final api = ref.watch(apiServiceProvider);
   try {
     // Добавляем таймаут на 10 секунд
@@ -34,8 +35,7 @@ final directionsProvider =
   }
 });
 
-final activitiesProvider =
-    FutureProvider.autoDispose<List<Activity>>((ref) async {
+final activitiesProvider = FutureProvider<List<Activity>>((ref) async {
   final api = ref.watch(apiServiceProvider);
   try {
     // Добавляем таймаут на 10 секунд
@@ -74,14 +74,19 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final _residenceCityController = TextEditingController(); // Город проживания
   final _collectiveNameController = TextEditingController();
   final _collectiveCityController = TextEditingController(); // Город коллектива
+  final _participantCountController = TextEditingController();
 
   Direction? _selectedDirection;
   Activity? _selectedActivity;
+  AgeCategory? _selectedAgeCategory;
 
   var isSecondStep = false;
 
   bool _isSecondStep = false;
   bool _isLoading = false;
+
+  // Флаг для управления активностью полей коллектива
+  bool _isCollectiveFieldsEnabled = false;
 
   @override
   void dispose() {
@@ -93,6 +98,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     _residenceCityController.dispose();
     _collectiveNameController.dispose();
     _collectiveCityController.dispose();
+    _participantCountController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -133,6 +139,12 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         activityId: _selectedActivity!.id,
         collectiveName: _collectiveNameController.text.trim(),
         collectiveCity: _collectiveCityController.text.trim(),
+        // Отправляем данные только если поля активны
+        ageCategoryId:
+            _isCollectiveFieldsEnabled ? _selectedAgeCategory?.id : null,
+        count_participant: _isCollectiveFieldsEnabled
+            ? int.tryParse(_participantCountController.text.trim())
+            : null,
       );
       // GoRouter сам обработает переход на главный экран после смены состояния
     } catch (e) {
@@ -154,7 +166,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.black,
+      backgroundColor: Palette.background,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
@@ -169,10 +181,12 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      height: 43,
-                      width: 43,
-                      decoration:
-                          Decor.base.copyWith(color: Palette.primaryLime),
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Palette.primaryLime,
+                      ),
                       child: IconButton(
                         onPressed: () {
                           if (isSecondStep) {
@@ -187,8 +201,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                     const Spacer(),
                     Text(
                       'Регистрация',
-                      textAlign: TextAlign.left,
-                      style: Styles.h3.copyWith(color: Palette.white),
+                      style: Styles.h4.copyWith(color: Palette.black),
                     ),
                     const Spacer(),
                     const SizedBox(width: 43),
@@ -212,7 +225,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                           ),
                           controller: _scrollController,
                           child: Form(
-                            key: _formKeyStep1,
+                            key: _isSecondStep ? _formKeyStep2 : _formKeyStep1,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -249,35 +262,28 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
 
   Widget _buildActionButtons() {
     if (_isSecondStep) {
-      return Column(
+      return Row(
         children: [
-          LTButtons.elevatedButton(
-            onPressed: _isLoading ? null : _submitRegistration,
-            child: _isLoading
-                ? CircularProgressIndicator(color: Palette.black)
-                : Text('Зарегистрироваться', style: Styles.button1),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: OutlinedButton(
+          Expanded(
+            child: LTButtons.outlinedButton(
               onPressed: _isLoading ? null : _goBackToStep1,
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Palette.stroke),
-                foregroundColor: Palette.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: BorderSide.none,
-                ),
-              ),
               child: Text('Назад', style: Styles.button1),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            flex: 2,
+            child: LTButtons.elevatedButton(
+              onPressed: _isLoading ? null : _handleContinue,
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Palette.black)
+                  : Text('Зарегистрироваться',
+                      style: Styles.button1.copyWith(color: Colors.white)),
             ),
           ),
         ],
       );
     } else {
-      // Одна кнопка на первом шаге
       return LTButtons.elevatedButton(
           onPressed: _handleContinue,
           child: Text('Продолжить', style: Styles.button1));
@@ -363,50 +369,89 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         // 4. Поля на втором шаге
         // Направление (модальное окно)
         _buildModalSelectorField(
-          label: 'Направление*',
-          value: _selectedDirection?.title,
-          hint: 'Выберите направление',
-          onTap: () => _showDirectionPicker(),
-          validator: (_) =>
-              _selectedDirection == null ? 'Выберите направление' : null,
+          label: 'Сфера деятельности*',
+          value: _selectedActivity?.title,
+          hint: 'Выберите',
+          onTap: () => _showActivityPicker(),
+          validator: (_) => _selectedActivity == null ? 'Выберите' : null,
         ),
+
         const SizedBox(height: 16),
         // Сфера деятельности (модальное окно)
         _buildModalSelectorField(
-          label: 'Сфера деятельности*',
-          value: _selectedActivity?.title,
-          hint: 'Выберите сферу',
-          onTap: () => _showActivityPicker(),
-          validator: (_) => _selectedActivity == null ? 'Выберите сферу' : null,
+          label: 'Направление*',
+          value: _selectedDirection?.title,
+          hint: 'Выберите',
+          onTap: () => _showDirectionPicker(),
+          validator: (_) => _selectedDirection == null ? 'Выберите' : null,
         ),
         const SizedBox(height: 16),
         _buildTextFormField(
-            'Название коллектива', "Название", _collectiveNameController,
-            isRequired: false),
+          'Название коллектива',
+          "Название",
+          _collectiveNameController,
+          isRequired: _isCollectiveFieldsEnabled,
+          enabled: _isCollectiveFieldsEnabled,
+        ),
+        const SizedBox(height: 16),
+        _buildTextFormField(
+          'Количество участников коллектива',
+          "Введите",
+          _participantCountController,
+          isRequired: _isCollectiveFieldsEnabled,
+          enabled: _isCollectiveFieldsEnabled,
+          keyboardType: TextInputType.number,
+        ),
+        const SizedBox(height: 16),
+        _buildModalSelectorField(
+          label: 'Возрастная категория',
+          value: _selectedAgeCategory?.title,
+          hint: 'Выберите',
+          onTap: _isCollectiveFieldsEnabled ? _showAgeCategoryPicker : null,
+          enabled: _isCollectiveFieldsEnabled,
+          validator: (_) {
+            if (_isCollectiveFieldsEnabled && _selectedAgeCategory == null) {
+              return 'Выберите';
+            }
+            return null;
+          },
+        ),
+
         const SizedBox(height: 16),
         CitySearchField(
-            label: "Город коллектива",
-            hint: "Начните вводить город",
-            controller: _collectiveCityController,
-            isRequired: false),
+          label: "Город",
+          hint: "Город",
+          controller: _collectiveCityController,
+          isRequired: _isCollectiveFieldsEnabled,
+          enabled: _isCollectiveFieldsEnabled,
+        ),
       ],
     );
   }
 
   Widget _buildTextFormField(
       String label, String hint, TextEditingController controller,
-      {TextInputType? keyboardType, int maxLines = 1, bool isRequired = true}) {
+      {TextInputType? keyboardType,
+      int maxLines = 1,
+      bool isRequired = true,
+      bool enabled = true}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Styles.b3.copyWith(color: Palette.gray)),
+        Text(label,
+            style: Styles.b3.copyWith(
+                color: enabled ? Palette.gray : Palette.gray.withOpacity(0.5))),
         const SizedBox(height: 6),
         TextFormField(
+          enabled: enabled,
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
-          style: Styles.b2.copyWith(color: Palette.black),
+          style:
+              Styles.b2.copyWith(color: enabled ? Palette.black : Palette.gray),
           decoration: InputDecoration(
+            filled: !enabled,
+            fillColor: Palette.background.withOpacity(0.5),
             isDense: true,
             hintText: hint,
             hintStyle: Styles.b2.copyWith(color: Palette.gray),
@@ -418,6 +463,10 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Palette.stroke, width: 1)),
+            disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                    color: Palette.stroke.withOpacity(0.5), width: 1)),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Palette.primaryLime, width: 1.5)),
@@ -447,7 +496,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   }
 
   void _showDirectionPicker() {
-    _showModalPicker<Direction>(
+    showModalPicker<Direction>(
       context: context,
       title: 'Направление',
       provider: directionsProvider,
@@ -463,269 +512,311 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   }
 
   void _showActivityPicker() {
-    _showModalPicker<Activity>(
+    showModalPicker<Activity>(
       context: context,
       title: 'Сфера деятельности',
       provider: activitiesProvider,
       itemBuilder: (activity) => activity.title,
       initialValue: _selectedActivity,
       onConfirm: (activity) {
-        setState(() => _selectedActivity = activity);
+        if (activity == null) return;
+
+        setState(() {
+          _selectedActivity = activity;
+          // Проверяем, является ли выбранная сфера "Руководитель коллектива"
+          // В реальном приложении лучше использовать ID или enum, а не строку
+          _isCollectiveFieldsEnabled =
+              activity.title == 'Руководитель коллектива';
+
+          // Если поля стали неактивными, очищаем их
+          if (!_isCollectiveFieldsEnabled) {
+            _collectiveNameController.clear();
+            _collectiveCityController.clear();
+            _participantCountController.clear();
+            _selectedAgeCategory = null;
+          }
+        });
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  void _showAgeCategoryPicker() {
+    showModalPicker<AgeCategory>(
+      context: context,
+      title: 'Возрастная категория',
+      provider: ageCategoryProvider,
+      itemBuilder: (category) => category.title,
+      initialValue: _selectedAgeCategory,
+      onConfirm: (category) {
+        setState(() => _selectedAgeCategory = category);
         Navigator.pop(context);
       },
     );
   }
 
 // --- ОБНОВЛЕННЫЙ ОБЩИЙ ХЕЛПЕР ДЛЯ МОДАЛЬНЫХ ОКОН ---
-
-  void _showModalPicker<T>({
-    required BuildContext context,
-    required String title,
-    required AutoDisposeFutureProvider<List<T>> provider,
-    required String Function(T) itemBuilder,
-    T? initialValue,
-    required ValueChanged<T?> onConfirm,
-  }) {
-    T? tempSelectedItem = initialValue;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Palette.white,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (modalContext) {
-        return Consumer(builder: (context, ref, child) {
-          return StatefulBuilder(
-            builder: (context, setModalState) {
-              final asyncValue = ref.watch(provider);
-
-              final bool isItemSelected = tempSelectedItem != null;
-              return Padding(
-                padding: EdgeInsets.only(
-                  top: 16,
-                  bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // --- Шапка модального окна ---
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(width: 40),
-                          Expanded(
-                            child: Text(title,
-                                textAlign: TextAlign.center, style: Styles.h4),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close, color: Palette.gray),
-                            onPressed: () => Navigator.pop(modalContext),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: asyncValue.when(
-                        loading: () => _buildShimmerList(),
-                        error: (err, st) => Center(child: Text('Ошибка: $err')),
-                        data: (items) {
-                          if (items.isEmpty) {
-                            return const Center(
-                                child: Text("Нет данных для выбора"));
-                          }
-                          // ListView теперь сам по себе, без shrinkWrap, т.к. Flexible дает ему границы
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            // Оставляем shrinkWrap для работы внутри Column + Flexible
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              final item = items[index];
-                              return Column(
-                                children: [
-                                  _buildRadioListTile<T>(
-                                    title: itemBuilder(item),
-                                    value: item,
-                                    groupValue: tempSelectedItem,
-                                    onChanged: (newValue) {
-                                      setModalState(() {
-                                        tempSelectedItem = newValue;
-                                      });
-                                    },
-                                  ),
-                                  const SizedBox(height: 20),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    //SizedBox(height: 40),
-                    // --- Футер модального окна (кнопка) ---
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16.0, right: 16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: LTButtons.elevatedButton(
-                          onPressed: isItemSelected
-                              ? () => onConfirm(tempSelectedItem)
-                              : null,
-                          child: Text(
-                            'Выбрать',
-                            style: Styles.button1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        });
-      },
-    );
-  }
-
-// --- НОВЫЙ ХЕЛПЕР ДЛЯ СТИЛИЗОВАННОЙ RADIO-КНОПКИ ---
-
-  Widget _buildRadioListTile<T>({
-    required String title,
-    required T value,
-    required T? groupValue,
-    required ValueChanged<T?> onChanged,
-  }) {
-    return InkWell(
-      onTap: () => onChanged(value),
-      child: Row(
-        children: [
-          Radio<T>(
-            value: value,
-            groupValue: groupValue,
-            onChanged: onChanged,
-            visualDensity: VisualDensity.compact,
-            activeColor: Palette.secondary,
-            fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-              if (states.contains(WidgetState.selected)) {
-                return Palette.secondary;
-              }
-              return Palette.stroke;
-            }),
-          ),
-          const SizedBox(width: 0.0),
-          // Контролируем расстояние между Radio и текстом
-          Expanded(
-            child: Text(title, style: Styles.b2),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildShimmerList() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxHeight: 300.0, // Ограничиваем высоту шиммера
-        ),
-        child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          // Отключаем прокрутку внутри шиммера
-          itemCount: 6,
-          itemBuilder: (_, __) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 48.0,
-                  height: 48.0,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        height: 8.0,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 150.0,
-                        // Используем фиксированную ширину вместо MediaQuery
-                        height: 8.0,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//
+//   void _showModalPicker<T>({
+//     required BuildContext context,
+//     required String title,
+//     required AutoDisposeFutureProvider<List<T>> provider,
+//     required String Function(T) itemBuilder,
+//     T? initialValue,
+//     required ValueChanged<T?> onConfirm,
+//   }) {
+//     T? tempSelectedItem = initialValue;
+//
+//     showModalBottomSheet(
+//       context: context,
+//       backgroundColor: Palette.white,
+//       isScrollControlled: true,
+//       shape: const RoundedRectangleBorder(
+//         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+//       ),
+//       builder: (modalContext) {
+//         return Consumer(builder: (context, ref, child) {
+//           return StatefulBuilder(
+//             builder: (context, setModalState) {
+//               final asyncValue = ref.watch(provider);
+//
+//               final bool isItemSelected = tempSelectedItem != null;
+//               return Padding(
+//                 padding: EdgeInsets.only(
+//                   top: 16,
+//                   bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
+//                 ),
+//                 child: Column(
+//                   mainAxisSize: MainAxisSize.min,
+//                   children: [
+//                     // --- Шапка модального окна ---
+//                     Padding(
+//                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
+//                       child: Row(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           const SizedBox(width: 40),
+//                           Expanded(
+//                             child: Text(title,
+//                                 textAlign: TextAlign.center, style: Styles.h4),
+//                           ),
+//                           IconButton(
+//                             icon: Icon(Icons.close, color: Palette.gray),
+//                             onPressed: () => Navigator.pop(modalContext),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//
+//                     Padding(
+//                       padding: const EdgeInsets.symmetric(horizontal: 8),
+//                       child: asyncValue.when(
+//                         loading: () => _buildShimmerList(),
+//                         error: (err, st) => Center(child: Text('Ошибка: $err')),
+//                         data: (items) {
+//                           if (items.isEmpty) {
+//                             return const Center(
+//                                 child: Text("Нет данных для выбора"));
+//                           }
+//                           // ListView теперь сам по себе, без shrinkWrap, т.к. Flexible дает ему границы
+//                           return ListView.builder(
+//                             shrinkWrap: true,
+//                             // Оставляем shrinkWrap для работы внутри Column + Flexible
+//                             itemCount: items.length,
+//                             itemBuilder: (context, index) {
+//                               final item = items[index];
+//                               return Column(
+//                                 children: [
+//                                   _buildRadioListTile<T>(
+//                                     title: itemBuilder(item),
+//                                     value: item,
+//                                     groupValue: tempSelectedItem,
+//                                     onChanged: (newValue) {
+//                                       setModalState(() {
+//                                         tempSelectedItem = newValue;
+//                                       });
+//                                     },
+//                                   ),
+//                                   const SizedBox(height: 20),
+//                                 ],
+//                               );
+//                             },
+//                           );
+//                         },
+//                       ),
+//                     ),
+//                     //SizedBox(height: 40),
+//                     // --- Футер модального окна (кнопка) ---
+//                     Padding(
+//                       padding: const EdgeInsets.only(left: 16.0, right: 16),
+//                       child: SizedBox(
+//                         width: double.infinity,
+//                         height: 48,
+//                         child: LTButtons.elevatedButton(
+//                           onPressed: isItemSelected
+//                               ? () => onConfirm(tempSelectedItem)
+//                               : null,
+//                           child: Text(
+//                             'Выбрать',
+//                             style: Styles.button1,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               );
+//             },
+//           );
+//         });
+//       },
+//     );
+//   }
+//
+// // --- НОВЫЙ ХЕЛПЕР ДЛЯ СТИЛИЗОВАННОЙ RADIO-КНОПКИ ---
+//
+//   Widget _buildRadioListTile<T>({
+//     required String title,
+//     required T value,
+//     required T? groupValue,
+//     required ValueChanged<T?> onChanged,
+//   }) {
+//     return InkWell(
+//       onTap: () => onChanged(value),
+//       child: Row(
+//         children: [
+//           Radio<T>(
+//             value: value,
+//             groupValue: groupValue,
+//             onChanged: onChanged,
+//             visualDensity: VisualDensity.compact,
+//             activeColor: Palette.secondary,
+//             fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+//               if (states.contains(WidgetState.selected)) {
+//                 return Palette.secondary;
+//               }
+//               return Palette.stroke;
+//             }),
+//           ),
+//           const SizedBox(width: 0.0),
+//           // Контролируем расстояние между Radio и текстом
+//           Expanded(
+//             child: Text(title, style: Styles.b2),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+//
+//   Widget _buildShimmerList() {
+//     return Shimmer.fromColors(
+//       baseColor: Colors.grey[300]!,
+//       highlightColor: Colors.grey[100]!,
+//       child: ConstrainedBox(
+//         constraints: const BoxConstraints(
+//           maxHeight: 300.0, // Ограничиваем высоту шиммера
+//         ),
+//         child: ListView.builder(
+//           physics: const NeverScrollableScrollPhysics(),
+//           // Отключаем прокрутку внутри шиммера
+//           itemCount: 6,
+//           itemBuilder: (_, __) => Padding(
+//             padding: const EdgeInsets.symmetric(vertical: 8.0),
+//             child: Row(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: <Widget>[
+//                 Container(
+//                   width: 48.0,
+//                   height: 48.0,
+//                   color: Colors.white,
+//                 ),
+//                 const SizedBox(width: 16),
+//                 Expanded(
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: <Widget>[
+//                       Container(
+//                         width: double.infinity,
+//                         height: 8.0,
+//                         color: Colors.white,
+//                       ),
+//                       const SizedBox(height: 8),
+//                       Container(
+//                         width: 150.0,
+//                         // Используем фиксированную ширину вместо MediaQuery
+//                         height: 8.0,
+//                         color: Colors.white,
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 // --- ВИДЖЕТЫ-ХЕЛПЕРЫ ДЛЯ ПОЛЕЙ ---
 
 // Общий виджет для полей, которые открывают модальное окно
-Widget _buildModalSelectorField({
-  required String label,
-  required String? value,
-  required String hint,
-  required VoidCallback onTap,
-  required FormFieldValidator<String> validator,
-}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(label, style: Styles.b3.copyWith(color: Palette.gray)),
-      const SizedBox(height: 6),
-      TextFormField(
-        controller: TextEditingController(text: value ?? ''),
-        readOnly: true,
-        onTap: onTap,
-        style: Styles.b2.copyWith(color: Palette.gray),
-        decoration: InputDecoration(
-          isDense: true,
-          hintText: hint,
-          hintStyle: Styles.b2.copyWith(color: Palette.gray),
-          suffixIcon: Icon(Icons.chevron_right, size: 20, color: Palette.gray),
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Palette.stroke, width: 1)),
-          enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Palette.stroke, width: 1)),
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Palette.primaryLime, width: 1.5)),
-          errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Palette.error, width: 1)),
-          focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Palette.error, width: 1.5)),
+  Widget _buildModalSelectorField({
+    required String label,
+    required String? value,
+    required String hint,
+    required VoidCallback? onTap,
+    required FormFieldValidator<String> validator,
+    bool enabled = true,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: Styles.b3.copyWith(
+                color: enabled ? Palette.gray : Palette.gray.withOpacity(0.5))),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: TextEditingController(text: value ?? ''),
+          enabled: enabled,
+          readOnly: true,
+          onTap: onTap,
+          style: Styles.b2.copyWith(color: Palette.gray),
+          decoration: InputDecoration(
+            isDense: true,
+            hintText: hint,
+            hintStyle: Styles.b2.copyWith(color: Palette.gray),
+            filled: !enabled,
+            fillColor: Palette.background.withOpacity(0.5),
+            suffixIcon:
+                Icon(Icons.chevron_right, size: 20, color: Palette.gray),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.stroke, width: 1)),
+            disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                    color: Palette.stroke.withOpacity(0.5), width: 1)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.stroke, width: 1)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.primaryLime, width: 1.5)),
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.error, width: 1)),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Palette.error, width: 1.5)),
+          ),
+          validator: validator,
         ),
-        validator: validator,
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }
 
 // Виджет для поиска города с подсказками
@@ -734,6 +825,7 @@ class CitySearchField extends StatelessWidget {
   final String hint;
   final TextEditingController controller;
   final bool isRequired;
+  final bool enabled;
 
   const CitySearchField({
     super.key,
@@ -741,6 +833,7 @@ class CitySearchField extends StatelessWidget {
     required this.hint,
     required this.controller,
     this.isRequired = true,
+    this.enabled = true,
   });
 
   // ... _getCitySuggestions остается без изменений ...
@@ -765,7 +858,9 @@ class CitySearchField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Styles.b3.copyWith(color: Palette.gray)),
+        Text(label,
+            style: Styles.b3.copyWith(
+                color: enabled ? Palette.gray : Palette.gray.withOpacity(0.5))),
         const SizedBox(height: 6),
         TypeAheadField<String>(
           hideOnUnfocus: false,
@@ -807,16 +902,20 @@ class CitySearchField extends StatelessWidget {
           },
           builder: (context, controller, focusNode) {
             return TextFormField(
+              enabled: enabled,
               controller: controller,
               focusNode: focusNode,
-              style: Styles.b2.copyWith(color: Palette.black),
+              style: Styles.b2
+                  .copyWith(color: enabled ? Palette.black : Palette.gray),
               decoration: InputDecoration(
+                filled: !enabled,
+                fillColor: Palette.background.withOpacity(0.5),
                 suffixIcon: Icon(
                   Icons.keyboard_arrow_right,
                   size: 20,
                   color: Palette.gray,
                 ),
-                fillColor: Palette.white,
+                // fillColor: Palette.white,
                 hintText: hint,
                 hintStyle: Styles.b2.copyWith(color: Palette.gray),
                 labelStyle: Styles.b2.copyWith(color: Palette.gray),
@@ -828,6 +927,10 @@ class CitySearchField extends StatelessWidget {
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: Palette.stroke, width: 1)),
+                disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                        color: Palette.stroke.withOpacity(0.5), width: 1)),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide:

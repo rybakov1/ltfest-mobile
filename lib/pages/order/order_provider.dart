@@ -16,6 +16,7 @@ import 'package:ltfest/providers/user_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 
 import '../../data/models/festival_tariff.dart';
+import '../../providers/loyalty_card_provider.dart';
 import '../payment/payment_provider.dart';
 
 enum DeliveryMethod { onFestival, cdek }
@@ -140,21 +141,34 @@ final orderBasePriceProvider = Provider<int>((ref) {
 final orderTotalPriceProvider = Provider<int>((ref) {
   final basePrice = ref.watch(orderBasePriceProvider);
   final promoState = ref.watch(promoCodeNotifierProvider);
+  final loyaltyCardState = ref.watch(loyaltyCardNotifierProvider);
 
-  return promoState.maybeMap(
-    orElse: () => basePrice,
-    success: (successState) {
-      final promo = successState.promoCode;
-      double discountAmount = 0.0;
-      if (promo.discountType == 'percentage') {
-        discountAmount = basePrice * (promo.discountValue / 100);
-      } else {
-        discountAmount =
-            min(promo.discountValue.toDouble(), basePrice.toDouble());
-      }
+  // Сначала проверяем скидку по карте лояльности (у нее приоритет)
+  return loyaltyCardState.maybeMap(
+    success: (successCardState) {
+      final card = successCardState.loyaltyCard;
+      // Скидка по карте всегда процентная
+      final discountAmount = basePrice * (card.discountPercent / 100);
       final finalPrice = basePrice - discountAmount;
       return finalPrice.isNegative ? 0 : finalPrice.round();
     },
+    // Если карты нет или она не применена, проверяем промокод
+    orElse: () => promoState.maybeMap(
+      success: (successPromoState) {
+        final promo = successPromoState.promoCode;
+        double discountAmount = 0.0;
+        if (promo.discountType == 'percentage') {
+          discountAmount = basePrice * (promo.discountValue / 100);
+        } else {
+          // Фиксированная скидка
+          discountAmount = min(promo.discountValue.toDouble(), basePrice.toDouble());
+        }
+        final finalPrice = basePrice - discountAmount;
+        return finalPrice.isNegative ? 0 : finalPrice.round();
+      },
+      // Если ни карты, ни промокода нет, возвращаем базовую цену
+      orElse: () => basePrice,
+    ),
   );
 });
 

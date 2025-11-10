@@ -238,11 +238,11 @@ class LTButtons {
         foregroundColor: foregroundColor ?? Palette.black,
         disabledForegroundColor: disabledForegroundColor ?? Palette.gray,
         elevation: 0,
-        side: BorderSide(color: Palette.stroke),
+        side: BorderSide(color: disabledBackgroundColor ?? Palette.stroke),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding:
             padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        minimumSize: minimumSize ?? const Size(double.infinity, 44),
+        minimumSize: minimumSize ?? const Size(double.infinity, 42),
       ),
       child: child,
     );

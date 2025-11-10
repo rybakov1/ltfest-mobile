@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/models/age_category.dart';
+import 'package:ltfest/data/models/loyalty_card.dart';
 import 'package:ltfest/data/models/ltstory.dart';
 import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -653,7 +654,28 @@ class ApiService {
     }
   }
 
-  // Получить промокод по его строке (например, "WINTER25")
+  Future<LoyaltyCard> getLoyaltyCardByNumber(String cardNumber) async {
+    try {
+      final response = await _dio.get(
+        ApiEndpoints.loyaltyCards,
+        queryParameters: {
+          'filters[cardNumber][\$eq]': cardNumber,
+          'populate': '*',
+        },
+      );
+
+      final List<dynamic> data = response.data['data'];
+
+      if (data.isEmpty) {
+        throw ApiException(message: 'Промокод не найден');
+      }
+
+      return LoyaltyCard.fromJson(data.first as Map<String, dynamic>);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
   Future<PromoCode> getPromoCodeByCode(String code) async {
     try {
       final response = await _dio.get(

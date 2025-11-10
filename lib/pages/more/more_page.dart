@@ -187,7 +187,7 @@ class ProfileCard extends ConsumerWidget {
             child: Container(
               height: 77,
               decoration: BoxDecoration(
-                color: Palette.black.withValues(alpha: 0.15),
+                color: Palette.black.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Stack(

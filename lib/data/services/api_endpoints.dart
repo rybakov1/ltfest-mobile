@@ -52,6 +52,7 @@ abstract class ApiEndpoints {
   static const String paymentsConfirm = '/api/payments/confirm';
 
   static const String promoCodes = '/api/promocodes';
+  static const String loyaltyCards = '/api/loyalty-cards';
 
   static const String baseStrapiUrl = 'http://37.46.132.144:1337';
 }

@@ -541,7 +541,7 @@ class CartBottomBar extends ConsumerWidget {
     final bool isInCart = cartItem != null;
     return Container(
       padding: EdgeInsets.fromLTRB(
-          16, 24, 16, MediaQuery.of(context).padding.bottom + 16),
+          16, 24, 16, MediaQuery.of(context).padding.bottom + 24),
       decoration: BoxDecoration(
         color: Palette.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -551,15 +551,25 @@ class CartBottomBar extends ConsumerWidget {
         child: !isAvailable
             ? Column(
                 children: [
-                  Text(
-                    "Нет в наличии",
-                    style: Styles.b2.copyWith(color: Palette.gray),
-                  ),
-                  const SizedBox(height: 12),
+                  // Text(
+                  //   "Нет в наличии",
+                  //   style: Styles.b2.copyWith(color: Palette.gray),
+                  // ),
+                  // TODO: Notification
+                  // const SizedBox(height: 12),
+                  // LTButtons.outlinedButton(
+                  //   onPressed: () {},
+                  //   child: Text(
+                  //     "Сообщить об поступлении",
+                  //     style: Styles.button1,
+                  //   ),
+                  // )
                   LTButtons.outlinedButton(
-                    onPressed: () {},
+                    onPressed: null,
+                    disabledBackgroundColor: Palette.white,
+                    disabledForegroundColor: const Color(0xFF9D9D9D),
                     child: Text(
-                      "Сообщить об поступлении",
+                      "Нет в наличии",
                       style: Styles.button1,
                     ),
                   )

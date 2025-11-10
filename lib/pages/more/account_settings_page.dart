@@ -15,6 +15,7 @@ import 'package:ltfest/providers/auth_state.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../components/modal.dart';
 import '../../data/models/age_category.dart';
 import '../../data/models/direction.dart';
 import '../../providers/direction_provider.dart';
@@ -65,7 +66,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       _collectiveCityController.text = user.collectiveCity ?? '';
       _collectiveAgeCategoryController.text = user.age_category?.title ?? '';
       _collectiveCountParticipateController.text =
-          user.count_participant!.toString();
+          user.count_participant.toString() ?? '';
       _selectedDirection = user.direction;
       _selectedAgeCategory = user.age_category;
     }
@@ -113,7 +114,8 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         collectiveCity: _collectiveCityController.text.trim(),
         educationPlace: _educationController.text.trim(),
         masterName: _masterFioController.text.trim(),
-        count_participant: int.parse(_collectiveCountParticipateController.text.trim()),
+        count_participant:
+            int.parse(_collectiveCountParticipateController.text.trim()),
         ageCategoryId: _selectedAgeCategory!.id,
       );
     }
@@ -128,204 +130,8 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
     }
   }
 
-  void _showModalPicker<T>({
-    required BuildContext context,
-    required String title,
-    required AutoDisposeFutureProvider<List<T>> provider,
-    required String Function(T) itemBuilder,
-    T? initialValue,
-    required ValueChanged<T?> onConfirm,
-  }) {
-    T? tempSelectedItem = initialValue;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Palette.white,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (modalContext) {
-        return Consumer(builder: (context, ref, child) {
-          return StatefulBuilder(
-            builder: (context, setModalState) {
-              final asyncValue = ref.watch(provider);
-
-              final bool isItemSelected = tempSelectedItem != null;
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: 24 + MediaQuery.of(context).viewPadding.bottom,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 4, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(width: 40),
-                          Expanded(
-                            child: Text(title,
-                                textAlign: TextAlign.center, style: Styles.h4),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close, color: Palette.gray),
-                            onPressed: () => Navigator.pop(modalContext),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: asyncValue.when(
-                          loading: () => _buildShimmerList(),
-                          error: (err, st) =>
-                              Center(child: Text('Ошибка: $err')),
-                          data: (items) {
-                            if (items.isEmpty) {
-                              return const Center(
-                                  child: Text("Нет данных для выбора"));
-                            }
-                            // ListView теперь сам по себе, без shrinkWrap, т.к. Flexible дает ему границы
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              // Оставляем shrinkWrap для работы внутри Column + Flexible
-                              itemCount: items.length,
-                              itemBuilder: (context, index) {
-                                final item = items[index];
-                                return _buildRadioListTile<T>(
-                                  title: itemBuilder(item),
-                                  value: item,
-                                  groupValue: tempSelectedItem,
-                                  onChanged: (newValue) {
-                                    setModalState(() {
-                                      tempSelectedItem = newValue;
-                                    });
-                                  },
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-
-                    // --- Футер модального окна (кнопка) ---
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16.0, right: 16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: LTButtons.elevatedButton(
-                          onPressed: isItemSelected
-                              ? () => onConfirm(tempSelectedItem)
-                              : null,
-                          child: Text(
-                            'Выбрать',
-                            style: Styles.button1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        });
-      },
-    );
-  }
-
-// --- НОВЫЙ ХЕЛПЕР ДЛЯ СТИЛИЗОВАННОЙ RADIO-КНОПКИ ---
-
-  Widget _buildRadioListTile<T>({
-    required String title,
-    required T value,
-    required T? groupValue,
-    required ValueChanged<T?> onChanged,
-  }) {
-    return InkWell(
-      onTap: () => onChanged(value),
-      child: Row(
-        children: [
-          Radio<T>(
-            value: value,
-            groupValue: groupValue,
-            onChanged: onChanged,
-            activeColor: Palette.secondary,
-            fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-              if (states.contains(WidgetState.selected)) {
-                return Palette.secondary;
-              }
-              return Palette.stroke;
-            }),
-          ),
-          const SizedBox(width: 0.0),
-          // Контролируем расстояние между Radio и текстом
-          Expanded(
-            child: Text(title, style: Styles.b2),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildShimmerList() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxHeight: 300.0, // Ограничиваем высоту шиммера
-        ),
-        child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          // Отключаем прокрутку внутри шиммера
-          itemCount: 6,
-          itemBuilder: (_, __) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 48.0,
-                  height: 48.0,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        height: 8.0,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 150.0,
-                        // Используем фиксированную ширину вместо MediaQuery
-                        height: 8.0,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   void _showDirectionPicker() {
-    _showModalPicker<Direction>(
+    showModalPicker<Direction>(
       context: context,
       title: 'Направление',
       provider: directionsProvider,
@@ -339,7 +145,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
   }
 
   void _showAgeCategoryPicker() {
-    _showModalPicker<AgeCategory>(
+    showModalPicker<AgeCategory>(
       context: context,
       title: 'Возрастная категория',
       provider: ageCategoryProvider,
@@ -827,7 +633,6 @@ class _CollectiveForm extends StatelessWidget {
     final state = context.findAncestorStateOfType<_AccountSettingsPageState>();
     final selectedDirection = state?._selectedDirection;
     final selectedAgeCategory = state?._selectedAgeCategory;
-
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
