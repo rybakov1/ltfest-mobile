@@ -369,9 +369,13 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                   final selectedIndex = ref.read(learningTypeIndexProvider);
                   final laboratory = laboratoryAsync.value;
 
-                  if (laboratory != null && laboratory.learningTypes != null && laboratory.learningTypes!.isNotEmpty) {
-                    final selectedLearningType = laboratory.learningTypes![selectedIndex];
-                    context.push(AppRoutes.laboratoryOrder, extra: selectedLearningType);
+                  if (laboratory != null &&
+                      laboratory.learningTypes != null &&
+                      laboratory.learningTypes!.isNotEmpty) {
+                    final selectedLearningType =
+                        laboratory.learningTypes![selectedIndex];
+                    context.push(AppRoutes.laboratoryOrder,
+                        extra: selectedLearningType);
                   }
                 },
                 child: Text("Оплатить", style: Styles.button1),
@@ -708,31 +712,25 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
-
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 6.0),
-                  child: SvgPicture.asset('assets/icons/map_point.svg', width: 16, height: 16,),
-                ),
+                SvgPicture.asset('assets/icons/map_point.svg',
+                    width: 20, height: 20),
                 const SizedBox(width: 16),
-                Container(
-                  child: Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-
-                      children: [
-                        Text("Место", style: Styles.h5.copyWith(fontSize: 18)),
-                        Text(
-                          laboratory.learningTypes?.isNotEmpty ?? false
-                              ? laboratory.learningTypes![learningTypeIndex]
-                                      .location ??
-                                  'Место неизвестно'
-                              : 'Место недоступно',
-                          style: Styles.b2.copyWith(color: Palette.gray),
-                        ),
-                      ],
-                    ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("Место", style: Styles.h5),
+                      Text(
+                        laboratory.learningTypes?.isNotEmpty ?? false
+                            ? laboratory.learningTypes![learningTypeIndex]
+                                    .location ??
+                                'Место неизвестно'
+                            : 'Место недоступно',
+                        style: Styles.b2.copyWith(color: Palette.gray),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -742,15 +740,16 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 6.0),
-                  child: SvgPicture.asset('assets/icons/time.svg', width: 16),
+                  padding: const EdgeInsets.only(top: 2.0),
+                  child: SvgPicture.asset('assets/icons/time.svg',
+                      width: 20, height: 20),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Время прохождения", style: Styles.h5.copyWith(fontSize: 18)),
+                      Text("Время прохождения", style: Styles.h5),
                       Text(
                         laboratory.learningTypes?.isNotEmpty ?? false
                             ? laboratory.learningTypes![learningTypeIndex]
@@ -768,17 +767,17 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // TODO: icons
                 Padding(
-                  padding: const EdgeInsets.only(top: 6.0),
-                  child: SvgPicture.asset('assets/icons/certificate.svg', width: 16),
+                  padding: const EdgeInsets.only(top: 2.0),
+                  child: SvgPicture.asset('assets/icons/certificate.svg',
+                      width: 20, height: 20),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Сертификат", style: Styles.h5.copyWith(fontSize: 18)),
+                      Text("Сертификат", style: Styles.h5),
                       Text(
                         laboratory.learningTypes?.isNotEmpty ?? false
                             ? laboratory.learningTypes![learningTypeIndex]
