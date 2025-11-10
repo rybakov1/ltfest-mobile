@@ -707,23 +707,32 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
             const SizedBox(height: 24),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+
               children: [
-                SvgPicture.asset('assets/icons/map_point.svg', width: 16),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: SvgPicture.asset('assets/icons/map_point.svg', width: 16, height: 16,),
+                ),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Место", style: Styles.h5),
-                      Text(
-                        laboratory.learningTypes?.isNotEmpty ?? false
-                            ? laboratory.learningTypes![learningTypeIndex]
-                                    .location ??
-                                'Место неизвестно'
-                            : 'Место недоступно',
-                        style: Styles.b2.copyWith(color: Palette.gray),
-                      ),
-                    ],
+                Container(
+                  child: Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+
+                      children: [
+                        Text("Место", style: Styles.h5.copyWith(fontSize: 18)),
+                        Text(
+                          laboratory.learningTypes?.isNotEmpty ?? false
+                              ? laboratory.learningTypes![learningTypeIndex]
+                                      .location ??
+                                  'Место неизвестно'
+                              : 'Место недоступно',
+                          style: Styles.b2.copyWith(color: Palette.gray),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -732,13 +741,16 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SvgPicture.asset('assets/icons/time.svg', width: 16),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: SvgPicture.asset('assets/icons/time.svg', width: 16),
+                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Время прохождения", style: Styles.h5),
+                      Text("Время прохождения", style: Styles.h5.copyWith(fontSize: 18)),
                       Text(
                         laboratory.learningTypes?.isNotEmpty ?? false
                             ? laboratory.learningTypes![learningTypeIndex]
@@ -757,13 +769,16 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // TODO: icons
-                SvgPicture.asset('assets/icons/certificate.svg', width: 16),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: SvgPicture.asset('assets/icons/certificate.svg', width: 16),
+                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Сертификат", style: Styles.h5),
+                      Text("Сертификат", style: Styles.h5.copyWith(fontSize: 18)),
                       Text(
                         laboratory.learningTypes?.isNotEmpty ?? false
                             ? laboratory.learningTypes![learningTypeIndex]
