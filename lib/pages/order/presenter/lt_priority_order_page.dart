@@ -5,7 +5,6 @@ import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:ltfest/pages/order/order_provider.dart';
 
-import '../../../data/models/user.dart';
 import '../../../providers/user_provider.dart';
 import '../components/custom_text_fields.dart';
 import '../components/loyalty_promo_section.dart';
@@ -70,10 +69,11 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(orderProvider.notifier).startOrder(
+    ref.read(orderProvider.notifier).startOrder(
           type: OrderType.ltpriority,
           item: widget.tariff,
-        ));
+        );
+
     final state = ref.read(orderProvider);
     final user = ref.read(userProvider);
 
@@ -204,7 +204,7 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
                           buildTextField(
                             controller: _collectiveNameController,
                             label: "Название коллектива*",
-                            hint: "Введите название",
+                            hint: "Введите",
                             onChanged: orderNotifier.updateCollectiveName,
                             func: _resetValidationState,
                             isInvalid: validationState.isCollectiveNameInvalid,

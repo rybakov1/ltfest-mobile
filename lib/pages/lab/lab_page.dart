@@ -13,6 +13,7 @@ import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/laboratory.dart';
 import 'package:ltfest/providers/direction_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
+import 'package:shimmer/shimmer.dart';
 
 class LaboratoryPage extends ConsumerStatefulWidget {
   const LaboratoryPage({super.key});
@@ -291,6 +292,63 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
     );
   }
 
+  Widget _buildShimmerEventCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Плейсхолдер для картинки
+            Container(
+              height: 180,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Плейсхолдер для заголовка
+            Container(
+              height: 24,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Плейсхолдер для адреса и даты
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  height: 16,
+                  width: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                Container(
+                  height: 16,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final laboratoriesAsync = ref.watch(laboratoriesNotifierProvider);
@@ -532,22 +590,43 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                       ),
                     ),
                     Expanded(
-                      child: AsyncItemsListView(
-                        asyncValue: laboratoriesAsync,
-                        items: filteredLaboratories,
-                        onRefresh: () =>
-                            ref.refresh(laboratoriesNotifierProvider.future),
-                        itemBuilder: (context, index) {
-                          final laboratory = filteredLaboratories[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: _buildEventCard(
-                              laboratory: laboratory,
-                              category: selectedDirection ?? 'Театр',
-                              context: context,
-                            ),
-                          );
-                        },
+                      child: laboratoriesAsync.when(
+                          loading: () => ListView.builder(
+                            itemCount: 5,
+                            itemBuilder: (context, index) =>
+                                _buildShimmerEventCard(),
+                          ),
+                          error: (error, stackTrace) => Center(
+                            child: Text('Произошла ошибка: $error'),
+                          ),
+                          data: (state) {
+                            if (filteredLaboratories.isEmpty) {
+                              return const Center(
+                                child: Text(
+                                  'Ничего не найдено',
+                                  style:
+                                  TextStyle(fontSize: 18, color: Colors.grey),
+                                ),
+                              );
+                            }
+                            return AsyncItemsListView(
+                              asyncValue: laboratoriesAsync,
+                              items: filteredLaboratories,
+                              onRefresh: () =>
+                                  ref.refresh(laboratoriesNotifierProvider.future),
+                              itemBuilder: (context, index) {
+                                final laboratory = filteredLaboratories[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                  child: _buildEventCard(
+                                    laboratory: laboratory,
+                                    category: selectedDirection ?? 'Театр',
+                                    context: context,
+                                  ),
+                                );
+                              },
+                            );
+                          }
                       ),
                     ),
                   ],

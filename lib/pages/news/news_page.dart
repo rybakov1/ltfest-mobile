@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/router/app_routes.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../constants.dart';
 import '../../data/models/news.dart';
@@ -12,6 +12,43 @@ import '../../providers/news_provider.dart';
 
 class NewsPage extends ConsumerWidget {
   const NewsPage({super.key});
+
+  Widget _buildShimmerNewsCard() {
+    return Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 160,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 20,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              height: 16,
+              width: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ],
+        ));
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -74,9 +111,18 @@ class NewsPage extends ConsumerWidget {
                         },
                       );
                     },
-                    loading: () => Center(
-                      child:
-                          CircularProgressIndicator(color: Palette.primaryLime),
+                    loading: () => GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 4,
+                        mainAxisExtent: 232,
+                      ),
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                        return _buildShimmerNewsCard();
+                      },
                     ),
                     error: (error, stack) => Padding(
                       padding: const EdgeInsets.all(16.0),

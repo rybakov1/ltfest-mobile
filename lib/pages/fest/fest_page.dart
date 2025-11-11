@@ -11,6 +11,7 @@ import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/festival.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../components/lt_appbar.dart';
 import '../../providers/favorites_provider.dart';
@@ -52,14 +53,13 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     _storiesAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
 
-    // CurvedAnimation делает движение более естественным (нелинейным)
     _storiesAnimation = CurvedAnimation(
       parent: _storiesAnimationController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOut,
     );
 
     _storiesAnimationController.value = 1.0;
@@ -75,8 +75,11 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
     super.dispose();
   }
 
+  /// Here scroll distance to show up a stories
   void _scrollListener() {
-    final progress = (_scrollController.offset / 100.0).clamp(0.0, 1.0);
+    const double storiesAnimationDistance = 150.0;
+    final progress =
+        (_scrollController.offset / storiesAnimationDistance).clamp(0.0, 1.0);
     _storiesAnimationController.value = 1.0 - progress;
   }
 
@@ -222,6 +225,64 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
     );
   }
 
+  Widget _buildShimmerEventCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Padding(
+        // Отступ, как у оригинальной карточки
+        padding: const EdgeInsets.only(bottom: 32.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Плейсхолдер для картинки
+            Container(
+              height: 180,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Плейсхолдер для заголовка
+            Container(
+              height: 24,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Плейсхолдер для адреса и даты
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  height: 16,
+                  width: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                Container(
+                  height: 16,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String title = widget.category;
@@ -237,7 +298,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
         if (newState != null && newState.filteredFestivals.length <= 2) {
           _storiesAnimationController.animateTo(
             1.0,
-            duration: const Duration(milliseconds: 150),
+            duration: const Duration(milliseconds: 250),
             curve: Curves.easeOut,
           );
         }
@@ -296,7 +357,9 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                                   : Palette.primaryLime,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: festivalState.selectedCities.isEmpty ? Palette.stroke : Palette.primaryLime,
+                                color: festivalState.selectedCities.isEmpty
+                                    ? Palette.stroke
+                                    : Palette.primaryLime,
                                 width: 1,
                               ),
                             ),
@@ -400,7 +463,8 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                                 ),
                               ),
                               hintText: "Поиск",
-                              hintStyle: Styles.b2.copyWith(color: Palette.gray),
+                              hintStyle:
+                                  Styles.b2.copyWith(color: Palette.gray),
                               constraints: const BoxConstraints(maxHeight: 43),
                               contentPadding: const EdgeInsets.only(
                                 left: 16,
@@ -414,26 +478,52 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                     ),
                     const SizedBox(height: 16),
                     Flexible(
-                      child: AsyncItemsListView(
-                        scrollController: _scrollController,
-                        asyncValue: festivalsAsync,
-                        items: festivalState.filteredFestivals,
-                        onRefresh: () => ref.refresh(
-                            festivalsNotifierProvider(widget.category).future),
-                        itemBuilder: (context, index) {
-                          final festival =
-                              festivalState.filteredFestivals[index];
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom: index <
-                                      festivalState.filteredFestivals.length - 1
-                                  ? 32.0
-                                  : 8,
-                            ),
-                            child: _buildEventCard(
-                              festival: festival,
-                              context: context,
-                            ),
+                      child: festivalsAsync.when(
+                        loading: () => ListView.builder(
+                          itemCount: 5,
+                          // Показываем 5 заглушек, чтобы заполнить экран
+                          itemBuilder: (context, index) =>
+                              _buildShimmerEventCard(),
+                        ),
+                        error: (error, stackTrace) => Center(
+                          child: Text('Произошла ошибка: $error'),
+                        ),
+                        data: (state) {
+                          if (festivalState.filteredFestivals.isEmpty) {
+                            return const Center(
+                              child: Text(
+                                'Ничего не найдено',
+                                style:
+                                    TextStyle(fontSize: 18, color: Colors.grey),
+                              ),
+                            );
+                          }
+
+                          return AsyncItemsListView(
+                            scrollController: _scrollController,
+                            asyncValue: festivalsAsync,
+                            items: festivalState.filteredFestivals,
+                            onRefresh: () => ref.refresh(
+                                festivalsNotifierProvider(widget.category)
+                                    .future),
+                            itemBuilder: (context, index) {
+                              final festival =
+                                  festivalState.filteredFestivals[index];
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: index <
+                                          festivalState
+                                                  .filteredFestivals.length -
+                                              1
+                                      ? 32.0
+                                      : 8,
+                                ),
+                                child: _buildEventCard(
+                                  festival: festival,
+                                  context: context,
+                                ),
+                              );
+                            },
                           );
                         },
                       ),

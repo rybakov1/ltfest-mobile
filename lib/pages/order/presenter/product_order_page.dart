@@ -217,7 +217,7 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
                           buildTextField(
                             controller: _collectiveNameController,
                             label: "Название коллектива*",
-                            hint: "Введите название",
+                            hint: "Введите",
                             onChanged: orderNotifier.updateCollectiveName,
                             isInvalid: validationState.isCollectiveNameInvalid,
                             func: _resetValidationState,

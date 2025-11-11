@@ -68,13 +68,12 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(orderProvider.notifier).startOrder(
-          type: OrderType.laboratory,
-          item: widget.learningType,
-        ));
-    final state = ref.read(orderProvider);
+    ref.read(orderProvider.notifier).startOrder(
+      type: OrderType.laboratory,
+      item: widget.learningType,
+    );
 
-    // ref.read(orderProvider.notifier).reset(OrderType.laboratory);
+    final state = ref.read(orderProvider);
     final user = ref.read(userProvider);
 
     _nameController = TextEditingController(text: state.payerName);
@@ -220,7 +219,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                           buildTextField(
                             controller: _collectiveNameController,
                             label: "Название коллектива*",
-                            hint: "Лопушки",
+                            hint: "Введите",
                             func: _resetValidationState,
                             onChanged: orderNotifier.updateCollectiveName,
                             isInvalid: validationState.isPhoneInvalid,

@@ -56,10 +56,12 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(orderProvider.notifier).startOrder(
+
+    ref.read(orderProvider.notifier).startOrder(
           type: OrderType.festival,
           item: widget.tariff,
-        ));
+        );
+
     final state = ref.read(orderProvider);
 
     _nameController = TextEditingController(text: state.payerName);
@@ -168,7 +170,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                           _buildTextField(
                             controller: _collectiveNameController,
                             label: "Название коллектива",
-                            hint: "Лопушки",
+                            hint: "Введите",
                             onChanged: orderNotifier.updateCollectiveName,
                             isInvalid: validationState.isCollectiveNameInvalid,
                           ),

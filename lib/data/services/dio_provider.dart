@@ -4,9 +4,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:io';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
+import '../../providers/connectivity_provider.dart';
 import 'token_storage.dart';
 
 part 'dio_provider.g.dart';
+
+class DioConnectivityInterceptor extends Interceptor {
+  final Ref _ref;
+
+  DioConnectivityInterceptor(this._ref);
+
+  @override
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    final connectivityStatus = _ref.read(connectivityStatusProvider);
+    if (connectivityStatus.value == ConnectivityStatus.isDisconnected) {
+      return handler.reject(
+        DioException(
+          requestOptions: options,
+          error: "Нет подключения к интернету",
+        ),
+      );
+    }
+
+    return handler.next(options);
+  }
+}
 
 class AuthInterceptor extends Interceptor {
   // Мы передаем Ref, чтобы иметь доступ к TokenStorage
@@ -68,7 +91,8 @@ Dio dio(Ref ref) {
         (X509Certificate cert, String host, int port) => true;
     return client;
   };
-
+  
+  dio.interceptors.add(DioConnectivityInterceptor(ref));
   dio.interceptors.add(RetryInterceptor(
     dio: dio,
     logPrint: print,

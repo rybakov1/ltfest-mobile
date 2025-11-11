@@ -29,6 +29,7 @@ import '../data/models/festival_tariff.dart';
 import '../pages/auth/input_code_page.dart';
 import '../pages/cart/cart_page.dart';
 import '../pages/more/favorites_page.dart';
+import '../pages/no_internet_page.dart';
 import '../pages/payment/payment_failure_screen.dart';
 import '../pages/payment/payment_init_screen.dart';
 import '../pages/payment/payment_provider.dart';
@@ -40,18 +41,34 @@ import '../pages/reference/presenter/lt_priority_page.dart';
 import '../pages/reference/presenter/lt_winner_page.dart';
 import '../pages/splash_page.dart';
 import '../providers/auth_state.dart';
+import '../providers/connectivity_provider.dart';
 import '../providers/user_provider.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final listenable = ValueNotifier<int>(0);
   ref.listen(authNotifierProvider, (_, __) => listenable.value++);
+  ref.listen(connectivityStatusProvider, (_, __) => listenable.value++);
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
     refreshListenable: listenable,
     redirect: (BuildContext context, GoRouterState state) {
-      final authState = ref.read(authNotifierProvider);
+      final connectivity = ref.read(connectivityStatusProvider).value;
       final currentLocation = state.uri.path;
+
+      const allowedRoutes = [
+        AppRoutes.splash,
+        AppRoutes.login,
+        AppRoutes.registration,
+        AppRoutes.verification,
+        AppRoutes.noInternet,
+      ];
+
+      if (connectivity == ConnectivityStatus.isDisconnected && !allowedRoutes.contains(currentLocation)) {
+        return AppRoutes.noInternet;
+      }
+
+      final authState = ref.read(authNotifierProvider);
 
       final isAuthRoute = currentLocation == AppRoutes.login ||
           currentLocation == AppRoutes.verification ||
@@ -103,6 +120,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       body: Center(child: Text('Страница не найдена: ${state.uri}')),
     ),
     routes: [
+      GoRoute(
+        path: AppRoutes.noInternet,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: NoInternetPage(),
+        ),
+      ),
       GoRoute(
         path: AppRoutes.splash,
         pageBuilder: (context, state) => const NoTransitionPage(

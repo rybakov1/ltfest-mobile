@@ -1,5 +1,3 @@
-// lib/pages/payment/payment_success_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -77,7 +75,8 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
         data: (state) => Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16)
+                  .copyWith(top: MediaQuery.of(context).padding.top + 24),
               decoration: Decor.base.copyWith(
                 color: Palette.background,
                 borderRadius: const BorderRadius.only(
@@ -86,15 +85,10 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                 ),
               ),
               width: double.infinity,
-              child: Column(
-                children: [
-                  const SizedBox(height: 24),
-                  Text(
-                    'Заявка успешно оформлена!',
-                    style: Styles.h4,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+              child: Text(
+                'Заявка успешно оформлена!',
+                style: Styles.h4,
+                textAlign: TextAlign.center,
               ),
             ),
             Expanded(
@@ -112,18 +106,16 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                             style: Styles.b1.copyWith(color: Palette.gray),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 16),
                           const ShopWidget(),
                           const Spacer(),
                           LTButtons.outlinedButton(
                             onPressed: () {
                               ref.read(cartProvider.notifier).clearCart();
-                              ref
-                                  .read(paymentNotifierProvider.notifier)
+                              ref.read(paymentNotifierProvider.notifier)
                                   .resetState();
                               context.go(AppRoutes.home);
                             },
-                            child: Text('Закрыть!', style: Styles.button1),
+                            child: Text('Закрыть', style: Styles.button1),
                           ),
                           const SizedBox(height: 40),
                         ],

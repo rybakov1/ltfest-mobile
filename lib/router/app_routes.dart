@@ -37,4 +37,6 @@ class AppRoutes {
   static const String paymentInit = '/payment/init';
   static const String paymentSuccess = '/success/:id';
   static const String paymentFailure = '/fail/:id';
+
+  static const String noInternet = '/no-internet';
 }

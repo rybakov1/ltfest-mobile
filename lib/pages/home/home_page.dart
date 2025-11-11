@@ -175,12 +175,12 @@ class HomePage extends ConsumerWidget {
                                 onTap: () => context.push(AppRoutes.ltPay),
                               ),
                               // TODO: lttravel waiting
-                              // _buildServiceCard(
-                              //   imagePath: 'assets/images/lt_travel.png',
-                              //   label: 'LT Travel',
-                              //   isSmall: true,
-                              //   onTap: () => context.push(AppRoutes.ltTravel),
-                              // ),
+                              _buildServiceCard(
+                                imagePath: 'assets/images/lt_travel.png',
+                                label: 'LT Travel',
+                                isSmall: true,
+                                onTap: () => context.push(AppRoutes.ltTravel),
+                              ),
                               _buildServiceCard(
                                 imagePath: 'assets/images/lt_priority.png',
                                 label: 'LT Priority',

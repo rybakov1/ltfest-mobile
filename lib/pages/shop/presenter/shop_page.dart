@@ -11,6 +11,7 @@ import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/router/app_routes.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../data/models/product/product.dart';
 
@@ -36,6 +37,53 @@ class _ShopPageState extends ConsumerState<ShopPage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Widget _buildShimmerProductCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 196,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 20,
+            width: 80,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            height: 16,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            height: 14,
+            width: 100,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -119,7 +167,21 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                                 return Text("This is error, $st");
                               },
                               loading: () {
-                                return Text("loading.......");
+                                return GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 8,
+                                    mainAxisSpacing: 16,
+                                    mainAxisExtent: 288,
+                                  ),
+                                  itemCount: 4, // Показываем 4 заглушки
+                                  itemBuilder: (context, index) {
+                                    return _buildShimmerProductCard();
+                                  },
+                                );
                               },
                             ),
                           ],

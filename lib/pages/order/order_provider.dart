@@ -183,6 +183,7 @@ class OrderNotifier extends StateNotifier<OrderState> {
       payableItem: item,
       seatCount: 1,
     );
+
     _prefillUserData();
   }
 

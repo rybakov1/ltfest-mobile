@@ -1,7 +1,7 @@
 name: ltfest
 description: "LT Fest"
 publish_to: 'none'
-version: 0.1.1+4
+version: 0.1.2+10
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -38,6 +38,7 @@ dependencies:
   app_links: ^6.4.1  # Для Deeplink
   sentry_flutter: ^9.7.0
   flutter_native_splash: ^2.4.7
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   sentry_dart_plugin: ^3.1.1
@@ -103,7 +104,7 @@ flutter_native_splash:
 
   android_gravity: center
   ios_content_mode: center
-  fullscreen: true
+#  fullscreen: true
 
   # --- Для Android 12+ ---
   android_12:
