@@ -1,7 +1,8 @@
 import UIKit
 import Flutter
+import SafariServices
 
-@main
+@UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
   override func application(
     _ application: UIApplication,
@@ -11,17 +12,18 @@ import Flutter
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-    override func application(
-      _ app: UIApplication,
-      open url: URL,
-      options: [UIApplication.OpenURLOptionsKey : Any] = [:]
-    ) -> Bool {
-      if url.scheme == "ltfestapp" {
-        guard let rootViewController = window?.rootViewController else {
-          return false
-        }
-        rootViewController.dismiss(animated: true, completion: nil)
+  override func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+  ) -> Bool {
+    if url.scheme == "ltfestapp" {
+      guard let rootViewController = window?.rootViewController else {
+        return false
       }
-      return super.application(app, open: url, options: options)
+      rootViewController.dismiss(animated: true, completion: nil)
     }
+
+    return super.application(app, open: url, options: options)
+  }
 }
