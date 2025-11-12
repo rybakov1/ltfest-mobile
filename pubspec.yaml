@@ -104,7 +104,7 @@ flutter_native_splash:
 
   android_gravity: center
   ios_content_mode: center
-#  fullscreen: true
+  fullscreen: false
 
   # --- Для Android 12+ ---
   android_12:

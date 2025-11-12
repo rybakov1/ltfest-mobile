@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/router/router.dart';
@@ -6,6 +7,10 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 // 11.10 build
 Future<void> main() async {
+
+ WidgetsFlutterBinding.ensureInitialized();
+ SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+
   await SentryFlutter.init(
     (options) {
       options.dsn = 'https://143ecd79de653a2d4c96a9a5ffc84ace@o4510202029801472.ingest.de.sentry.io/4510202031112272';
