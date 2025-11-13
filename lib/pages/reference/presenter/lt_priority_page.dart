@@ -14,7 +14,7 @@ class LtPriorityPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tariffsAsync = ref.watch(priorityTariffsProvider);
-    
+
     return ReferencePage(
       title: 'LT Priority',
       imageAsset: 'assets/images/lt_priority_full.png',
@@ -46,17 +46,20 @@ class LtPriorityPage extends ConsumerWidget {
               const SizedBox(height: 24),
               tariffsAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Center(child: Text('Не удалось загрузить тарифы: $err')),
+                error: (err, stack) =>
+                    Center(child: Text('Не удалось загрузить тарифы: $err')),
                 data: (tariffs) {
                   if (tariffs.isEmpty) {
-                    return const Center(child: Text('Для этого фестиваля пока нет тарифов.'));
+                    return const Center(
+                        child: Text('Для этого фестиваля пока нет тарифов.'));
                   }
 
                   return ListView.separated(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: tariffs.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final tariff = tariffs[index];
 
@@ -64,7 +67,9 @@ class LtPriorityPage extends ConsumerWidget {
                         title: tariff.title,
                         price: tariff.price.toInt(),
                         description: tariff.description,
-                        bonuses: tariff.features.map((feature) => feature.title).toList(),
+                        bonuses: tariff.features
+                            .map((feature) => feature.title)
+                            .toList(),
                         onBuyPressed: () {
                           context.push(AppRoutes.priorityOrder, extra: tariff);
                         },
@@ -191,11 +196,22 @@ class LtPriorityPage extends ConsumerWidget {
         children: [
           Text('Часто задаваемые вопросы', style: Styles.h3),
           const SizedBox(height: 24),
-          for (var item in faqItems)
-            FaqItem(
-              question: item['q']!,
-              answer: item['a']!,
-            ),
+          Column(
+            children: [
+              for (int i = 0; i < faqItems.length; i++) ...[
+                FaqItem(
+                  question: faqItems[i]['q']!,
+                  answer: faqItems[i]['a']!,
+                ),
+                if (i < faqItems.length - 1)
+                  Divider(
+                    color: Palette.stroke,
+                    height: 1,
+                    thickness: 1,
+                  ),
+              ],
+            ],
+          ),
         ],
       ),
     );
@@ -270,7 +286,8 @@ class _LTPriorityTariffState extends State<LTPriorityTariff>
                   Row(
                     children: [
                       Text("Подробнее",
-                          style: Styles.b3.copyWith(color: Palette.secondary)),
+                          style: Styles.b3.copyWith(
+                              color: Palette.secondary, fontSize: 14)),
                       AnimatedRotation(
                         turns: _expanded ? 0.5 : 0.0,
                         duration: widget.animationDuration,

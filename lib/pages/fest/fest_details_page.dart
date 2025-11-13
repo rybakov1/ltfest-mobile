@@ -621,7 +621,8 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
   Widget festivalTariffInfo(Festival festival) {
     final user = ref.watch(userProvider);
     // 1. Вызываем новый provider с ID текущего фестиваля
-    final tariffsAsync = ref.watch(festivalTariffsProvider);
+    final tariffsAsync = ref.watch(tariffsForFestivalProvider(festival.id));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -652,20 +653,19 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
         const SizedBox(height: 24),
         Text("Тарифы", style: Styles.h3),
         const SizedBox(height: 16),
-
-        // 2. Используем .when для обработки состояний загрузки/ошибки/данных
         tariffsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Не удалось загрузить тарифы: $err')),
+          error: (err, stack) =>
+              Center(child: Text('Не удалось загрузить тарифы: $err')),
           data: (tariffs) {
             if (tariffs.isEmpty) {
-              return const Center(child: Text('Для этого фестиваля пока нет тарифов.'));
+              return const Center(
+                  child: Text('Для этого фестиваля пока нет тарифов.'));
             }
 
-            // 3. Строим список виджетов LTTariff в цикле
             return ListView.separated(
-              physics: const NeverScrollableScrollPhysics(), // Отключаем скролл у вложенного списка
-              shrinkWrap: true, // Сжимаем список до размера его содержимого
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
               itemCount: tariffs.length,
               separatorBuilder: (context, index) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
@@ -673,15 +673,22 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
 
                 return LTTariff(
                   title: tariff.title,
-                  price: tariff.price.toInt(), // Конвертируем double в int
+                  price: tariff.price.toInt(),
                   description: tariff.description,
+                  priceDescription: tariff.price_description,
+                  factPrice: tariff.fact_price?.toInt(),
                   category: widget.category,
-                  // Преобразуем компоненты "feature" в список бонусов
-                  bonuses: tariff.feature.map((feature) => feature.title).toList(),
+                  bonuses:
+                      tariff.feature.map((feature) => feature.title).toList(),
                   onBuyPressed: () {
-                    // 4. При нажатии "Купить" переходим на страницу заказа,
-                    // передавая ВЕСЬ ОБЪЕКТ тарифа.
                     context.push(AppRoutes.festivalOrder, extra: tariff);
+                  },
+                  onSecondaryBuyPressed: () async {
+                    final Uri uri = Uri.parse("https://t.me/LTPay_Later_bot");
+                    await launchUrl(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    );
                   },
                 );
               },
@@ -691,74 +698,17 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
       ],
     );
   }
-//
-//   Widget festivalTariffInfo(Festival festival) {
-//     final user = ref.watch(userProvider);
-//
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Text("Важно", style: Styles.h3),
-//         const SizedBox(height: 16),
-//         Text(
-//           "Перед оплатой фестиваля необходимо чтобы руководитель заполнил заявку на участие. Только после заполнения заявки и подтверждения от организатора, родители приступают к оплате фестиваля.",
-//           style: Styles.b1,
-//         ),
-//         if (user!.activity!.title == "Руководитель коллектива") ...[
-//           const SizedBox(height: 16),
-//           LTButtons.elevatedButton(
-//             onPressed: () async {
-//               final Uri uri = Uri.parse(
-//                 festival.entryurl!,
-//               );
-//               await launchUrl(
-//                 uri,
-//                 mode: LaunchMode.externalApplication,
-//               );
-//             },
-//             child: Text("Заполнить заявку", style: Styles.button1),
-//             backgroundColor: widget.category == "Театр"
-//                 ? Palette.primaryLime
-//                 : Palette.primaryPink,
-//           ),
-//         ],
-//         const SizedBox(height: 24),
-//         Text("Тарифы", style: Styles.h3),
-//         const SizedBox(height: 16),
-//         LTTariff(
-//           title: "Местный",
-//           price: 7500,
-//           category: widget.category,
-//           description: "Стоимость тарифа включает один спектакль",
-//           bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
-//         ),
-//         const SizedBox(height: 8),
-//         LTTariff(
-//           title: "Самостоятельный",
-//           price: 15000,
-//           category: widget.category,
-//           description: "Стоимость тарифа включает один спектакль",
-//           bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
-//         ),
-//         const SizedBox(height: 8),
-//         LTTariff(
-//           title: "Всё включено",
-//           price: 26950,
-//           description: "Стоимость тарифа включает один спектакль",
-//           category: widget.category,
-//           bonuses: const ["Фирменный подарок", "Участие в 2-х номинациях"],
-//         ),
-//       ],
-//     );
-//   }
 }
 
 class LTTariff extends StatefulWidget {
   final String title;
+  final int? factPrice;
+  final String? priceDescription;
   final int price;
-  final String description;
+  final String? description;
   final String category;
   final VoidCallback onBuyPressed;
+  final VoidCallback onSecondaryBuyPressed;
   final List<String> bonuses;
 
   final List<Widget> children;
@@ -770,14 +720,17 @@ class LTTariff extends StatefulWidget {
     super.key,
     required this.title,
     required this.price,
-    required this.description,
+    this.factPrice,
+    this.description,
     required this.category,
     required this.onBuyPressed,
+    required this.onSecondaryBuyPressed,
     this.children = const [],
     this.bonuses = const [],
     this.initiallyExpanded = false,
     this.animationDuration = const Duration(milliseconds: 200),
     this.animationCurve = Curves.easeInOut,
+    this.priceDescription,
   });
 
   @override
@@ -815,15 +768,19 @@ class _LTTariffState extends State<LTTariff>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(widget.title, style: Styles.h4),
+                  const SizedBox(height: 12),
                   Text("${Utils.formatMoney(widget.price)}/чел",
                       style: Styles.h2),
-                  const SizedBox(height: 8),
-                  Text(widget.description, style: Styles.b2),
+                  if (widget.description != null) ...[
+                    const SizedBox(height: 8),
+                    Text(widget.description!, style: Styles.b2),
+                  ],
                   const SizedBox(height: 24),
                   Row(
                     children: [
                       Text("Подробнее",
-                          style: Styles.b3.copyWith(color: Palette.secondary)),
+                          style: Styles.b3.copyWith(
+                              color: Palette.secondary, fontSize: 14)),
                       AnimatedRotation(
                         turns: _expanded ? 0.5 : 0.0,
                         duration: widget.animationDuration,
@@ -847,22 +804,26 @@ class _LTTariffState extends State<LTTariff>
                 if (widget.bonuses.isNotEmpty)
                   for (int i = 0; i < widget.bonuses.length; i++) ...[
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(Icons.check_circle,
                             color: widget.category == "Театр"
                                 ? Palette.primaryLime
                                 : Palette.primaryPink),
                         const SizedBox(width: 8),
-                        Text(widget.bonuses[i], style: Styles.b2)
+                        Expanded(
+                          child: Text(widget.bonuses[i], style: Styles.b2),
+                        )
                       ],
                     ),
                     const SizedBox(height: 16),
                   ],
                 const SizedBox(height: 24),
-                Text("Предоплата 50%",
+                Text(widget.priceDescription ?? "Предоплата 50%",
                     style: Styles.b2.copyWith(color: Palette.gray)),
                 const SizedBox(height: 8),
-                Text("${Utils.formatMoney((widget.price / 2).toInt())}/чел",
+                Text(
+                    "${Utils.formatMoney(widget.factPrice ?? (widget.price / 2).toInt())}/чел",
                     style: Styles.h2),
                 const SizedBox(height: 16),
                 LTButtons.elevatedButton(
@@ -873,8 +834,8 @@ class _LTTariffState extends State<LTTariff>
                         : Palette.primaryPink),
                 const SizedBox(height: 8),
                 LTButtons.elevatedButton(
-                    onPressed: widget.onBuyPressed,
-                    child: Text("В рассрочку от 3 мес.",
+                    onPressed: widget.onSecondaryBuyPressed,
+                    child: Text("LT Pay: рассрочка от 3 мес.",
                         style: Styles.button1.copyWith(color: Palette.black)),
                     backgroundColor: Palette.secondaryGray)
               ],

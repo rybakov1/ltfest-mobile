@@ -161,7 +161,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
         children: [
           Image.asset("assets/icons/states/nothing.png", width: 192),
           const SizedBox(height: 12),
-          Text("Здесь пока ничего нет", style: Styles.b3),
+          Text("Здесь пока ничего нет", style: Styles.b2.copyWith(color: Palette.gray)),
         ],
       ),
     );

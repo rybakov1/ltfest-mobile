@@ -12,9 +12,9 @@ class LtCoinPage extends StatelessWidget {
     return ReferencePage(
       title: 'LT Coin',
       imageAsset: 'assets/images/lt_coin_full.png',
-      shareLink: 'https://ltfest.ru',
+      shareLink: 'https://t.me/LTfest_coin_bot',
       ctaLabel: 'Перейти в Telegram',
-      telegramLink: 'https://t.me/ltfest',
+      telegramLink: 'https://t.me/LTfest_coin_bot',
       contentBlocks: [
         buildTextBlock(
           title: 'Монета, которая помогает планировать будущее',
@@ -235,11 +235,23 @@ class LtCoinPage extends StatelessWidget {
         children: [
           Text('Часто задаваемые вопросы', style: Styles.h3),
           const SizedBox(height: 24),
-          for (var item in faqItems)
-            FaqItem(
-              question: item['q']!,
-              answer: item['a']!,
-            ),
+          Column(
+            children: [
+              for (int i = 0; i < faqItems.length; i++) ...[
+                FaqItem(
+                  question: faqItems[i]['q']!,
+                  answer: faqItems[i]['a']!,
+                ),
+                // Добавляем разделитель после каждого элемента, кроме последнего
+                if (i < faqItems.length - 1)
+                  Divider(
+                    color: Palette.stroke,
+                    height: 1,
+                    thickness: 1,
+                  ),
+              ],
+            ],
+          ),
         ],
       ),
     );

@@ -7,7 +7,7 @@ part of 'loyalty_card_provider.dart';
 // **************************************************************************
 
 String _$loyaltyCardNotifierHash() =>
-    r'e3bf143bab9a4cac6f4f729be9b428c2d8e04c32';
+    r'809aeb807b72b5727f0884e819428840c3e34562';
 
 /// See also [LoyaltyCardNotifier].
 @ProviderFor(LoyaltyCardNotifier)

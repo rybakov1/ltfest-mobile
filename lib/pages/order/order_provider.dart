@@ -119,7 +119,11 @@ final orderBasePriceProvider = Provider<int>((ref) {
     case OrderType.festival:
       if (orderState.payableItem is FestivalTariff) {
         final tariff = orderState.payableItem as FestivalTariff;
-        basePrice = tariff.price.toInt() * orderState.seatCount;
+        if (tariff.fact_price != null) {
+          basePrice = tariff.fact_price!.toInt() * orderState.seatCount;
+        } else {
+          basePrice = (tariff.price/2).toInt() * orderState.seatCount;
+        }
       }
       break;
     case OrderType.laboratory:
@@ -161,7 +165,8 @@ final orderTotalPriceProvider = Provider<int>((ref) {
           discountAmount = basePrice * (promo.discountValue / 100);
         } else {
           // Фиксированная скидка
-          discountAmount = min(promo.discountValue.toDouble(), basePrice.toDouble());
+          discountAmount =
+              min(promo.discountValue.toDouble(), basePrice.toDouble());
         }
         final finalPrice = basePrice - discountAmount;
         return finalPrice.isNegative ? 0 : finalPrice.round();
@@ -216,7 +221,8 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
   void updatePassport(String value) => state = state.copyWith(passport: value);
 
-  void updateResidence(String value) => state = state.copyWith(residence: value);
+  void updateResidence(String value) =>
+      state = state.copyWith(residence: value);
 
   void updateCollectiveName(String value) =>
       state = state.copyWith(collectiveName: value);

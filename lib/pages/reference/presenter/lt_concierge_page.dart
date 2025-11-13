@@ -11,9 +11,9 @@ class LtConciergePage extends StatelessWidget {
     return ReferencePage(
       title: 'LT Консьерж',
       imageAsset: 'assets/images/concierge_full.png',
-      shareLink: 'https://ltfest.ru',
+      shareLink: 'https://t.me/LTfest_bot',
       ctaLabel: 'Перейти в Telegram',
-      telegramLink: 'https://t.me/ltfest',
+      telegramLink: 'https://t.me/LTfest_bot',
       contentBlocks: [
         buildTextBlock(
             title: "Творите, а остальное — \nмы возьмём на себя",
@@ -38,6 +38,163 @@ class LtConciergePage extends StatelessWidget {
                   'С LT Консьерж вы всегда свободны от рутины и полностью погружены в творчество!'
             },
           ],
+        ),
+        const SizedBox(height: 2),
+        Container(
+          decoration: Decor.base,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12)
+              .copyWith(bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Что умеет LT Консьерж", style: Styles.h3),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            "assets/images/concierge_first.png",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Напишем сценарии, тексты, письма",
+                            style: Styles.h4,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            "assets/images/concierge_2.png",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Найдём конкурсы и мастер-классы",
+                            style: Styles.h4,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              SizedBox(
+                height: 200,
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        "assets/images/concierge_3.png",
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Подберём музыку, реквизит, визуальные решения",
+                        style: Styles.h4,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            "assets/images/concierge_4.png",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Придумаем идеи для проекта",
+                            style: Styles.h4,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            "assets/images/concierge_5.png",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Поможем с организацией мероприятий",
+                            style: Styles.h4,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              SizedBox(
+                height: 200,
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        "assets/images/concierge_6.png",
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "И многое другое — в зависимости от вашей задачи",
+                        style: Styles.h4,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 2),
         buildStepsBlock(
@@ -111,11 +268,23 @@ Widget _buildFaqSection() {
       children: [
         Text('Часто задаваемые вопросы', style: Styles.h3),
         const SizedBox(height: 24),
-        for (var item in faqItems)
-          FaqItem(
-            question: item['q']!,
-            answer: item['a']!,
-          ),
+        Column(
+          children: [
+            for (int i = 0; i < faqItems.length; i++) ...[
+              FaqItem(
+                question: faqItems[i]['q']!,
+                answer: faqItems[i]['a']!,
+              ),
+              // Добавляем разделитель после каждого элемента, кроме последнего
+              if (i < faqItems.length - 1)
+                Divider(
+                  color: Palette.stroke,
+                  height: 1,
+                  thickness: 1,
+                ),
+            ],
+          ],
+        ),
       ],
     ),
   );

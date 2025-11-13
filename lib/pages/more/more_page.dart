@@ -77,7 +77,7 @@ class MorePage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: _MenuTile(
                   iconPath: 'assets/icons/news.svg',
@@ -93,7 +93,7 @@ class MorePage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: _MenuTile(
                   iconPath: 'assets/icons/favourite.svg',
@@ -107,7 +107,7 @@ class MorePage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: Column(
                   children: [
@@ -134,7 +134,7 @@ class MorePage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
                 child: Column(
                   children: [
@@ -181,60 +181,65 @@ class ProfileCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return switch (status) {
-      "Silver" || "Gold" || "Platinum" =>
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              height: 77,
-              decoration: BoxDecoration(
-                color: Palette.black.withValues(alpha: 0.35),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  Image.asset("assets/images/${status!}.png", width: double.infinity, fit: BoxFit.fitWidth,),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Row(
-                        children: [
-                          Text("LT Priority",
-                              style: Styles.h4.copyWith(color: Palette.white)),
-                          const Spacer(),
-                          Text(status!, style: Styles.h6.copyWith(color: Palette.white))
-                        ],
-                      ),
+      "Silver" || "Gold" || "Platinum" => ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            height: 77,
+            child: Stack(
+              children: [
+                Image.asset(
+                  "assets/images/${status!}.png",
+                  width: double.infinity,
+                  fit: BoxFit.fitWidth,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Palette.black.withValues(alpha: 0.30),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        Text("LT Priority",
+                            style: Styles.h4.copyWith(color: Palette.white)),
+                        const Spacer(),
+                        Text(status!,
+                            style: Styles.h6.copyWith(color: Palette.white))
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-      'Base' || null || _ =>
-          InkWell(
-            onTap: () => context.push(AppRoutes.ltPriority),
-            child: Container(
-              height: 72,
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-              decoration: BoxDecoration(
-                color: Palette.primaryLime,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Text("LT Priority",
-                      style: Styles.h4.copyWith(color: Palette.white)),
-                  const Spacer(),
-                  Text("Подключить",
-                      style: Styles.button1.copyWith(color: Palette.white)),
-                  const SizedBox(width: 8),
-                  SvgPicture.asset('assets/icons/arrow_right.svg',
-                      colorFilter:
-                      ColorFilter.mode(Palette.white, BlendMode.srcIn)),
-                ],
-              ),
+        ),
+      'Base' || null || _ => InkWell(
+          onTap: () => context.push(AppRoutes.ltPriority),
+          child: Container(
+            height: 72,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+            decoration: BoxDecoration(
+              color: Palette.primaryLime,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Text("LT Priority",
+                    style: Styles.h4.copyWith(color: Palette.white)),
+                const Spacer(),
+                Text("Подключить",
+                    style: Styles.button1.copyWith(color: Palette.white)),
+                const SizedBox(width: 8),
+                SvgPicture.asset('assets/icons/arrow_right.svg',
+                    colorFilter:
+                        ColorFilter.mode(Palette.white, BlendMode.srcIn)),
+              ],
             ),
           ),
+        ),
     };
   }
 }

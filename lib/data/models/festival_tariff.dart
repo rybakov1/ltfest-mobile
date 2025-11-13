@@ -9,8 +9,10 @@ abstract class FestivalTariff with _$FestivalTariff {
   const factory FestivalTariff({
     required int id,
     required String title,
-    required String description,
+    String? description,
     required double price,
+    double? fact_price,
+    String? price_description,
     required List<Feature> feature,
   }) = _FestivalTariff;
 

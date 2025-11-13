@@ -7,7 +7,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 // 11.10 build
 Future<void> main() async {
-
  WidgetsFlutterBinding.ensureInitialized();
  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
 

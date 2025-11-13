@@ -94,8 +94,7 @@ class _ReferencePageState extends ConsumerState<ReferencePage> {
                       SizedBox(
                           height: 270 - MediaQuery.of(context).padding.top),
                       ...widget.contentBlocks,
-
-                       SizedBox(height: widget.ctaLabel != null ? 82 : 8),
+                      SizedBox(height: widget.ctaLabel != null ? 82 : 8),
                     ],
                   ),
                 ),
@@ -259,30 +258,26 @@ class _FaqItemState extends State<FaqItem> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: Decor.base,
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Palette.stroke),
-        child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          backgroundColor: Colors.white,
-          collapsedBackgroundColor: Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          collapsedShape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: Text(widget.question, style: Styles.h4),
-          trailing: Icon(
-            _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-            color: Palette.black,
-          ),
-          onExpansionChanged: (v) => setState(() => _expanded = v),
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(widget.answer, style: Styles.b2),
-            ),
-          ],
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.zero,
+        childrenPadding: EdgeInsets.zero,
+        backgroundColor: Colors.white,
+        collapsedBackgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        collapsedShape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        title: Text(widget.question, style: Styles.h4),
+        trailing: Icon(
+          _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+          color: Palette.black,
         ),
+        onExpansionChanged: (v) => setState(() => _expanded = v),
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(widget.answer, style: Styles.b2),
+          ),
+        ],
       ),
     );
   }

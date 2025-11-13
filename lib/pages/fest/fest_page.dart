@@ -489,16 +489,6 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                           child: Text('Произошла ошибка: $error'),
                         ),
                         data: (state) {
-                          if (festivalState.filteredFestivals.isEmpty) {
-                            return const Center(
-                              child: Text(
-                                'Ничего не найдено',
-                                style:
-                                    TextStyle(fontSize: 18, color: Colors.grey),
-                              ),
-                            );
-                          }
-
                           return AsyncItemsListView(
                             scrollController: _scrollController,
                             asyncValue: festivalsAsync,

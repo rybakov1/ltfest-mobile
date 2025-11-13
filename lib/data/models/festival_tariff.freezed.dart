@@ -16,8 +16,10 @@ T _$identity<T>(T value) => value;
 mixin _$FestivalTariff {
   int get id;
   String get title;
-  String get description;
+  String? get description;
   double get price;
+  double? get fact_price;
+  String? get price_description;
   List<Feature> get feature;
 
   /// Create a copy of FestivalTariff
@@ -41,17 +43,28 @@ mixin _$FestivalTariff {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.price, price) || other.price == price) &&
+            (identical(other.fact_price, fact_price) ||
+                other.fact_price == fact_price) &&
+            (identical(other.price_description, price_description) ||
+                other.price_description == price_description) &&
             const DeepCollectionEquality().equals(other.feature, feature));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, description, price,
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      title,
+      description,
+      price,
+      fact_price,
+      price_description,
       const DeepCollectionEquality().hash(feature));
 
   @override
   String toString() {
-    return 'FestivalTariff(id: $id, title: $title, description: $description, price: $price, feature: $feature)';
+    return 'FestivalTariff(id: $id, title: $title, description: $description, price: $price, fact_price: $fact_price, price_description: $price_description, feature: $feature)';
   }
 }
 
@@ -64,8 +77,10 @@ abstract mixin class $FestivalTariffCopyWith<$Res> {
   $Res call(
       {int id,
       String title,
-      String description,
+      String? description,
       double price,
+      double? fact_price,
+      String? price_description,
       List<Feature> feature});
 }
 
@@ -84,8 +99,10 @@ class _$FestivalTariffCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? title = null,
-    Object? description = null,
+    Object? description = freezed,
     Object? price = null,
+    Object? fact_price = freezed,
+    Object? price_description = freezed,
     Object? feature = null,
   }) {
     return _then(_self.copyWith(
@@ -97,14 +114,22 @@ class _$FestivalTariffCopyWithImpl<$Res>
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       price: null == price
           ? _self.price
           : price // ignore: cast_nullable_to_non_nullable
               as double,
+      fact_price: freezed == fact_price
+          ? _self.fact_price
+          : fact_price // ignore: cast_nullable_to_non_nullable
+              as double?,
+      price_description: freezed == price_description
+          ? _self.price_description
+          : price_description // ignore: cast_nullable_to_non_nullable
+              as String?,
       feature: null == feature
           ? _self.feature
           : feature // ignore: cast_nullable_to_non_nullable
@@ -206,7 +231,13 @@ extension FestivalTariffPatterns on FestivalTariff {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(int id, String title, String description, double price,
+    TResult Function(
+            int id,
+            String title,
+            String? description,
+            double price,
+            double? fact_price,
+            String? price_description,
             List<Feature> feature)?
         $default, {
     required TResult orElse(),
@@ -215,7 +246,7 @@ extension FestivalTariffPatterns on FestivalTariff {
     switch (_that) {
       case _FestivalTariff() when $default != null:
         return $default(_that.id, _that.title, _that.description, _that.price,
-            _that.feature);
+            _that.fact_price, _that.price_description, _that.feature);
       case _:
         return orElse();
     }
@@ -236,7 +267,13 @@ extension FestivalTariffPatterns on FestivalTariff {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(int id, String title, String description, double price,
+    TResult Function(
+            int id,
+            String title,
+            String? description,
+            double price,
+            double? fact_price,
+            String? price_description,
             List<Feature> feature)
         $default,
   ) {
@@ -244,7 +281,7 @@ extension FestivalTariffPatterns on FestivalTariff {
     switch (_that) {
       case _FestivalTariff():
         return $default(_that.id, _that.title, _that.description, _that.price,
-            _that.feature);
+            _that.fact_price, _that.price_description, _that.feature);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -264,7 +301,13 @@ extension FestivalTariffPatterns on FestivalTariff {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(int id, String title, String description, double price,
+    TResult? Function(
+            int id,
+            String title,
+            String? description,
+            double price,
+            double? fact_price,
+            String? price_description,
             List<Feature> feature)?
         $default,
   ) {
@@ -272,7 +315,7 @@ extension FestivalTariffPatterns on FestivalTariff {
     switch (_that) {
       case _FestivalTariff() when $default != null:
         return $default(_that.id, _that.title, _that.description, _that.price,
-            _that.feature);
+            _that.fact_price, _that.price_description, _that.feature);
       case _:
         return null;
     }
@@ -285,8 +328,10 @@ class _FestivalTariff implements FestivalTariff {
   const _FestivalTariff(
       {required this.id,
       required this.title,
-      required this.description,
+      this.description,
       required this.price,
+      this.fact_price,
+      this.price_description,
       required final List<Feature> feature})
       : _feature = feature;
   factory _FestivalTariff.fromJson(Map<String, dynamic> json) =>
@@ -297,9 +342,13 @@ class _FestivalTariff implements FestivalTariff {
   @override
   final String title;
   @override
-  final String description;
+  final String? description;
   @override
   final double price;
+  @override
+  final double? fact_price;
+  @override
+  final String? price_description;
   final List<Feature> _feature;
   @override
   List<Feature> get feature {
@@ -333,17 +382,28 @@ class _FestivalTariff implements FestivalTariff {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.price, price) || other.price == price) &&
+            (identical(other.fact_price, fact_price) ||
+                other.fact_price == fact_price) &&
+            (identical(other.price_description, price_description) ||
+                other.price_description == price_description) &&
             const DeepCollectionEquality().equals(other._feature, _feature));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, description, price,
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      title,
+      description,
+      price,
+      fact_price,
+      price_description,
       const DeepCollectionEquality().hash(_feature));
 
   @override
   String toString() {
-    return 'FestivalTariff(id: $id, title: $title, description: $description, price: $price, feature: $feature)';
+    return 'FestivalTariff(id: $id, title: $title, description: $description, price: $price, fact_price: $fact_price, price_description: $price_description, feature: $feature)';
   }
 }
 
@@ -358,8 +418,10 @@ abstract mixin class _$FestivalTariffCopyWith<$Res>
   $Res call(
       {int id,
       String title,
-      String description,
+      String? description,
       double price,
+      double? fact_price,
+      String? price_description,
       List<Feature> feature});
 }
 
@@ -378,8 +440,10 @@ class __$FestivalTariffCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? title = null,
-    Object? description = null,
+    Object? description = freezed,
     Object? price = null,
+    Object? fact_price = freezed,
+    Object? price_description = freezed,
     Object? feature = null,
   }) {
     return _then(_FestivalTariff(
@@ -391,14 +455,22 @@ class __$FestivalTariffCopyWithImpl<$Res>
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       price: null == price
           ? _self.price
           : price // ignore: cast_nullable_to_non_nullable
               as double,
+      fact_price: freezed == fact_price
+          ? _self.fact_price
+          : fact_price // ignore: cast_nullable_to_non_nullable
+              as double?,
+      price_description: freezed == price_description
+          ? _self.price_description
+          : price_description // ignore: cast_nullable_to_non_nullable
+              as String?,
       feature: null == feature
           ? _self._feature
           : feature // ignore: cast_nullable_to_non_nullable

@@ -10,9 +10,9 @@ class LtWinnerPage extends StatelessWidget {
     return ReferencePage(
       title: 'LT Winner',
       imageAsset: 'assets/images/lt_winner_full.png',
-      shareLink: 'https://ltfest.ru',
+      shareLink: 'https://t.me/LT_winner',
       ctaLabel: 'Перейти в Telegram',
-      telegramLink: 'https://ltfest.ru',
+      telegramLink: 'https://t.me/LT_winner',
       contentBlocks: [
         buildTextBlock(
             title: 'Добро пожаловать в LT СЧАСТЛИВЧИК!',

@@ -458,7 +458,7 @@ class ApiService {
         ApiEndpoints.festivalTariffs,
         queryParameters: {
           'filters[festival][id][\$eq]': festivalId,
-          'populate': 'festival,feature',
+          'populate': '*'
         },
       );
 
