@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ltfest/router/app_routes.dart'; // Убедитесь, что импорт верный
 
 class PaymentInitScreen extends ConsumerStatefulWidget {
   final String paymentUrl;
@@ -18,22 +20,61 @@ class PaymentInitScreen extends ConsumerStatefulWidget {
   ConsumerState<PaymentInitScreen> createState() => _PaymentInitScreenState();
 }
 
-class _PaymentInitScreenState extends ConsumerState<PaymentInitScreen> {
+class _PaymentInitScreenState extends ConsumerState<PaymentInitScreen>
+    with WidgetsBindingObserver {
   bool _browserOpened = false;
+  bool _isNavigating = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _launchPaymentBrowser();
     });
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed && _browserOpened && !_isNavigating) {
+      // Не перенаправляем сразу, а даем диплинку шанс отработать.
+      // Ждем короткое время.
+      Future.delayed(const Duration(milliseconds: 500), () {
+        // Проверяем, активен ли еще этот виджет.
+        // Если GoRouter перенаправил пользователя по диплинку,
+        // то `mounted` будет `false`, и мы ничего не делаем.
+        if (mounted && !_isNavigating) {
+          // Если мы все еще здесь, значит, диплинка не было.
+          // Это была ручная отмена.
+          debugPrint("Deep link not detected, navigating to failure screen.");
+          _navigateToFailureScreen();
+        }
+      });
+    }
+  }
+
+  void _navigateToFailureScreen() {
+    if (mounted && !_isNavigating) { // Дополнительная проверка
+      _isNavigating = true;
+      context.go(AppRoutes.paymentFailure.replaceFirst(':id', widget.orderId));
+    }
+  }
+
   Future<void> _launchPaymentBrowser() async {
     if (_browserOpened) return;
-    _browserOpened = true;
 
     try {
+      _browserOpened = true;
+
       await launchUrl(
         Uri.parse(widget.paymentUrl),
         customTabsOptions: CustomTabsOptions(
@@ -54,6 +95,7 @@ class _PaymentInitScreenState extends ConsumerState<PaymentInitScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Не удалось открыть страницу оплаты: $e')),
         );
+        _navigateToFailureScreen();
       }
     }
   }

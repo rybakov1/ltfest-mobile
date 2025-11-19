@@ -538,6 +538,16 @@ class CartBottomBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    bool isAvailableQuantity = true;
+
+    if(cartItem != null) {
+      final productStock = cartItem!.productInStock!;
+
+      if (cartItem!.quantity >= productStock.stockQuantity) {
+        isAvailableQuantity = false;
+      }
+    }
+
     final bool isInCart = cartItem != null;
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -601,12 +611,21 @@ class CartBottomBar extends ConsumerWidget {
                       Text('${cartItem!.quantity}', style: Styles.h4),
                       const SizedBox(width: 10),
                       IconButton(
-                        icon: Icon(Icons.add_circle,
-                            size: 32, color: Palette.primaryLime),
-                        onPressed: () {
-                          ref.read(cartProvider.notifier).updateItemQuantity(
-                              cartItem!.id, cartItem!.quantity + 1);
-                        },
+                        icon: Icon(
+                          Icons.add_circle,
+                          size: 32,
+                          color: !isAvailableQuantity
+                              ? Palette.stroke
+                              : Palette.primaryLime,
+                        ),
+                        onPressed: !isAvailableQuantity
+                            ? null
+                            : () {
+                                ref
+                                    .read(cartProvider.notifier)
+                                    .updateItemQuantity(
+                                        cartItem!.id, cartItem!.quantity + 1);
+                              },
                       ),
                       const SizedBox(width: 16),
                       Expanded(

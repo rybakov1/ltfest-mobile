@@ -65,7 +65,9 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       _collectiveCityController.text = user.collectiveCity ?? '';
       _collectiveAgeCategoryController.text = user.age_category?.title ?? '';
       _collectiveCountParticipateController.text =
-          user.count_participant.toString();
+          user.count_participant.toString() != "null"
+              ? user.count_participant.toString()
+              : '';
       _selectedDirection = user.direction;
       _selectedAgeCategory = user.age_category;
     }
@@ -115,7 +117,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         masterName: _masterFioController.text.trim(),
         count_participant:
             int.parse(_collectiveCountParticipateController.text.trim()),
-        ageCategoryId: _selectedAgeCategory!.id,
+        ageCategoryId: _selectedAgeCategory?.id,
       );
     }
     if (mounted) {
@@ -133,6 +135,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
     showModalPicker<Direction>(
       context: context,
       title: 'Направление',
+      isNoNeedSize: true,
       provider: directionsProvider,
       itemBuilder: (direction) => direction.title,
       initialValue: _selectedDirection,
@@ -148,6 +151,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       context: context,
       title: 'Возрастная категория',
       provider: ageCategoryProvider,
+      isNoNeedSize: true,
       itemBuilder: (ageCategory) => ageCategory.title,
       initialValue: _selectedAgeCategory,
       onConfirm: (ageCategory) {
@@ -576,7 +580,7 @@ Widget _buildModalSelectorField({
         controller: TextEditingController(text: value ?? ''),
         readOnly: true,
         onTap: onTap,
-        style: Styles.b2.copyWith(color: Palette.gray),
+        style: Styles.b2,
         decoration: InputDecoration(
           isDense: true,
           hintText: hint,

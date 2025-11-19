@@ -141,86 +141,89 @@ class CartItemCard extends ConsumerWidget {
               orElse: () => false,
             );
 
-            return Container(
-              height: 320,
-              padding: EdgeInsets.only(
-                  left: 16, right: 16, bottom: 24 + bottomPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8),
-                  Center(
-                    child: Container(
-                      width: 41,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Palette.stroke,
+            return SafeArea(
+              child: Container(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Container(
+                        width: 41,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Palette.stroke,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  InkWell(
-                    onTap: isFavorite
-                        ? () {}
-                        : () async => await notifier.toggleFavorite(
-                            EventType.product, productId),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () async => await notifier.toggleFavorite(
+                          EventType.product, productId),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
                               color: isFavorite
                                   ? Palette.primaryLime
                                   : Palette.primaryLime.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8)),
-                          child: Icon(
-                            isFavorite
-                                ? Icons.favorite
-                                : Icons.favorite_outline,
-                            color: isFavorite
-                                ? Palette.white
-                                : Palette.primaryLime,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_outline,
+                              color: isFavorite
+                                  ? Palette.white
+                                  : Palette.primaryLime,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          isFavorite ? "В избранном" : "Перенести в избранное",
-                          style: Styles.b1,
-                        ),
-                      ],
+                          const SizedBox(width: 16),
+                          Text(
+                            isFavorite
+                                ? "В избранном"
+                                : "Перенести в избранное",
+                            style: Styles.b1,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 26),
-                  InkWell(
-                    onTap: () =>
-                        ref.read(cartProvider.notifier).removeItem(cartItem.id),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                              color: Palette.error.withValues(alpha: 0.10),
-                              borderRadius: BorderRadius.circular(8)),
-                          child: SvgPicture.asset('assets/icons/trash.svg',
-                              fit: BoxFit.scaleDown, width: 24, height: 24),
-                        ),
-                        const SizedBox(width: 16),
-                        Text("Удалить из корзины", style: Styles.b1),
-                      ],
+                    const SizedBox(height: 26),
+                    InkWell(
+                      onTap: () => ref
+                          .read(cartProvider.notifier)
+                          .removeItem(cartItem.id),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: Palette.error.withValues(alpha: 0.10),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: SvgPicture.asset('assets/icons/trash.svg',
+                                fit: BoxFit.scaleDown, width: 24, height: 24),
+                          ),
+                          const SizedBox(width: 16),
+                          Text("Удалить из корзины", style: Styles.b1),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 68),
-                  LTButtons.outlinedButton(
-                    onPressed: () => context.pop(),
-                    child: Text(
-                      "Закрыть",
-                      style: Styles.button1,
-                    ),
-                  )
-                ],
+                    const SizedBox(height: 68),
+                    LTButtons.outlinedButton(
+                      onPressed: () => context.pop(),
+                      child: Text(
+                        "Закрыть",
+                        style: Styles.button1,
+                      ),
+                    )
+                  ],
+                ),
               ),
             );
           },
@@ -240,6 +243,12 @@ class CartItemCard extends ConsumerWidget {
     }
 
     final productStock = cartItem.productInStock!;
+
+    bool isAvailable = true;
+
+    if (cartItem.quantity >= productStock.stockQuantity) {
+      isAvailable = false;
+    }
 
     return Container(
       decoration: Decor.base,
@@ -309,8 +318,11 @@ class CartItemCard extends ConsumerWidget {
                       Text('${cartItem.quantity}', style: Styles.h4),
                       IconButton(
                         icon: Icon(Icons.add_circle,
-                            size: 32, color: Palette.primaryLime),
-                        onPressed: isCartLoading
+                            size: 32,
+                            color: !isAvailable
+                                ? Palette.stroke
+                                : Palette.primaryLime),
+                        onPressed: isCartLoading || !isAvailable
                             ? null
                             : () {
                                 ref

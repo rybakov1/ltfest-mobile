@@ -55,6 +55,7 @@ Widget _buildShimmerList() {
 void showModalPicker<T>({
   required BuildContext context,
   required String title,
+  bool? isNoNeedSize,
   required FutureProvider<List<T>> provider,
   required String Function(T) itemBuilder,
   T? initialValue,
@@ -72,7 +73,7 @@ void showModalPicker<T>({
     builder: (modalContext) {
       return Consumer(builder: (context, ref, child) {
         return SizedBox(
-          height: 500,
+          height: isNoNeedSize != null ? null : 500,
           child: StatefulBuilder(
             builder: (context, setModalState) {
               final asyncValue = ref.watch(provider);
