@@ -294,8 +294,8 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
 
   Widget _buildShimmerEventCard() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: Palette.shimmerBase,
+      highlightColor: Palette.shimmerHighlight,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20.0),
         child: Column(
@@ -360,7 +360,7 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
 
     return Scaffold(
       backgroundColor: Palette.background,
-        resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: CustomScrollView(
           physics: const NeverScrollableScrollPhysics(),
@@ -592,28 +592,28 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                     Expanded(
                       child: laboratoriesAsync.when(
                           loading: () => ListView.builder(
-                            itemCount: 5,
-                            itemBuilder: (context, index) =>
-                                _buildShimmerEventCard(),
-                          ),
+                                itemCount: 5,
+                                itemBuilder: (context, index) =>
+                                    _buildShimmerEventCard(),
+                              ),
                           error: (error, stackTrace) => Center(
-                            child: Text('Произошла ошибка: $error'),
-                          ),
+                                child: Text('Произошла ошибка: $error'),
+                              ),
                           data: (state) {
                             if (filteredLaboratories.isEmpty) {
                               return const Center(
                                 child: Text(
                                   'Ничего не найдено',
-                                  style:
-                                  TextStyle(fontSize: 18, color: Colors.grey),
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.grey),
                                 ),
                               );
                             }
                             return AsyncItemsListView(
                               asyncValue: laboratoriesAsync,
                               items: filteredLaboratories,
-                              onRefresh: () =>
-                                  ref.refresh(laboratoriesNotifierProvider.future),
+                              onRefresh: () => ref
+                                  .refresh(laboratoriesNotifierProvider.future),
                               itemBuilder: (context, index) {
                                 final laboratory = filteredLaboratories[index];
                                 return Padding(
@@ -626,8 +626,7 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                                 );
                               },
                             );
-                          }
-                      ),
+                          }),
                     ),
                   ],
                 ),

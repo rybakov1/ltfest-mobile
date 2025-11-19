@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:ltfest/data/models/laboratory.dart';
 import 'package:ltfest/data/services/api_service.dart';
-import 'package:ltfest/providers/direction_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'laboratory_provider.g.dart';

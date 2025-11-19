@@ -1,7 +1,5 @@
 import 'package:ltfest/data/models/product/product.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../../data/models/product/product_details.dart';
 import '../../../data/services/api_service.dart';
 
 part 'shop_provider.g.dart';

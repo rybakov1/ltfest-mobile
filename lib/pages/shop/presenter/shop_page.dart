@@ -41,8 +41,8 @@ class _ShopPageState extends ConsumerState<ShopPage> {
 
   Widget _buildShimmerProductCard() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: Palette.shimmerBase,
+      highlightColor: Palette.shimmerHighlight,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -100,9 +100,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
             SliverToBoxAdapter(
               child: LTAppBar(
                 title: "LT Shop",
-                postfixWidget:
-
-                Container(
+                postfixWidget: Container(
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
@@ -171,7 +169,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
                                   gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 8,
                                     mainAxisSpacing: 16,

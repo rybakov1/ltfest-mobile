@@ -15,8 +15,8 @@ class NewsPage extends ConsumerWidget {
 
   Widget _buildShimmerNewsCard() {
     return Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+        baseColor: Palette.shimmerBase,
+        highlightColor: Palette.shimmerHighlight,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

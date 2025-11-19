@@ -158,38 +158,27 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
                           buildTextField(
                             controller: _nameController,
                             label: "Имя плательщика*",
-                            hint: "Иванов Иван Иванович",
+                            hint: "ФИО",
                             onChanged: orderNotifier.updatePayerName,
-                            func: _resetValidationState,
                             isInvalid: validationState.isNameInvalid,
                           ),
                           const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: buildTextField(
-                                  controller: _emailController,
-                                  label: "Email*",
-                                  hint: "example@mail.com",
-                                  onChanged: orderNotifier.updateEmail,
-                                  keyboardType: TextInputType.emailAddress,
-                                  func: _resetValidationState,
-                                  isInvalid: validationState.isEmailInvalid,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: buildTextField(
-                                  controller: _phoneController,
-                                  label: "Номер телефона*",
-                                  hint: "+7 (999) 999-99-99",
-                                  onChanged: orderNotifier.updatePhone,
-                                  keyboardType: TextInputType.phone,
-                                  func: _resetValidationState,
-                                  isInvalid: validationState.isPhoneInvalid,
-                                ),
-                              ),
-                            ],
+                          buildTextField(
+                            controller: _emailController,
+                            label: "Email*",
+                            hint: "Email",
+                            onChanged: orderNotifier.updateEmail,
+                            keyboardType: TextInputType.emailAddress,
+                            isInvalid: validationState.isEmailInvalid,
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            controller: _phoneController,
+                            label: "Номер телефона*",
+                            hint: "+7",
+                            onChanged: orderNotifier.updatePhone,
+                            keyboardType: TextInputType.phone,
+                            isInvalid: validationState.isPhoneInvalid,
                           ),
                           const SizedBox(height: 16),
                           buildTextField(
@@ -204,7 +193,7 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
                           buildTextField(
                             controller: _collectiveNameController,
                             label: "Название коллектива*",
-                            hint: "Введите",
+                            hint: "Название коллектива",
                             onChanged: orderNotifier.updateCollectiveName,
                             func: _resetValidationState,
                             isInvalid: validationState.isCollectiveNameInvalid,
@@ -213,7 +202,7 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
                           buildTextField(
                             controller: _cityController,
                             label: "Город проживания*",
-                            hint: "Иванов Иван Иванович",
+                            hint: "Выберите город",
                             onChanged: orderNotifier.updateResidence,
                             func: _resetValidationState,
                             isInvalid: validationState.isCityInvalid,

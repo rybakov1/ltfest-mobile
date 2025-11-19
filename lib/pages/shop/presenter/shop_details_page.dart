@@ -642,9 +642,6 @@ class ProductImageCarousel extends ConsumerWidget {
     final currentPage =
         ref.watch(carouselPageIndexProvider(productVariationId));
 
-    // PageController нужен для программного управления PageView
-    final pageController = PageController(initialPage: currentPage);
-
     return AspectRatio(
       aspectRatio: 1.0,
       child: Stack(

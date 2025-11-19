@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/constants.dart';
-import 'package:ltfest/data/models/favorite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/favorite_button.dart';

@@ -227,8 +227,8 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
 
   Widget _buildShimmerEventCard() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: Palette.shimmerBase,
+      highlightColor: Palette.shimmerHighlight,
       child: Padding(
         // Отступ, как у оригинальной карточки
         padding: const EdgeInsets.only(bottom: 32.0),

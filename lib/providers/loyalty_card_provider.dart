@@ -42,7 +42,7 @@ class LoyaltyCardNotifier extends _$LoyaltyCardNotifier {
         state = const LoyaltyCardState.error(
             'Эта карта лояльности принадлежит другому пользователю');
       }
-    } on ApiException catch (e) {
+    } on ApiException {
       state = const LoyaltyCardState.error("Карта лояльности не найдена");
     } catch (e) {
       state = const LoyaltyCardState.error('Произошла неизвестная ошибка');

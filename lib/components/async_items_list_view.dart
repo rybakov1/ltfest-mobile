@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/constants.dart';
 
-// Этот виджет отвечает за отображение состояний: загрузка, ошибка, данные, пустой список
 class AsyncItemsListView extends StatelessWidget {
-  final AsyncValue asyncValue; // Состояние провайдера
-  final List<dynamic> items; // Отфильтрованный список
+  final AsyncValue asyncValue;
+  final List<dynamic> items;
   final Widget Function(BuildContext context, int index) itemBuilder;
   final VoidCallback onRefresh;
   final ScrollController? scrollController;

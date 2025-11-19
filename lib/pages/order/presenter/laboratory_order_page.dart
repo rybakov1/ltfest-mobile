@@ -69,9 +69,9 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
   void initState() {
     super.initState();
     ref.read(orderProvider.notifier).startOrder(
-      type: OrderType.laboratory,
-      item: widget.learningType,
-    );
+          type: OrderType.laboratory,
+          item: widget.learningType,
+        );
 
     final state = ref.read(orderProvider);
     final user = ref.read(userProvider);
@@ -80,8 +80,8 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
     _emailController = TextEditingController(text: state.email);
     _phoneController = TextEditingController(text: state.phone);
 
-    _birthDateController =
-        TextEditingController(text: user?.birthdate.toString() ?? '');
+    _birthDateController = TextEditingController(
+        text: user?.birthdate.toString().split(" ")[0] ?? '');
     _cityController = TextEditingController(text: user?.residence ?? '');
 
     _collectiveNameController =
@@ -164,38 +164,27 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                           buildTextField(
                             controller: _nameController,
                             label: "Имя плательщика*",
-                            hint: "Иванов Иван Иванович",
+                            hint: "ФИО",
                             onChanged: orderNotifier.updatePayerName,
-                            func: _resetValidationState,
                             isInvalid: validationState.isNameInvalid,
                           ),
                           const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: buildTextField(
-                                  controller: _emailController,
-                                  label: "Email*",
-                                  hint: "Email",
-                                  onChanged: orderNotifier.updateEmail,
-                                  func: _resetValidationState,
-                                  keyboardType: TextInputType.emailAddress,
-                                  isInvalid: validationState.isEmailInvalid,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: buildTextField(
-                                  controller: _phoneController,
-                                  label: "Номер телефона*",
-                                  hint: "+7 ",
-                                  onChanged: orderNotifier.updatePhone,
-                                  keyboardType: TextInputType.phone,
-                                  func: _resetValidationState,
-                                  isInvalid: validationState.isPhoneInvalid,
-                                ),
-                              ),
-                            ],
+                          buildTextField(
+                            controller: _emailController,
+                            label: "Email*",
+                            hint: "Email",
+                            onChanged: orderNotifier.updateEmail,
+                            keyboardType: TextInputType.emailAddress,
+                            isInvalid: validationState.isEmailInvalid,
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            controller: _phoneController,
+                            label: "Номер телефона*",
+                            hint: "+7",
+                            onChanged: orderNotifier.updatePhone,
+                            keyboardType: TextInputType.phone,
+                            isInvalid: validationState.isPhoneInvalid,
                           ),
                           const SizedBox(height: 16),
                           buildTextField(
@@ -203,9 +192,8 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                             label: "Дата рождения*",
                             hint: "дд.мм.гггг",
                             func: _resetValidationState,
-                            onChanged: (_) {},
-                            // TODO: сохранить в state
-                            isInvalid: validationState.isPhoneInvalid,
+                            onChanged: orderNotifier.updateBirthdate,
+                            isInvalid: validationState.isBirthdateInvalid,
                           ),
                           const SizedBox(height: 16),
                           buildTextField(
@@ -219,7 +207,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                           buildTextField(
                             controller: _collectiveNameController,
                             label: "Название коллектива*",
-                            hint: "Введите",
+                            hint: "Название коллектива",
                             func: _resetValidationState,
                             onChanged: orderNotifier.updateCollectiveName,
                             isInvalid: validationState.isPhoneInvalid,
@@ -320,8 +308,10 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
         Text(label, style: Styles.h4),
         const Spacer(),
         IconButton(
-          icon: Icon(Icons.remove_circle, size: 32, color: Palette.primaryLime),
-          onPressed: onDecrease,
+          icon: Icon(Icons.remove_circle,
+              size: 32,
+              color: count > 1 ? Palette.primaryLime : Palette.stroke),
+          onPressed: count > 1 ? onDecrease : null,
         ),
         const SizedBox(width: 10),
         Text('$count', style: Styles.h4),

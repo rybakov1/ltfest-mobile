@@ -74,23 +74,15 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
       body: paymentAsync.when(
         data: (state) => Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(16)
-                  .copyWith(top: MediaQuery.of(context).padding.top + 24),
-              decoration: Decor.base.copyWith(
-                color: Palette.background,
-                borderRadius: const BorderRadius.only(
-                  bottomRight: Radius.circular(28),
-                  bottomLeft: Radius.circular(28),
-                ),
-              ),
-              width: double.infinity,
-              child: Text(
-                'Заявка успешно оформлена!',
-                style: Styles.h4,
-                textAlign: TextAlign.center,
-              ),
+            SizedBox(height: 64 + MediaQuery.of(context).padding.top),
+            Image.asset(
+              'assets/images/payment_success.png',
+              width: 101,
             ),
+            const SizedBox(height: 16),
+            Text("Заявка успешно оформлена!",
+                style: Styles.h3, textAlign: TextAlign.center),
+            const SizedBox(height: 56),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +103,8 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                           LTButtons.outlinedButton(
                             onPressed: () {
                               ref.read(cartProvider.notifier).clearCart();
-                              ref.read(paymentNotifierProvider.notifier)
+                              ref
+                                  .read(paymentNotifierProvider.notifier)
                                   .resetState();
                               context.go(AppRoutes.home);
                             },

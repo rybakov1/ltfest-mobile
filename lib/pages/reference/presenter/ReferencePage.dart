@@ -125,7 +125,7 @@ class _ReferencePageState extends ConsumerState<ReferencePage> {
                   postfixWidget: Row(
                     children: [
                       ShareButton(
-                        link: "https://ltfest.ru",
+                        link: widget.shareLink,
                         color: Palette.primaryLime,
                       ),
                     ],

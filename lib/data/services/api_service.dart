@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/data/models/age_category.dart';
@@ -770,7 +769,6 @@ class ApiService {
       return Order.fromJson(response.data['data']);
     } catch (e) {
       _handleError(e);
-      rethrow;
     }
   }
 

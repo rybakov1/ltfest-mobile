@@ -1,5 +1,3 @@
-// lib/pages/order/order_provider.dart
-
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -29,6 +27,7 @@ class OrderState {
   final OrderType orderType;
   final String payerName;
   final String email;
+  final String birthdate;
   final String phone;
   final bool isLoading;
 
@@ -49,6 +48,7 @@ class OrderState {
 
   const OrderState({
     // Общие
+    this.birthdate = "",
     this.orderType = OrderType.products,
     this.payerName = '',
     this.email = '',
@@ -82,6 +82,7 @@ class OrderState {
       String? participantNames,
       String? passport,
       String? residence,
+      String? birthdate,
       int? seatCount,
       dynamic payableItem}) {
     return OrderState(
@@ -99,6 +100,7 @@ class OrderState {
       passport: passport ?? this.passport,
       residence: residence ?? this.residence,
       payableItem: payableItem ?? this.payableItem,
+      birthdate: birthdate ?? this.birthdate,
     );
   }
 }
@@ -122,7 +124,7 @@ final orderBasePriceProvider = Provider<int>((ref) {
         if (tariff.fact_price != null) {
           basePrice = tariff.fact_price!.toInt() * orderState.seatCount;
         } else {
-          basePrice = (tariff.price/2).toInt() * orderState.seatCount;
+          basePrice = (tariff.price / 2).toInt() * orderState.seatCount;
         }
       }
       break;
@@ -216,7 +218,8 @@ class OrderNotifier extends StateNotifier<OrderState> {
       state = state.copyWith(payerName: value);
 
   void updateEmail(String value) => state = state.copyWith(email: value);
-
+  void updateBirthdate(String value) =>
+      state = state.copyWith(birthdate: value);
   void updatePhone(String value) => state = state.copyWith(phone: value);
 
   void updatePassport(String value) => state = state.copyWith(passport: value);

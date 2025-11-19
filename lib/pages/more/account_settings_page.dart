@@ -13,7 +13,6 @@ import 'package:ltfest/data/models/user.dart';
 import 'package:ltfest/providers/age_category_provider.dart';
 import 'package:ltfest/providers/auth_state.dart';
 import 'package:ltfest/providers/user_provider.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../components/modal.dart';
 import '../../data/models/age_category.dart';
@@ -66,7 +65,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       _collectiveCityController.text = user.collectiveCity ?? '';
       _collectiveAgeCategoryController.text = user.age_category?.title ?? '';
       _collectiveCountParticipateController.text =
-          user.count_participant.toString() ?? '';
+          user.count_participant.toString();
       _selectedDirection = user.direction;
       _selectedAgeCategory = user.age_category;
     }

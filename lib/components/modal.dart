@@ -6,8 +6,8 @@ import '../constants.dart';
 
 Widget _buildShimmerList() {
   return Shimmer.fromColors(
-    baseColor: Colors.grey[300]!,
-    highlightColor: Colors.grey[100]!,
+    baseColor: Palette.shimmerBase,
+    highlightColor: Palette.shimmerHighlight,
     child: ConstrainedBox(
       constraints: const BoxConstraints(
         maxHeight: 300.0,

@@ -5,8 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../constants.dart';
-import '../data/models/news.dart';
-import '../pages/home/more_items_page.dart';
 import '../providers/news_provider.dart';
 import '../router/app_routes.dart';
 

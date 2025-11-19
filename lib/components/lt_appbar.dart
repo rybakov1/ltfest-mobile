@@ -52,6 +52,7 @@ class LTAppBar extends StatelessWidget {
             child: Center(
               child: Text(
                 title ?? "",
+                textAlign: TextAlign.center,
                 style: Styles.h4.copyWith(color: Palette.black),
               ),
             ),

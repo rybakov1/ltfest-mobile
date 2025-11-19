@@ -125,9 +125,14 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                           LTButtons.elevatedButton(
                             disabledForegroundColor: Palette.gray,
                             foregroundColor: Palette.white,
-                            onPressed: _phoneController.text.isNotEmpty && _canSubmit && !_isLoading ? _requestOtp : null,
+                            onPressed: _phoneController.text.isNotEmpty &&
+                                    _canSubmit &&
+                                    !_isLoading
+                                ? _requestOtp
+                                : null,
                             child: _isLoading
-                                ? CircularProgressIndicator(color: Palette.black)
+                                ? CircularProgressIndicator(
+                                    color: Palette.black)
                                 : Text('Получить код', style: Styles.button1),
                           ),
                           const SizedBox(height: 24),
@@ -143,21 +148,27 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
                                           'Нажимая на кнопку "Получить код", я принимаю условия '),
                                   TextSpan(
                                     text: 'пользовательского соглашения',
-                                    style: Styles.b3.copyWith(color: Palette.secondary),
+                                    style: Styles.b3
+                                        .copyWith(color: Palette.secondary),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
-                                        launchUrl(Uri.parse(
-                                            'https://example.com/terms-and-conditions')); // TODO: url
+                                        launchUrl(
+                                          Uri.parse('https://ltfest.ru/agree'),
+                                        );
                                       },
                                   ),
                                   const TextSpan(text: ' и '),
                                   TextSpan(
                                     text: 'обработки персональных данных',
-                                    style: Styles.b3.copyWith(color: Palette.secondary),
+                                    style: Styles.b3
+                                        .copyWith(color: Palette.secondary),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
-                                        launchUrl(Uri.parse(
-                                            'https://ltfest.ru/privacy'));
+                                        launchUrl(
+                                          Uri.parse(
+                                            'https://ltfest.ru/privacy',
+                                          ),
+                                        );
                                       },
                                   ),
                                 ],

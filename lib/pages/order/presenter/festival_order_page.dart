@@ -82,7 +82,6 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
   }
 
   bool _validateForm() {
-    // Сбрасываем предыдущие ошибки перед новой проверкой
     final validationStateNotifier = ref.read(formValidationProvider.notifier);
 
     final newState = FormValidationState(
@@ -94,12 +93,10 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
     );
 
     validationStateNotifier.state = newState;
-    return !newState.hasErrors; // Возвращаем true, если ошибок нет
+    return !newState.hasErrors;
   }
 
-  // Метод для сброса состояния ошибок при начале ввода
   void _resetValidationState() {
-    // Проверяем, есть ли уже ошибки, чтобы не перестраивать виджет лишний раз
     if (ref.read(formValidationProvider).hasErrors) {
       ref.read(formValidationProvider.notifier).state =
           const FormValidationState();
@@ -136,41 +133,33 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                           _buildTextField(
                             controller: _nameController,
                             label: "Имя плательщика*",
-                            hint: "Иванов Иван Иванович",
+                            hint: "ФИО",
                             onChanged: orderNotifier.updatePayerName,
                             isInvalid: validationState.isNameInvalid,
                           ),
                           const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildTextField(
-                                  controller: _emailController,
-                                  label: "Email*",
-                                  hint: "example@mail.com",
-                                  onChanged: orderNotifier.updateEmail,
-                                  keyboardType: TextInputType.emailAddress,
-                                  isInvalid: validationState.isEmailInvalid,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _buildTextField(
-                                  controller: _phoneController,
-                                  label: "Номер телефона*",
-                                  hint: "+7 (999) 999-99-99",
-                                  onChanged: orderNotifier.updatePhone,
-                                  keyboardType: TextInputType.phone,
-                                  isInvalid: validationState.isPhoneInvalid,
-                                ),
-                              ),
-                            ],
+                          _buildTextField(
+                            controller: _emailController,
+                            label: "Email*",
+                            hint: "Email",
+                            onChanged: orderNotifier.updateEmail,
+                            keyboardType: TextInputType.emailAddress,
+                            isInvalid: validationState.isEmailInvalid,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _phoneController,
+                            label: "Номер телефона*",
+                            hint: "+7",
+                            onChanged: orderNotifier.updatePhone,
+                            keyboardType: TextInputType.phone,
+                            isInvalid: validationState.isPhoneInvalid,
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _collectiveNameController,
                             label: "Название коллектива",
-                            hint: "Введите",
+                            hint: "Название коллектива",
                             onChanged: orderNotifier.updateCollectiveName,
                             isInvalid: validationState.isCollectiveNameInvalid,
                           ),
@@ -178,7 +167,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                           _buildTextField(
                             controller: _participantsNameController,
                             label: "Имя участника*",
-                            hint: "Иван,",
+                            hint: "Имя участника",
                             onChanged: orderNotifier.updateParticipantNames,
                             isInvalid:
                                 validationState.isParticipantsNameInvalid,
@@ -258,8 +247,10 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
         Text(label, style: Styles.h4),
         const Spacer(),
         IconButton(
-          icon: Icon(Icons.remove_circle, size: 32, color: Palette.primaryLime),
-          onPressed: onDecrease,
+          icon: Icon(Icons.remove_circle,
+              size: 32,
+              color: count > 1 ? Palette.primaryLime : Palette.stroke),
+          onPressed: count > 1 ? onDecrease : null,
         ),
         const SizedBox(width: 10),
         Text('$count', style: Styles.h4),
@@ -288,8 +279,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
               }
               orderNotifier.placeOrderAndPay(context, totalPrice);
             },
-            child: Text("Оплатить ${Utils.formatMoney(totalPrice)}",
-                style: Styles.button1),
+            child: Text("Оплатить", style: Styles.button1),
           ),
         ],
       ),
@@ -302,12 +292,9 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
     required String hint,
     required ValueChanged<String> onChanged,
     TextInputType? keyboardType,
-    bool isInvalid = false, // Новый параметр
+    bool isInvalid = false,
   }) {
-    // Определяем цвет рамки на основе флага isInvalid
-    final borderColor = isInvalid
-        ? Palette.error
-        : Palette.stroke; // Замените Palette.error на ваш цвет
+    final borderColor = isInvalid ? Palette.error : Palette.stroke;
     final focusedBorderColor = isInvalid ? Palette.error : Palette.primaryLime;
 
     return Column(
@@ -318,7 +305,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
         TextFormField(
           controller: controller,
           onChanged: (value) {
-            _resetValidationState(); // Сбрасываем ошибки при начале ввода
+            _resetValidationState();
             onChanged(value);
           },
           keyboardType: keyboardType,

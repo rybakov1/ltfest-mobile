@@ -15,7 +15,6 @@ class BannerCarousel extends ConsumerStatefulWidget {
 }
 
 class _BannerCarouselState extends ConsumerState<BannerCarousel> {
-  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +90,6 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
                   viewportFraction: 1,
                   onPageChanged: (index, reason) {
                     setState(() {
-                      _currentIndex = index;
                     });
                   },
                 ),

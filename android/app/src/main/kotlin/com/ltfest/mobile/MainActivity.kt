@@ -1,4 +1,4 @@
-package com.example.ltfest
+package com.ltfest.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

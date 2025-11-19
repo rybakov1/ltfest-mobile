@@ -8,7 +8,7 @@ class LtWinnerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReferencePage(
-      title: 'LT Winner',
+      title: 'Добро пожаловать в LT\nСчастливчик!',
       imageAsset: 'assets/images/lt_winner_full.png',
       shareLink: 'https://t.me/LT_winner',
       ctaLabel: 'Перейти в Telegram',
