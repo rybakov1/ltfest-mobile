@@ -119,8 +119,6 @@ class CartItemCard extends ConsumerWidget {
   const CartItemCard({super.key, required this.cartItemId});
 
   void _showItemMore(BuildContext context, CartItem cartItem, WidgetRef ref) {
-    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
-
     showModalBottomSheet(
       context: context,
       backgroundColor: Palette.white,

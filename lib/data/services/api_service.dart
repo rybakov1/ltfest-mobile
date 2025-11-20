@@ -220,9 +220,6 @@ class ApiService {
   Future<List<UpcomingEvent>> fetchUpcomingEvents() =>
       _fetchCollection(ApiEndpoints.upcomingEvents, UpcomingEvent.fromJson);
 
-  // Future<List<Favorite>> fetchFavorites() =>
-  //     _fetchCollection(ApiEndpoints.favorites, Favorite.fromJson);
-
   Future<List<Favorite>> fetchFavorites() async {
     try {
       final response = await _dio.get(ApiEndpoints.favorites);
@@ -237,9 +234,8 @@ class ApiService {
 
   Future<Festival> getFestivalById(String id) async {
     try {
-      // FIX: Add the populate parameters back in using queryParameters
       final response = await _dio.get(
-        ApiEndpoints.festivals, // Use the base endpoint for lists
+        ApiEndpoints.festivals,
         queryParameters: {
           'filters[id][\$eq]': id,
           'populate[0]': 'direction',
@@ -260,9 +256,8 @@ class ApiService {
 
   Future<Laboratory> getLaboratoryById(String id) async {
     try {
-      // FIX: Add the populate parameters back in using queryParameters
       final response = await _dio.get(
-        ApiEndpoints.laboratories, // Use the base endpoint for lists
+        ApiEndpoints.laboratories,
         queryParameters: {
           'filters[id][\$eq]': id,
           'populate[0]': 'direction',
@@ -287,10 +282,10 @@ class ApiService {
   Future<News> getNewsById(String id) async {
     try {
       final response = await _dio.get(
-        ApiEndpoints.news, // Use the base endpoint for lists
+        ApiEndpoints.news,
         queryParameters: {
           'filters[id][\$eq]': id,
-          'populate': '*', // Or list specific fields if you know them
+          'populate': '*',
         },
       );
 
@@ -361,8 +356,6 @@ class ApiService {
     }
   }
 
-// --- ЭТОТ МЕТОД ОСТАЕТСЯ ВЕРНЫМ ---
-// Он принимает ID самого "избранного" и передает его в URL, что правильно для вашего бэкенда.
   Future<void> removeFavorite(int favoriteId) async {
     try {
       await _dio.delete('${ApiEndpoints.favorites}/$favoriteId');
@@ -370,86 +363,6 @@ class ApiService {
       _handleError(e);
     }
   }
-
-//   Future<void> addFavorite(String eventType, int eventId) async {
-//     if (!['festival', 'laboratory'].contains(eventType)) {
-//       throw ApiException(message: 'Invalid event_type: $eventType');
-//     }
-//
-//     try {
-//       final response = await _dio.post(
-//         ApiEndpoints.favorites,
-//         data: {
-//           'event_type': eventType,
-//           'event_id': eventId,
-//         },
-//       );
-//
-//       if (response.statusCode != 200) {
-//         throw ApiException(
-//           message:
-//               'Failed to add favorite $eventType: ${response.statusMessage}',
-//           statusCode: response.statusCode,
-//         );
-//       }
-//     } catch (e) {
-//       _handleError(e);
-//     }
-//   }
-//
-// // Удаление мероприятия из избранного
-//   Future<void> removeFavorite(int userId, String eventType, int eventId) async {
-//     if (!['festival', 'laboratory'].contains(eventType)) {
-//       throw ApiException(message: 'Invalid event_type: $eventType');
-//     }
-//
-//     try {
-//       // Находим запись в Favorites
-//       final response = await _dio.get(
-//         ApiEndpoints.favorites,
-//         queryParameters: {
-//           'filters[users_permissions_user][id][\$eq]': userId,
-//           'filters[event_type][\$eq]': eventType,
-//           'filters[event_id][\$eq]': eventId,
-//         },
-//       );
-//
-//       print("$eventType/$eventId/$userId/$response");
-//
-//       if (response.statusCode != 200) {
-//         throw ApiException(
-//           message:
-//               'Failed to find favorite $eventType: ${response.statusMessage}',
-//           statusCode: response.statusCode,
-//         );
-//       }
-//
-//       print("api response: ${response.data}");
-//
-//       final data = response.data as List<dynamic>;
-//       if (data.isEmpty) {
-//         throw ApiException(message: 'Favorite $eventType not found');
-//       }
-//
-//       print(data[0].toString());
-//       final favoriteId = int.parse(data[0]['favoriteId'].toString());
-//       print(favoriteId);
-//
-//       //Удаляем запись
-//       final deleteResponse =
-//           await _dio.delete(ApiEndpoints.favoriteById(favoriteId));
-//
-//       if (deleteResponse.statusCode != 200) {
-//         throw ApiException(
-//           message:
-//               'Failed to remove favorite $eventType: ${deleteResponse.statusMessage}',
-//           statusCode: deleteResponse.statusCode,
-//         );
-//       }
-//     } catch (e) {
-//       _handleError(e);
-//     }
-//   }
 
   Future<List<FestivalTariff>> getTariffsForFestival(int festivalId) async {
     try {
@@ -472,11 +385,10 @@ class ApiService {
 
   Future<List<PriorityTariff>> getPriorityTariffs() async {
     try {
-      final response = await _dio.get(
-          ApiEndpoints.priorityTariffs,
-          queryParameters: {
-            'populate': '*',
-          });
+      final response =
+          await _dio.get(ApiEndpoints.priorityTariffs, queryParameters: {
+        'populate': '*',
+      });
 
       final List<dynamic> data = response.data['data'];
 
@@ -490,12 +402,11 @@ class ApiService {
 
   Future<List<FestivalTariff>> getFestivalTariffs() async {
     try {
-      final response = await _dio.get(
-        ApiEndpoints.festivalTariffs,
-          queryParameters: {
-            'populate[0]': 'festival',
-            'populate[1]': 'feature',
-          });
+      final response =
+          await _dio.get(ApiEndpoints.festivalTariffs, queryParameters: {
+        'populate[0]': 'festival',
+        'populate[1]': 'feature',
+      });
 
       final List<dynamic> data = response.data['data'];
 
@@ -506,8 +417,6 @@ class ApiService {
       _handleError(e);
     }
   }
-
-  // --- SHOP & CART ---
 
   Future<List<ProductInStock>> getAllVariations() async {
     try {
@@ -546,7 +455,6 @@ class ApiService {
   Future<Product> getProductDetailsById(String id) async {
     try {
       final response = await _dio.get(
-        // Используем общий эндпоинт, чтобы добавить фильтры и populate
         ApiEndpoints.products,
         queryParameters: {
           'filters[id][\$eq]': id,
@@ -562,14 +470,12 @@ class ApiService {
       if (dataList.isEmpty) {
         throw ApiException(message: 'Product with id $id not found');
       }
-      // Парсим первый (и единственный) элемент из полученного массива
       return Product.fromJson(dataList.first as Map<String, dynamic>);
     } catch (e) {
       _handleError(e);
     }
   }
 
-  /// Получает корзину текущего пользователя.
   Future<Cart> getMyCart() async {
     try {
       return _fetchOne(ApiEndpoints.myCart, Cart.fromJson,
@@ -579,7 +485,6 @@ class ApiService {
     }
   }
 
-  /// Добавляет товар (вариацию) в корзину.
   Future<void> addToCart(
       {required int productInStockId, int quantity = 1}) async {
     try {
@@ -591,7 +496,6 @@ class ApiService {
     }
   }
 
-  /// Обновляет количество товара в корзине.
   Future<void> updateCartItemQuantity(
       {required int cartItemId, required int newQuantity}) async {
     try {
@@ -602,7 +506,6 @@ class ApiService {
     }
   }
 
-  /// Удаляет товар из корзины.
   Future<void> removeCartItem({required int cartItemId}) async {
     try {
       await _dio.delete('${ApiEndpoints.cartItems}/$cartItemId');
@@ -701,7 +604,6 @@ class ApiService {
     }
   }
 
-  // Применить промокод (увеличить current_uses на 1)
   Future<PromoCode> applyPromoCode(PromoCode promoCode) async {
     try {
       if (promoCode.currentUses >= promoCode.maxUses) {
@@ -724,7 +626,6 @@ class ApiService {
     }
   }
 
-  // Вспомогательный метод — получить промокод по ID (для apply)
   Future<PromoCode> getPromoCodeById(int id) async {
     try {
       final response = await _dio.get('${ApiEndpoints.promoCodes}/$id');
@@ -734,10 +635,6 @@ class ApiService {
     }
   }
 
-  // -------------------------------
-  // ORDERS
-  // -------------------------------
-  /// Создать заказ (создаётся запись в Strapi)
   Future<Order> createOrder(Order order) async {
     final data = {
       'data': {
@@ -749,16 +646,18 @@ class ApiService {
         'details': order.details,
         'paymentId': order.paymentId,
         'paymentStatus': order.paymentStatus,
-
-        // if (order.user?.id != null) 'user': {'connect': order.user!.id},
-
-        // ✅ Для остальных — connect:[id]
         if (order.festival?.id != null)
-          'festival': {'connect': [order.festival!.id]},
+          'festival': {
+            'connect': [order.festival!.id]
+          },
         if (order.laboratory?.id != null)
-          'laboratory': {'connect': [order.laboratory!.id]},
+          'laboratory': {
+            'connect': [order.laboratory!.id]
+          },
         if (order.productInStock?.id != null)
-          'product_in_stock': {'connect': [order.productInStock!.id]},
+          'product_in_stock': {
+            'connect': [order.productInStock!.id]
+          },
       },
     };
 
@@ -772,8 +671,6 @@ class ApiService {
     }
   }
 
-
-  /// Получить все заказы текущего пользователя
   Future<List<Order>> getOrdersByUser(int userId) async {
     final query = {
       'filters[user][id][\$eq]': userId,
@@ -783,7 +680,8 @@ class ApiService {
     _logRequest('GET', ApiEndpoints.orders, query);
 
     try {
-      final response = await _dio.get(ApiEndpoints.orders, queryParameters: query);
+      final response =
+          await _dio.get(ApiEndpoints.orders, queryParameters: query);
       final data = response.data['data'] as List<dynamic>;
       return data.map((e) => Order.fromJson(e)).toList();
     } catch (e) {
@@ -791,7 +689,6 @@ class ApiService {
     }
   }
 
-  /// Получить заказ по ID
   Future<Order> getOrderById(String id) async {
     final query = {'populate': '*'};
     final endpoint = '${ApiEndpoints.orders}/$id';
@@ -806,7 +703,6 @@ class ApiService {
     }
   }
 
-  /// Обновить статус оплаты (или любые другие поля)
   Future<Order> updateOrder({
     required String id,
     String? paymentStatus,
@@ -827,6 +723,30 @@ class ApiService {
     try {
       final response = await _dio.put(endpoint, data: data);
       return Order.fromJson(response.data['data']);
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<void> updateProductInStockQuantity({
+    required String productInStockDocumentId,
+    required int newQuantity,
+  }) async {
+    final endpoint = '${ApiEndpoints.productInStocks}/$productInStockDocumentId';
+    final data = {
+      'data': {
+        'quantity': newQuantity,
+      }
+    };
+
+    _logRequest('PUT', endpoint, data);
+
+    try {
+      final response = await _dio.put(endpoint, data: data); 
+      if (response.statusCode == 200 && response.data?['data'] == null) {
+          debugPrint('[ApiService] Warning: PUT /product-in-stocks returned 200 but data is null.');
+      }
+      
     } catch (e) {
       _handleError(e);
     }

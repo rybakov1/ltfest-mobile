@@ -268,6 +268,7 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
     final apiService = _ref.read(apiServiceProvider);
     final user = _ref.read(userProvider);
+    final cartAsync = _ref.read(cartProvider);
 
     try {
       final promoState = _ref.read(promoCodeNotifierProvider);
@@ -284,6 +285,20 @@ class OrderNotifier extends StateNotifier<OrderState> {
           details['collectiveName'] = state.collectiveName;
           details['deliveryMethod'] = state.deliveryMethod.name;
           details['deliveryAddress'] = state.deliveryAddress;
+          if (cartAsync.value?.items != null) {
+            details['cartItems'] = cartAsync.value!.items
+                .where((item) => item.productInStock != null)
+                .map((item) => {
+                      'product_in_stock_id': item.productInStock!.id,
+                      'product_name':
+                          item.productInStock!.product?.name ?? 'Товар',
+                      'variant':
+                          '${item.productInStock!.productColor.title}, ${item.productInStock!.productSize.title}',
+                      'quantity': item.quantity,
+                      'unit_price': item.productInStock!.price,
+                    })
+                .toList();
+          }
           break;
         case OrderType.festival:
           details['collectiveName'] = state.collectiveName;

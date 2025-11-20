@@ -14,6 +14,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$ProductInStock {
+  String? get documentId;
   int get id;
   int get price;
   String? get sku;
@@ -42,6 +43,8 @@ mixin _$ProductInStock {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is ProductInStock &&
+            (identical(other.documentId, documentId) ||
+                other.documentId == documentId) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.sku, sku) || other.sku == sku) &&
@@ -59,6 +62,7 @@ mixin _$ProductInStock {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      documentId,
       id,
       price,
       sku,
@@ -70,7 +74,7 @@ mixin _$ProductInStock {
 
   @override
   String toString() {
-    return 'ProductInStock(id: $id, price: $price, sku: $sku, stockQuantity: $stockQuantity, productColor: $productColor, productSize: $productSize, images: $images, product: $product)';
+    return 'ProductInStock(documentId: $documentId, id: $id, price: $price, sku: $sku, stockQuantity: $stockQuantity, productColor: $productColor, productSize: $productSize, images: $images, product: $product)';
   }
 }
 
@@ -81,7 +85,8 @@ abstract mixin class $ProductInStockCopyWith<$Res> {
       _$ProductInStockCopyWithImpl;
   @useResult
   $Res call(
-      {int id,
+      {String? documentId,
+      int id,
       int price,
       String? sku,
       @JsonKey(name: 'quantity') int stockQuantity,
@@ -108,6 +113,7 @@ class _$ProductInStockCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? documentId = freezed,
     Object? id = null,
     Object? price = null,
     Object? sku = freezed,
@@ -118,6 +124,10 @@ class _$ProductInStockCopyWithImpl<$Res>
     Object? product = freezed,
   }) {
     return _then(_self.copyWith(
+      documentId: freezed == documentId
+          ? _self.documentId
+          : documentId // ignore: cast_nullable_to_non_nullable
+              as String?,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -282,6 +292,7 @@ extension ProductInStockPatterns on ProductInStock {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
+            String? documentId,
             int id,
             int price,
             String? sku,
@@ -296,8 +307,16 @@ extension ProductInStockPatterns on ProductInStock {
     final _that = this;
     switch (_that) {
       case _ProductInStock() when $default != null:
-        return $default(_that.id, _that.price, _that.sku, _that.stockQuantity,
-            _that.productColor, _that.productSize, _that.images, _that.product);
+        return $default(
+            _that.documentId,
+            _that.id,
+            _that.price,
+            _that.sku,
+            _that.stockQuantity,
+            _that.productColor,
+            _that.productSize,
+            _that.images,
+            _that.product);
       case _:
         return orElse();
     }
@@ -319,6 +338,7 @@ extension ProductInStockPatterns on ProductInStock {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
+            String? documentId,
             int id,
             int price,
             String? sku,
@@ -332,8 +352,16 @@ extension ProductInStockPatterns on ProductInStock {
     final _that = this;
     switch (_that) {
       case _ProductInStock():
-        return $default(_that.id, _that.price, _that.sku, _that.stockQuantity,
-            _that.productColor, _that.productSize, _that.images, _that.product);
+        return $default(
+            _that.documentId,
+            _that.id,
+            _that.price,
+            _that.sku,
+            _that.stockQuantity,
+            _that.productColor,
+            _that.productSize,
+            _that.images,
+            _that.product);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -354,6 +382,7 @@ extension ProductInStockPatterns on ProductInStock {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
+            String? documentId,
             int id,
             int price,
             String? sku,
@@ -367,8 +396,16 @@ extension ProductInStockPatterns on ProductInStock {
     final _that = this;
     switch (_that) {
       case _ProductInStock() when $default != null:
-        return $default(_that.id, _that.price, _that.sku, _that.stockQuantity,
-            _that.productColor, _that.productSize, _that.images, _that.product);
+        return $default(
+            _that.documentId,
+            _that.id,
+            _that.price,
+            _that.sku,
+            _that.stockQuantity,
+            _that.productColor,
+            _that.productSize,
+            _that.images,
+            _that.product);
       case _:
         return null;
     }
@@ -379,7 +416,8 @@ extension ProductInStockPatterns on ProductInStock {
 @JsonSerializable()
 class _ProductInStock implements ProductInStock {
   const _ProductInStock(
-      {required this.id,
+      {this.documentId,
+      required this.id,
       required this.price,
       this.sku,
       @JsonKey(name: 'quantity') required this.stockQuantity,
@@ -391,6 +429,8 @@ class _ProductInStock implements ProductInStock {
   factory _ProductInStock.fromJson(Map<String, dynamic> json) =>
       _$ProductInStockFromJson(json);
 
+  @override
+  final String? documentId;
   @override
   final int id;
   @override
@@ -439,6 +479,8 @@ class _ProductInStock implements ProductInStock {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _ProductInStock &&
+            (identical(other.documentId, documentId) ||
+                other.documentId == documentId) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.sku, sku) || other.sku == sku) &&
@@ -456,6 +498,7 @@ class _ProductInStock implements ProductInStock {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      documentId,
       id,
       price,
       sku,
@@ -467,7 +510,7 @@ class _ProductInStock implements ProductInStock {
 
   @override
   String toString() {
-    return 'ProductInStock(id: $id, price: $price, sku: $sku, stockQuantity: $stockQuantity, productColor: $productColor, productSize: $productSize, images: $images, product: $product)';
+    return 'ProductInStock(documentId: $documentId, id: $id, price: $price, sku: $sku, stockQuantity: $stockQuantity, productColor: $productColor, productSize: $productSize, images: $images, product: $product)';
   }
 }
 
@@ -480,7 +523,8 @@ abstract mixin class _$ProductInStockCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {String? documentId,
+      int id,
       int price,
       String? sku,
       @JsonKey(name: 'quantity') int stockQuantity,
@@ -510,6 +554,7 @@ class __$ProductInStockCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? documentId = freezed,
     Object? id = null,
     Object? price = null,
     Object? sku = freezed,
@@ -520,6 +565,10 @@ class __$ProductInStockCopyWithImpl<$Res>
     Object? product = freezed,
   }) {
     return _then(_ProductInStock(
+      documentId: freezed == documentId
+          ? _self.documentId
+          : documentId // ignore: cast_nullable_to_non_nullable
+              as String?,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable

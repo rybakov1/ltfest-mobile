@@ -37,7 +37,6 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
     final apiService = ref.read(apiServiceProvider);
 
     notifier.setState(const AsyncLoading());
-
     try {
       print("in widget id is ${widget.paymentId}");
 
@@ -48,9 +47,13 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
       if (response.success) {
         if (response.status == 'AUTHORIZED') {
           await apiService.confirmPayment(widget.paymentId);
+          await notifier.handleOrderFulfillment(widget.paymentId); 
+          
           notifier.setState(AsyncData(PaymentState(
               status: PaymentStatus.success, paymentId: widget.paymentId)));
+              
         } else if (response.status == 'CONFIRMED') {
+          await notifier.handleOrderFulfillment(widget.paymentId);
           notifier.setState(AsyncData(PaymentState(
               status: PaymentStatus.success, paymentId: widget.paymentId)));
         } else {

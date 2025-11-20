@@ -8,6 +8,7 @@ part of 'product_in_stock.dart';
 
 _ProductInStock _$ProductInStockFromJson(Map<String, dynamic> json) =>
     _ProductInStock(
+      documentId: json['documentId'] as String?,
       id: (json['id'] as num).toInt(),
       price: (json['price'] as num).toInt(),
       sku: json['sku'] as String?,
@@ -27,6 +28,7 @@ _ProductInStock _$ProductInStockFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ProductInStockToJson(_ProductInStock instance) =>
     <String, dynamic>{
+      'documentId': instance.documentId,
       'id': instance.id,
       'price': instance.price,
       'sku': instance.sku,

@@ -9,6 +9,7 @@ part 'product_in_stock.g.dart';
 @freezed
 abstract class ProductInStock with _$ProductInStock {
   const factory ProductInStock({
+    String? documentId,
     required int id,
     required int price,
     String? sku,
