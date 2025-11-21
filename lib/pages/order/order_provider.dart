@@ -282,46 +282,59 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
       switch (state.orderType) {
         case OrderType.products:
-          details['collectiveName'] = state.collectiveName;
-          details['deliveryMethod'] = state.deliveryMethod.name;
-          details['deliveryAddress'] = state.deliveryAddress;
+          details['Имя коллектива'] = state.collectiveName;
+
           if (cartAsync.value?.items != null) {
-            details['cartItems'] = cartAsync.value!.items
+            details['Корзина'] = cartAsync.value!.items
                 .where((item) => item.productInStock != null)
                 .map((item) => {
-                      'product_in_stock_id': item.productInStock!.id,
-                      'product_name':
-                          item.productInStock!.product?.name ?? 'Товар',
-                      'variant':
+                      'ID товара': item.productInStock!.id,
+                      'Название': item.productInStock!.product?.name ?? 'Товар',
+                      'Характеристики':
                           '${item.productInStock!.productColor.title}, ${item.productInStock!.productSize.title}',
-                      'quantity': item.quantity,
-                      'unit_price': item.productInStock!.price,
+                      'Количество': item.quantity,
+                      'Цена за штуку': item.productInStock!.price,
                     })
                 .toList();
           }
+
+          if (state.selectedFestival?.title != null) {
+            details['Фестиваль'] = state.selectedFestival!.title;
+          }
+          if (state.deliveryAddress.isNotEmpty) {
+            details['Адрес доставки'] = state.deliveryAddress;
+          }
+
+          details['Метод доставки'] = state.deliveryMethod.name == "onFestival"
+              ? "Заберу на фестивале"
+              : "Доставка до адреса";
           break;
         case OrderType.festival:
-          details['collectiveName'] = state.collectiveName;
-          details['participantNames'] = state.participantNames;
-          details['seatCount'] = state.seatCount;
+          details['Имя коллектива'] = state.collectiveName;
+          details['Имена участников'] = state.participantNames;
+          details['Количество мест'] = state.seatCount;
           break;
         case OrderType.laboratory:
           if (state.payableItem is LearningType) {
             final learningType = state.payableItem as LearningType;
-            details['learningId'] = learningType.id;
-            details['learningType'] = learningType.type;
-            details['seatCount'] = state.seatCount;
+            details['ID типа обучения'] = learningType.id;
+            details['Тип обучения'] = learningType.type;
+            details['Количество мест'] = state.seatCount;
           }
           break;
         case OrderType.ltpriority:
-          details['collectiveName'] = state.collectiveName;
-          details['deliveryAddress'] = state.deliveryAddress;
-          details['passport'] = state.passport;
+          details['Имя коллектива'] = state.collectiveName;
+          details['Адрес доставки'] = state.deliveryAddress;
+          details['Паспорт'] = state.passport;
           break;
       }
 
       details.removeWhere((key, value) =>
           value == null || value == '' || (value is int && value == 0));
+
+      final List<Map<String, dynamic>> orderedDetailsList = details.entries
+          .map((entry) => {'key': entry.key, 'value': entry.value})
+          .toList();
 
       final orderData = {
         'name': state.payerName,
@@ -329,7 +342,7 @@ class OrderNotifier extends StateNotifier<OrderState> {
         'phone': state.phone,
         'amount': totalAmount,
         'type': _mapOrderTypeToStrapi(state.orderType),
-        'details': details,
+        'details': orderedDetailsList,
         'users_permissions_user': user?.id,
         'festival_tariff':
             state.payableItem is FestivalTariff ? state.payableItem?.id : null,

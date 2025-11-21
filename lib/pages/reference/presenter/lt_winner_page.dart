@@ -8,14 +8,14 @@ class LtWinnerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReferencePage(
-      title: 'Добро пожаловать в LT\nСчастливчик!',
+      title: 'LT Winner',
       imageAsset: 'assets/images/lt_winner_full.png',
       shareLink: 'https://t.me/LT_winner',
       ctaLabel: 'Перейти в Telegram',
       telegramLink: 'https://t.me/LT_winner',
       contentBlocks: [
         buildTextBlock(
-            title: 'Добро пожаловать в LT СЧАСТЛИВЧИК!',
+            title: 'Добро пожаловать в LT Счастливчик!',
             text:
                 'Это место, где выигрывают реальные и очень ценные призы: путешествия в Китай, Дубай и другие потрясающие места, билеты на лучшие фестивали, концерты, денежные призы и стильные подарки от Всероссийского фестивального движения LT FEST!'),
         const SizedBox(height: 2),

@@ -87,7 +87,7 @@ void showModalPicker<T>({
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 4, 0),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 4, 32),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -97,7 +97,7 @@ void showModalPicker<T>({
                                 textAlign: TextAlign.center, style: Styles.h4),
                           ),
                           IconButton(
-                            icon: Icon(Icons.close, color: Palette.gray),
+                            icon: Icon(Icons.close, color: Palette.stroke),
                             onPressed: () => Navigator.pop(modalContext),
                           ),
                         ],
@@ -106,7 +106,7 @@ void showModalPicker<T>({
 
                     Flexible(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.only(right: 16, left: 8),
                         child: asyncValue.when(
                           loading: () => _buildShimmerList(),
                           error: (err, st) =>

@@ -1,0 +1,4 @@
+{
+  "dart.flutterRunAdditionalArgs": ["--enable-experiment=macros"], // если используешь макросы, иначе можно не писать
+  "dart.runAllAppsFromFile": true
+}

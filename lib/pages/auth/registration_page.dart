@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ltfest/providers/age_category_provider.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:ltfest/router/app_routes.dart';
 
 import '../../components/modal.dart';
 import '../../data/models/activity.dart';
@@ -71,21 +73,18 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final _patronymicController = TextEditingController();
   final _birthDateController = TextEditingController();
   final _emailController = TextEditingController();
-  final _residenceCityController = TextEditingController(); // Город проживания
+  final _residenceCityController = TextEditingController();
   final _collectiveNameController = TextEditingController();
-  final _collectiveCityController = TextEditingController(); // Город коллектива
+  final _collectiveCityController = TextEditingController();
   final _participantCountController = TextEditingController();
 
   Direction? _selectedDirection;
   Activity? _selectedActivity;
   AgeCategory? _selectedAgeCategory;
 
-  var isSecondStep = false;
 
   bool _isSecondStep = false;
   bool _isLoading = false;
-
-  // Флаг для управления активностью полей коллектива
   bool _isCollectiveFieldsEnabled = false;
 
   @override
@@ -128,25 +127,43 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
 
     final authNotifier = ref.read(authNotifierProvider.notifier);
 
+    String formattedBirthDate;
+    try {
+      final DateFormat inputFormat = DateFormat('dd.MM.yyyy');
+      final DateTime parsedDate = inputFormat.parse(_birthDateController.text);
+      final DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+      formattedBirthDate = outputFormat.format(parsedDate);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Ошибка форматирования даты рождения. Проверьте поле.'),
+            backgroundColor: Palette.error,
+          ),
+        );
+      }
+      setState(() => _isLoading = false);
+      return;
+    }
+
     try {
       await authNotifier.updateProfileInfo(
         lastName: _lastNameController.text.trim(),
         firstName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
-        birthDate: _birthDateController.text,
+        birthDate: formattedBirthDate,
         residence: _residenceCityController.text.trim(),
         directionId: _selectedDirection!.id,
         activityId: _selectedActivity!.id,
         collectiveName: _collectiveNameController.text.trim(),
         collectiveCity: _collectiveCityController.text.trim(),
-        // Отправляем данные только если поля активны
         ageCategoryId:
             _isCollectiveFieldsEnabled ? _selectedAgeCategory?.id : null,
         count_participant: _isCollectiveFieldsEnabled
             ? int.tryParse(_participantCountController.text.trim())
             : null,
       );
-      // GoRouter сам обработает переход на главный экран после смены состояния
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -189,10 +206,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                       ),
                       child: IconButton(
                         onPressed: () {
-                          if (isSecondStep) {
-                            setState(() => isSecondStep = false);
+                          if (_isSecondStep) {
+                            setState(() => _isSecondStep = false);
                           } else {
                             ref.read(authNotifierProvider.notifier).logout();
+                            context.go(AppRoutes.login);
                           }
                         },
                         icon: Icon(Icons.arrow_back, color: Palette.white),
@@ -340,11 +358,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTextFormField('ФИО*', "Ваше имя", _lastNameController),
-        // const SizedBox(height: 16),
-        // _buildTextFormField('Имя*', "Иван", _firstNameController),
-        // const SizedBox(height: 16),
-        // _buildTextFormField('Отчество', "Иванович", _patronymicController,
-        //     isRequired: false),
         const SizedBox(height: 16),
         DatePickerTextField(
             label: "Дата рождения*", controller: _birthDateController),
@@ -353,10 +366,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             keyboardType: TextInputType.emailAddress),
         const SizedBox(height: 16),
         CitySearchField(
-            label: "Город проживания*",
-            hint: "Город",
-            controller: _residenceCityController,
-            isRequired: false),
+          label: "Город проживания*",
+          hint: "Город",
+          controller: _residenceCityController,
+          isRequired: true,
+        ),
       ],
     );
   }
@@ -366,8 +380,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       key: const ValueKey('step2'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 4. Поля на втором шаге
-        // Направление (модальное окно)
         _buildModalSelectorField(
           label: 'Сфера деятельности*',
           value: _selectedActivity?.title,
@@ -375,9 +387,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           onTap: () => _showActivityPicker(),
           validator: (_) => _selectedActivity == null ? 'Выберите' : null,
         ),
-
         const SizedBox(height: 16),
-        // Сфера деятельности (модальное окно)
         _buildModalSelectorField(
           label: 'Направление*',
           value: _selectedDirection?.title,
@@ -416,7 +426,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             return null;
           },
         ),
-
         const SizedBox(height: 16),
         CitySearchField(
           label: "Город",
@@ -499,12 +508,11 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     showModalPicker<Direction>(
       context: context,
       title: 'Направление',
+      isNoNeedSize: true,
       provider: directionsProvider,
       itemBuilder: (direction) => direction.title,
-      // Передаем текущее выбранное значение для инициализации
       initialValue: _selectedDirection,
       onConfirm: (direction) {
-        // Обновляем состояние страницы, когда пользователь нажимает "Выбрать"
         setState(() => _selectedDirection = direction);
         Navigator.pop(context);
       },
@@ -516,6 +524,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       context: context,
       title: 'Сфера деятельности',
       provider: activitiesProvider,
+      isNoNeedSize: true,
       itemBuilder: (activity) => activity.title,
       initialValue: _selectedActivity,
       onConfirm: (activity) {
@@ -523,12 +532,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
 
         setState(() {
           _selectedActivity = activity;
-          // Проверяем, является ли выбранная сфера "Руководитель коллектива"
-          // В реальном приложении лучше использовать ID или enum, а не строку
           _isCollectiveFieldsEnabled =
-              activity.title == 'Руководитель коллектива';
-
-          // Если поля стали неактивными, очищаем их
+              activity.title != 'Не состою в коллективе';
           if (!_isCollectiveFieldsEnabled) {
             _collectiveNameController.clear();
             _collectiveCityController.clear();
@@ -546,6 +551,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       context: context,
       title: 'Возрастная категория',
       provider: ageCategoryProvider,
+      isNoNeedSize: true,
       itemBuilder: (category) => category.title,
       initialValue: _selectedAgeCategory,
       onConfirm: (category) {
@@ -575,7 +581,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           enabled: enabled,
           readOnly: true,
           onTap: onTap,
-          style: Styles.b2.copyWith(color: Palette.gray),
+          style: Styles.b2,
           decoration: InputDecoration(
             isDense: true,
             hintText: hint,
@@ -769,7 +775,7 @@ class _DatePickerTextFieldState extends State<DatePickerTextField> {
   void initState() {
     super.initState();
     initializeDateFormatting('ru');
-    _dateFormat = DateFormat('yyyy-MM-dd', 'ru');
+    _dateFormat = DateFormat('dd.MM.yyyy', 'ru');
   }
 
   Future<void> _selectDate(BuildContext context) async {

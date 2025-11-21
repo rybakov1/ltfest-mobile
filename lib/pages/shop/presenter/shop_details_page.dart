@@ -416,6 +416,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                         "Материал",
                                         style: Styles.b2,
                                       ),
+                                      if (product.productMaterials.isNotEmpty)
                                       Text(
                                         product.productMaterials[0].title,
                                         style: Styles.b2,
