@@ -298,16 +298,18 @@ class OrderNotifier extends StateNotifier<OrderState> {
                 .toList();
           }
 
-          if (state.selectedFestival?.title != null) {
-            details['Фестиваль'] = state.selectedFestival!.title;
-          }
-          if (state.deliveryAddress.isNotEmpty) {
-            details['Адрес доставки'] = state.deliveryAddress;
-          }
 
           details['Метод доставки'] = state.deliveryMethod.name == "onFestival"
               ? "Заберу на фестивале"
               : "Доставка до адреса";
+
+          if (state.deliveryAddress.isNotEmpty) {
+            details['Адрес доставки'] = state.deliveryAddress;
+          }
+
+          if (state.selectedFestival?.title != null) {
+            details['Фестиваль'] = state.selectedFestival!.title;
+          }
           break;
         case OrderType.festival:
           details['Имя коллектива'] = state.collectiveName;
@@ -333,7 +335,7 @@ class OrderNotifier extends StateNotifier<OrderState> {
           value == null || value == '' || (value is int && value == 0));
 
       final List<Map<String, dynamic>> orderedDetailsList = details.entries
-          .map((entry) => {'key': entry.key, 'value': entry.value})
+          .map((entry) => {entry.key: entry.value})
           .toList();
 
       final orderData = {
