@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs_lite.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
@@ -179,8 +180,11 @@ class HomePage extends ConsumerWidget {
                                 imagePath: 'assets/images/lt_travel.png',
                                 label: 'LT Travel',
                                 isSmall: true,
-                                onTap: () => context.push(AppRoutes.ltTravel),
+                                onTap: () async {
+                                  await launchUrl(Uri.parse("https://t.me/ltfest_travel"));
+                                },
                               ),
+                              // () => context.push(AppRoutes.ltTravel),
                               _buildServiceCard(
                                 imagePath: 'assets/images/lt_priority.png',
                                 label: 'LT Priority',

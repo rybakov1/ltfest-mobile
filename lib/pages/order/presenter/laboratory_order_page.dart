@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:ltfest/data/models/laboratory_learning_type.dart';
 
 import '../../../components/lt_appbar.dart';
@@ -80,8 +81,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
     _emailController = TextEditingController(text: state.email);
     _phoneController = TextEditingController(text: state.phone);
 
-    _birthDateController = TextEditingController(
-        text: user?.birthdate.toString().split(" ")[0] ?? '');
+    _birthDateController = TextEditingController(text: state.birthdate);
     _cityController = TextEditingController(text: user?.residence ?? '');
 
     _collectiveNameController =
@@ -210,14 +210,14 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                             hint: "Название коллектива",
                             func: _resetValidationState,
                             onChanged: orderNotifier.updateCollectiveName,
-                            isInvalid: validationState.isPhoneInvalid,
+                            isInvalid: validationState.isCollectiveNameInvalid,
                           ),
                           const SizedBox(height: 16),
                           buildTextField(
                             controller: _educationController,
                             label: "Образование*",
                             hint: "Образование",
-                            onChanged: (_) {},
+                            onChanged: orderNotifier.updateEducation,
                             func: _resetValidationState,
                             isInvalid: validationState.isEducationInvalid,
                           ),
@@ -236,7 +236,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                               hint: "Название коллектива",
                               keyboardType: TextInputType.number,
                               func: _resetValidationState,
-                              onChanged: (_) {},
+                              onChanged: orderNotifier.updateCollectiveInfo,
                             ),
                           if (validationState.hasErrors)
                             Padding(

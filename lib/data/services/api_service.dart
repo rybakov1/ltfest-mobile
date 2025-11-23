@@ -369,8 +369,8 @@ class ApiService {
       final response = await _dio.get(
         ApiEndpoints.festivalTariffs,
         queryParameters: {
-          'filters[festival][id][\$eq]': festivalId,
-          'populate': '*'
+          'filters[festivals][id][\$eq]': festivalId,
+          'populate': 'feature'
         },
       );
 

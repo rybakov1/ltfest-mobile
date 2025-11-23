@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ltfest/data/models/festival.dart';
 import 'package:ltfest/data/models/laboratory_learning_type.dart';
 import 'package:ltfest/data/models/priority_tariff.dart';
@@ -38,6 +39,9 @@ class OrderState {
 
   // --- Поля для заказа на ФЕСТИВАЛЬ (Festival) ---
   final String collectiveName; // Название коллектива
+  final String collectiveInfo; // Название коллектива
+  final String education; // Название коллектива
+
   final String participantNames; // Имена участников через запятую
   final int seatCount; // Количество мест
 
@@ -62,6 +66,8 @@ class OrderState {
 
     // Фестиваль
     this.collectiveName = '',
+    this.collectiveInfo = '',
+    this.education = '',
     this.participantNames = '',
     this.seatCount = 1,
     this.passport = '',
@@ -79,6 +85,8 @@ class OrderState {
       Festival? selectedFestival,
       String? deliveryAddress,
       String? collectiveName,
+      String? collectiveInfo,
+      String? education,
       String? participantNames,
       String? passport,
       String? residence,
@@ -95,6 +103,8 @@ class OrderState {
       selectedFestival: selectedFestival ?? this.selectedFestival,
       deliveryAddress: deliveryAddress ?? this.deliveryAddress,
       collectiveName: collectiveName ?? this.collectiveName,
+      collectiveInfo: collectiveInfo ?? this.collectiveInfo,
+      education: education ?? this.education,
       participantNames: participantNames ?? this.participantNames,
       seatCount: seatCount ?? this.seatCount,
       passport: passport ?? this.passport,
@@ -196,11 +206,21 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
   void _prefillUserData() {
     final user = _ref.read(userProvider);
+
+
+    
     if (user != null) {
+      String formattedBirthDate;
+      final DateFormat inputFormat = DateFormat('yyyy-MM-dd');
+      final DateTime parsedDate = inputFormat.parse(user.birthdate.toString().split(" ")[0]);
+      final DateFormat outputFormat = DateFormat('dd.MM.yyyy');
+      formattedBirthDate = outputFormat.format(parsedDate);
+      
       state = state.copyWith(
         payerName: user.lastname!.trim(),
         email: user.email,
         phone: user.phone,
+        birthdate: formattedBirthDate,
         collectiveName: user.collectiveName,
       );
     }
@@ -218,8 +238,10 @@ class OrderNotifier extends StateNotifier<OrderState> {
       state = state.copyWith(payerName: value);
 
   void updateEmail(String value) => state = state.copyWith(email: value);
+
   void updateBirthdate(String value) =>
       state = state.copyWith(birthdate: value);
+
   void updatePhone(String value) => state = state.copyWith(phone: value);
 
   void updatePassport(String value) => state = state.copyWith(passport: value);
@@ -237,6 +259,12 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
   void updateDeliveryAddress(String value) =>
       state = state.copyWith(deliveryAddress: value);
+
+  void updateCollectiveInfo(String value) =>
+      state = state.copyWith(collectiveInfo: value);
+
+  void updateEducation(String value) =>
+      state = state.copyWith(education: value);
 
   void selectFestival(Festival festival) =>
       state = state.copyWith(selectedFestival: festival);
@@ -282,22 +310,23 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
       switch (state.orderType) {
         case OrderType.products:
-          details['Имя коллектива'] = state.collectiveName;
+          details['Название коллектива'] = state.collectiveName;
 
           if (cartAsync.value?.items != null) {
             details['Корзина'] = cartAsync.value!.items
                 .where((item) => item.productInStock != null)
-                .map((item) => {
-                      'ID товара': item.productInStock!.id,
-                      'Название': item.productInStock!.product?.name ?? 'Товар',
-                      'Характеристики':
-                          '${item.productInStock!.productColor.title}, ${item.productInStock!.productSize.title}',
-                      'Количество': item.quantity,
-                      'Цена за штуку': item.productInStock!.price,
-                    })
+                .map(
+                  (item) => {
+                    'ID товара': item.productInStock!.id,
+                    'Название': item.productInStock!.product?.name ?? 'Товар',
+                    'Характеристики':
+                        '${item.productInStock!.productColor.title}, ${item.productInStock!.productSize.title}',
+                    'Количество': item.quantity,
+                    'Цена за штуку': item.productInStock!.price,
+                  },
+                )
                 .toList();
           }
-
 
           details['Метод доставки'] = state.deliveryMethod.name == "onFestival"
               ? "Заберу на фестивале"
@@ -319,6 +348,12 @@ class OrderNotifier extends StateNotifier<OrderState> {
         case OrderType.laboratory:
           if (state.payableItem is LearningType) {
             final learningType = state.payableItem as LearningType;
+            details['Название коллектива'] = state.collectiveName;
+            details['Информация о коллективе'] = state.collectiveInfo;
+
+            details['Дата рождения'] = state.birthdate;
+            details['Образование'] = state.education;
+
             details['ID типа обучения'] = learningType.id;
             details['Тип обучения'] = learningType.type;
             details['Количество мест'] = state.seatCount;
@@ -328,15 +363,15 @@ class OrderNotifier extends StateNotifier<OrderState> {
           details['Имя коллектива'] = state.collectiveName;
           details['Адрес доставки'] = state.deliveryAddress;
           details['Паспорт'] = state.passport;
+          details['Город проживания'] = state.residence;
           break;
       }
 
       details.removeWhere((key, value) =>
           value == null || value == '' || (value is int && value == 0));
 
-      final List<Map<String, dynamic>> orderedDetailsList = details.entries
-          .map((entry) => {entry.key: entry.value})
-          .toList();
+      final List<Map<String, dynamic>> orderedDetailsList =
+          details.entries.map((entry) => {entry.key: entry.value}).toList();
 
       final orderData = {
         'name': state.payerName,

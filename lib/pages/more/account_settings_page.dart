@@ -52,10 +52,35 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
   void _loadInitialData() {
     final authState = ref.read(authNotifierProvider);
+
+    // String formattedBirthDate;
+    // try {
+    //   final DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+    //   formattedBirthDate = outputFormat.format(parsedDate);
+    // } catch (e) {
+    //   if (mounted) {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       SnackBar(
+    //         content:
+    //         Text('Ошибка форматирования даты рождения. Проверьте поле.'),
+    //         backgroundColor: Palette.error,
+    //       ),
+    //     );
+    //   }
+    //   setState(() => _isLoading = false);
+    //   return;
+    // }
+
     if (authState.value is Authenticated) {
       final user = (authState.value as Authenticated).user;
+      String formattedBirthDate;
+      final DateFormat inputFormat = DateFormat('yyyy-MM-dd');
+      final DateTime parsedDate =
+          inputFormat.parse(user.birthdate!.toString().split(" ")[0]);
+      final DateFormat outputFormat = DateFormat('dd.MM.yyyy');
+      formattedBirthDate = outputFormat.format(parsedDate);
 
-      _birthdayController.text = user.birthdate!.toString().split(" ")[0];
+      _birthdayController.text = formattedBirthDate;
       _emailController.text = user.email!;
       _cityController.text = user.residence!;
       _educationController.text = user.educationPlace ?? '';
@@ -96,10 +121,30 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
   Future<void> _saveSettings() async {
     setState(() => _isLoading = true);
-    // TODO: Здесь будет логика сохранения данных.
-    // Вы будете вызывать метод из вашего authNotifier, например:
+
     final authNotifier = ref.read(authNotifierProvider.notifier);
     final authState = ref.read(authNotifierProvider);
+
+    String formattedBirthDate;
+    try {
+      final DateFormat inputFormat = DateFormat('dd.MM.yyyy');
+      final DateTime parsedDate = inputFormat.parse(_birthdayController.text);
+      final DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+      formattedBirthDate = outputFormat.format(parsedDate);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Ошибка форматирования даты рождения. Проверьте поле.'),
+            backgroundColor: Palette.error,
+          ),
+        );
+      }
+      setState(() => _isLoading = false);
+      return;
+    }
+
     if (authState.value is Authenticated) {
       final user = (authState.value as Authenticated).user;
 
@@ -107,7 +152,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         lastName: user.lastname!,
         firstName: user.firstname!,
         email: _emailController.text.trim(),
-        birthDate: _birthdayController.text.toString(),
+        birthDate: formattedBirthDate,
         residence: _cityController.text.trim(),
         directionId: _selectedDirection!.id,
         activityId: user.activity?.id ?? 0,
@@ -115,8 +160,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         collectiveCity: _collectiveCityController.text.trim(),
         educationPlace: _educationController.text.trim(),
         masterName: _masterFioController.text.trim(),
-        count_participant:
-            int.parse(_collectiveCountParticipateController.text.trim()),
+        count_participant: _collectiveCountParticipateController.text.isEmpty ? 0 : int.parse(_collectiveCountParticipateController.text.trim()),
         ageCategoryId: _selectedAgeCategory?.id,
       );
     }
@@ -781,7 +825,7 @@ class _DatePickerTextFieldState extends State<DatePickerTextField> {
   void initState() {
     super.initState();
     initializeDateFormatting('ru');
-    _dateFormat = DateFormat('yyyy-MM-dd', 'ru');
+    _dateFormat = DateFormat('dd.MM.yyyy', 'ru');
   }
 
   Future<void> _selectDate(BuildContext context) async {

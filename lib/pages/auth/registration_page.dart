@@ -449,7 +449,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       children: [
         Text(label,
             style: Styles.b3.copyWith(
-                color: enabled ? Palette.gray : Palette.gray.withOpacity(0.5))),
+                color: enabled ? Palette.gray : Palette.gray.withValues(alpha: 0.5))),
         const SizedBox(height: 6),
         TextFormField(
           enabled: enabled,
@@ -460,7 +460,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
               Styles.b2.copyWith(color: enabled ? Palette.black : Palette.gray),
           decoration: InputDecoration(
             filled: !enabled,
-            fillColor: Palette.background.withOpacity(0.5),
+            fillColor: Palette.background.withValues(alpha: 0.5),
             isDense: true,
             hintText: hint,
             hintStyle: Styles.b2.copyWith(color: Palette.gray),
