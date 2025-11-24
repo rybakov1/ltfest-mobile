@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../constants.dart';
 
 Widget _buildShimmerList() {
@@ -10,19 +9,19 @@ Widget _buildShimmerList() {
     highlightColor: Palette.shimmerHighlight,
     child: ConstrainedBox(
       constraints: const BoxConstraints(
-        maxHeight: 300.0,
+        maxHeight: 300,
       ),
       child: ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         itemCount: 6,
         itemBuilder: (_, __) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                width: 48.0,
-                height: 48.0,
+                width: 48,
+                height: 48,
                 color: Colors.white,
               ),
               const SizedBox(width: 16),
@@ -32,13 +31,13 @@ Widget _buildShimmerList() {
                   children: <Widget>[
                     Container(
                       width: double.infinity,
-                      height: 8.0,
+                      height: 8,
                       color: Colors.white,
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      width: 150.0,
-                      height: 8.0,
+                      width: 150,
+                      height: 8,
                       color: Colors.white,
                     ),
                   ],

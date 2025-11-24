@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/router/app_routes.dart';
-
 import '../provider/shop_provider.dart';
 
 class ShopWidget extends ConsumerStatefulWidget {
@@ -55,7 +54,8 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                   Stack(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12)),
                         child: Image.network(
                           'http://37.46.132.144:1337${product.variations[0].images[0].url}',
                           height: 160,
@@ -64,8 +64,13 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                           loadingBuilder: (context, child, progress) {
                             return progress == null
                                 ? child
-                                : const Center(
-                                    child: CircularProgressIndicator());
+                                : Container(
+                                    height: 160,
+                                    width: double.infinity,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
                           },
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
@@ -89,6 +94,8 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                   const SizedBox(height: 4),
                   Text(
                     product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: Styles.b2.copyWith(
                       color: Palette.gray,
                     ),

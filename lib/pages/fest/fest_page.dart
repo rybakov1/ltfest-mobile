@@ -549,6 +549,18 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Shimmer.fromColors(
+                      baseColor: Palette.shimmerBase,
+                      highlightColor: Palette.shimmerHighlight,
+                      child: Container(
+                        height: 180,
+                        width: double.infinity,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
                 ),
               ),
               Padding(

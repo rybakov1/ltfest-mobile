@@ -33,7 +33,7 @@ class FavoriteButton extends ConsumerWidget {
     );
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
         child: Container(
@@ -41,7 +41,7 @@ class FavoriteButton extends ConsumerWidget {
           width: size,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
           ),
           child: IconButton(
             padding: EdgeInsets.zero,
@@ -55,11 +55,7 @@ class FavoriteButton extends ConsumerWidget {
               try {
                 await notifier.toggleFavorite(type, id);
               } catch (e) {
-                print(e);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Ошибка при изменении избранного')),
-                );
+                debugPrint(e.toString());
               }
             },
           ),

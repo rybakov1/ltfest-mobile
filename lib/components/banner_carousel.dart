@@ -15,7 +15,6 @@ class BannerCarousel extends ConsumerStatefulWidget {
 }
 
 class _BannerCarouselState extends ConsumerState<BannerCarousel> {
-
   @override
   Widget build(BuildContext context) {
     final apiService = ref.read(apiServiceProvider);
@@ -31,7 +30,7 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
           width: double.infinity,
           decoration: BoxDecoration(
             color: Palette.gray.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -70,7 +69,7 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
                       }
                     },
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
                       child: Image.network(
                         imageUrl,
                         height: 180,
@@ -89,29 +88,10 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
                   enlargeCenterPage: true,
                   viewportFraction: 1,
                   onPageChanged: (index, reason) {
-                    setState(() {
-                    });
+                    setState(() {});
                   },
                 ),
               ),
-              // Кружочки
-              // const SizedBox(height: 12),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: bannerList.asMap().entries.map((entry) {
-              //     return Container(
-              //       width: 8.0,
-              //       height: 8.0,
-              //       margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              //       decoration: BoxDecoration(
-              //         shape: BoxShape.circle,
-              //         color: _currentIndex == entry.key
-              //             ? Palette.primaryLime
-              //             : Palette.gray.withValues(alpha: 0.4),
-              //       ),
-              //     );
-              //   }).toList(),
-              // ),
             ],
           );
         },
@@ -125,7 +105,7 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Palette.gray.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
       ),
       child: const Center(child: CircularProgressIndicator()),
     );

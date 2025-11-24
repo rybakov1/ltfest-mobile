@@ -1,8 +1,6 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../constants.dart';
 
 class LTAppBar extends StatelessWidget {
@@ -24,7 +22,7 @@ class LTAppBar extends StatelessWidget {
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
             child: BackdropFilter(
               filter: ImageFilter.blur(
                 sigmaX: suffixIconColor != null ? 10 : 0,
@@ -34,7 +32,7 @@ class LTAppBar extends StatelessWidget {
                 height: 40,
                 width: 40,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
                   color: suffixIconColor ?? Palette.primaryLime,
                 ),
                 child: IconButton(

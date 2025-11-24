@@ -8,6 +8,7 @@ import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/pages/payment/payment_failure_screen.dart';
 import 'package:ltfest/pages/payment/payment_provider.dart';
 import 'package:ltfest/pages/shop/presenter/shop_widget.dart';
+import 'package:ltfest/pages/shop/presenter/shop_with_cart_widget.dart';
 import 'package:ltfest/router/app_routes.dart';
 
 class PaymentSuccessScreen extends ConsumerStatefulWidget {
@@ -47,11 +48,10 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
       if (response.success) {
         if (response.status == 'AUTHORIZED') {
           await apiService.confirmPayment(widget.paymentId);
-          await notifier.handleOrderFulfillment(widget.paymentId); 
-          
+          await notifier.handleOrderFulfillment(widget.paymentId);
+
           notifier.setState(AsyncData(PaymentState(
               status: PaymentStatus.success, paymentId: widget.paymentId)));
-              
         } else if (response.status == 'CONFIRMED') {
           await notifier.handleOrderFulfillment(widget.paymentId);
           notifier.setState(AsyncData(PaymentState(
@@ -75,50 +75,63 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
     return Scaffold(
       backgroundColor: Palette.white,
       body: paymentAsync.when(
-        data: (state) => Column(
+        data: (state) => Stack(
           children: [
-            SizedBox(height: 64 + MediaQuery.of(context).padding.top),
-            Image.asset(
-              'assets/images/payment_success.png',
-              width: 101,
-            ),
-            const SizedBox(height: 16),
-            Text("Заявка успешно оформлена!",
-                style: Styles.h3, textAlign: TextAlign.center),
-            const SizedBox(height: 56),
-            Expanded(
+            SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 24),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Вам также может понравиться',
-                            style: Styles.b1.copyWith(color: Palette.gray),
-                            textAlign: TextAlign.center,
-                          ),
-                          const ShopWidget(),
-                          const Spacer(),
-                          LTButtons.outlinedButton(
-                            onPressed: () {
-                              ref.read(cartProvider.notifier).clearCart();
-                              ref
-                                  .read(paymentNotifierProvider.notifier)
-                                  .resetState();
-                              context.go(AppRoutes.home);
-                            },
-                            child: Text('Закрыть', style: Styles.button1),
-                          ),
-                          const SizedBox(height: 40),
-                        ],
-                      ),
+                  SizedBox(height: 64 + MediaQuery.of(context).padding.top),
+                  Image.asset(
+                    'assets/images/payment_success.png',
+                    width: 101,
+                  ),
+                  const SizedBox(height: 16),
+                  Text("Заявка успешно оформлена!",
+                      style: Styles.h3, textAlign: TextAlign.center),
+                  const SizedBox(height: 56),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 24),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Вам также может понравиться',
+                          style: Styles.b1.copyWith(color: Palette.gray),
+                          textAlign: TextAlign.center,
+                        ),
+                        const ShopWidget(),
+                      ],
                     ),
-                  )
+                  ),
+                  SizedBox(height: MediaQuery.of(context).padding.bottom + 48),
                 ],
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom + 24,
+                  right: 16,
+                  left: 16,
+                  top: 24,
+                ),
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                    color: Palette.white),
+                child: LTButtons.outlinedButton(
+                  onPressed: () {
+                    ref.read(cartProvider.notifier).clearCart();
+                    ref.read(paymentNotifierProvider.notifier).resetState();
+                    context.go(AppRoutes.home);
+                  },
+                  child: Text('Закрыть', style: Styles.button1),
+                ),
               ),
             ),
           ],

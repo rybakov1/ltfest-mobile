@@ -16,6 +16,9 @@ _Order _$OrderFromJson(Map<String, dynamic> json) => _Order(
       details: json['details'] as Map<String, dynamic>?,
       paymentId: json['paymentId'] as String?,
       paymentStatus: json['paymentStatus'] as String?,
+      user: json['user'] == null
+          ? null
+          : User.fromJson(json['user'] as Map<String, dynamic>),
       festival: json['festival'] == null
           ? null
           : Festival.fromJson(json['festival'] as Map<String, dynamic>),
@@ -41,6 +44,7 @@ Map<String, dynamic> _$OrderToJson(_Order instance) => <String, dynamic>{
       'details': instance.details,
       'paymentId': instance.paymentId,
       'paymentStatus': instance.paymentStatus,
+      'user': instance.user,
       'festival': instance.festival,
       'laboratory': instance.laboratory,
       'product_in_stock': instance.productInStock,

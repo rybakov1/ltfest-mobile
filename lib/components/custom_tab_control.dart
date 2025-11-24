@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../constants.dart';
 
 class CustomSegmentedControl extends StatelessWidget {
@@ -21,7 +20,7 @@ class CustomSegmentedControl extends StatelessWidget {
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         color: Palette.background,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
       ),
       child: Row(
         children: tabs.asMap().entries.map((entry) {
@@ -34,7 +33,7 @@ class CustomSegmentedControl extends StatelessWidget {
               onTap: () => onTap(index),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
                   color: isSelected ? Palette.primaryLime : Colors.transparent,
                 ),
                 child: Center(

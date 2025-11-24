@@ -22,7 +22,8 @@ mixin _$Order {
   String get type;
   Map<String, dynamic>? get details;
   String? get paymentId;
-  String? get paymentStatus; // User? user,
+  String? get paymentStatus;
+  User? get user;
   Festival? get festival;
   Laboratory? get laboratory;
   @JsonKey(name: 'product_in_stock')
@@ -55,6 +56,7 @@ mixin _$Order {
                 other.paymentId == paymentId) &&
             (identical(other.paymentStatus, paymentStatus) ||
                 other.paymentStatus == paymentStatus) &&
+            (identical(other.user, user) || other.user == user) &&
             (identical(other.festival, festival) ||
                 other.festival == festival) &&
             (identical(other.laboratory, laboratory) ||
@@ -78,6 +80,7 @@ mixin _$Order {
       const DeepCollectionEquality().hash(details),
       paymentId,
       paymentStatus,
+      user,
       festival,
       laboratory,
       productInStock,
@@ -85,7 +88,7 @@ mixin _$Order {
 
   @override
   String toString() {
-    return 'Order(id: $id, name: $name, email: $email, phone: $phone, amount: $amount, type: $type, details: $details, paymentId: $paymentId, paymentStatus: $paymentStatus, festival: $festival, laboratory: $laboratory, productInStock: $productInStock, createdAt: $createdAt)';
+    return 'Order(id: $id, name: $name, email: $email, phone: $phone, amount: $amount, type: $type, details: $details, paymentId: $paymentId, paymentStatus: $paymentStatus, user: $user, festival: $festival, laboratory: $laboratory, productInStock: $productInStock, createdAt: $createdAt)';
   }
 }
 
@@ -104,11 +107,13 @@ abstract mixin class $OrderCopyWith<$Res> {
       Map<String, dynamic>? details,
       String? paymentId,
       String? paymentStatus,
+      User? user,
       Festival? festival,
       Laboratory? laboratory,
       @JsonKey(name: 'product_in_stock') ProductInStock? productInStock,
       DateTime? createdAt});
 
+  $UserCopyWith<$Res>? get user;
   $FestivalCopyWith<$Res>? get festival;
   $LaboratoryCopyWith<$Res>? get laboratory;
   $ProductInStockCopyWith<$Res>? get productInStock;
@@ -135,6 +140,7 @@ class _$OrderCopyWithImpl<$Res> implements $OrderCopyWith<$Res> {
     Object? details = freezed,
     Object? paymentId = freezed,
     Object? paymentStatus = freezed,
+    Object? user = freezed,
     Object? festival = freezed,
     Object? laboratory = freezed,
     Object? productInStock = freezed,
@@ -177,6 +183,10 @@ class _$OrderCopyWithImpl<$Res> implements $OrderCopyWith<$Res> {
           ? _self.paymentStatus
           : paymentStatus // ignore: cast_nullable_to_non_nullable
               as String?,
+      user: freezed == user
+          ? _self.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       festival: freezed == festival
           ? _self.festival
           : festival // ignore: cast_nullable_to_non_nullable
@@ -194,6 +204,20 @@ class _$OrderCopyWithImpl<$Res> implements $OrderCopyWith<$Res> {
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
+  }
+
+  /// Create a copy of Order
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_self.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_self.user!, (value) {
+      return _then(_self.copyWith(user: value));
+    });
   }
 
   /// Create a copy of Order
@@ -342,6 +366,7 @@ extension OrderPatterns on Order {
             Map<String, dynamic>? details,
             String? paymentId,
             String? paymentStatus,
+            User? user,
             Festival? festival,
             Laboratory? laboratory,
             @JsonKey(name: 'product_in_stock') ProductInStock? productInStock,
@@ -362,6 +387,7 @@ extension OrderPatterns on Order {
             _that.details,
             _that.paymentId,
             _that.paymentStatus,
+            _that.user,
             _that.festival,
             _that.laboratory,
             _that.productInStock,
@@ -396,6 +422,7 @@ extension OrderPatterns on Order {
             Map<String, dynamic>? details,
             String? paymentId,
             String? paymentStatus,
+            User? user,
             Festival? festival,
             Laboratory? laboratory,
             @JsonKey(name: 'product_in_stock') ProductInStock? productInStock,
@@ -415,6 +442,7 @@ extension OrderPatterns on Order {
             _that.details,
             _that.paymentId,
             _that.paymentStatus,
+            _that.user,
             _that.festival,
             _that.laboratory,
             _that.productInStock,
@@ -448,6 +476,7 @@ extension OrderPatterns on Order {
             Map<String, dynamic>? details,
             String? paymentId,
             String? paymentStatus,
+            User? user,
             Festival? festival,
             Laboratory? laboratory,
             @JsonKey(name: 'product_in_stock') ProductInStock? productInStock,
@@ -467,6 +496,7 @@ extension OrderPatterns on Order {
             _that.details,
             _that.paymentId,
             _that.paymentStatus,
+            _that.user,
             _that.festival,
             _that.laboratory,
             _that.productInStock,
@@ -490,6 +520,7 @@ class _Order implements Order {
       required final Map<String, dynamic>? details,
       this.paymentId,
       this.paymentStatus,
+      this.user,
       this.festival,
       this.laboratory,
       @JsonKey(name: 'product_in_stock') this.productInStock,
@@ -523,7 +554,8 @@ class _Order implements Order {
   final String? paymentId;
   @override
   final String? paymentStatus;
-// User? user,
+  @override
+  final User? user;
   @override
   final Festival? festival;
   @override
@@ -565,6 +597,7 @@ class _Order implements Order {
                 other.paymentId == paymentId) &&
             (identical(other.paymentStatus, paymentStatus) ||
                 other.paymentStatus == paymentStatus) &&
+            (identical(other.user, user) || other.user == user) &&
             (identical(other.festival, festival) ||
                 other.festival == festival) &&
             (identical(other.laboratory, laboratory) ||
@@ -588,6 +621,7 @@ class _Order implements Order {
       const DeepCollectionEquality().hash(_details),
       paymentId,
       paymentStatus,
+      user,
       festival,
       laboratory,
       productInStock,
@@ -595,7 +629,7 @@ class _Order implements Order {
 
   @override
   String toString() {
-    return 'Order(id: $id, name: $name, email: $email, phone: $phone, amount: $amount, type: $type, details: $details, paymentId: $paymentId, paymentStatus: $paymentStatus, festival: $festival, laboratory: $laboratory, productInStock: $productInStock, createdAt: $createdAt)';
+    return 'Order(id: $id, name: $name, email: $email, phone: $phone, amount: $amount, type: $type, details: $details, paymentId: $paymentId, paymentStatus: $paymentStatus, user: $user, festival: $festival, laboratory: $laboratory, productInStock: $productInStock, createdAt: $createdAt)';
   }
 }
 
@@ -615,11 +649,14 @@ abstract mixin class _$OrderCopyWith<$Res> implements $OrderCopyWith<$Res> {
       Map<String, dynamic>? details,
       String? paymentId,
       String? paymentStatus,
+      User? user,
       Festival? festival,
       Laboratory? laboratory,
       @JsonKey(name: 'product_in_stock') ProductInStock? productInStock,
       DateTime? createdAt});
 
+  @override
+  $UserCopyWith<$Res>? get user;
   @override
   $FestivalCopyWith<$Res>? get festival;
   @override
@@ -649,6 +686,7 @@ class __$OrderCopyWithImpl<$Res> implements _$OrderCopyWith<$Res> {
     Object? details = freezed,
     Object? paymentId = freezed,
     Object? paymentStatus = freezed,
+    Object? user = freezed,
     Object? festival = freezed,
     Object? laboratory = freezed,
     Object? productInStock = freezed,
@@ -691,6 +729,10 @@ class __$OrderCopyWithImpl<$Res> implements _$OrderCopyWith<$Res> {
           ? _self.paymentStatus
           : paymentStatus // ignore: cast_nullable_to_non_nullable
               as String?,
+      user: freezed == user
+          ? _self.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       festival: freezed == festival
           ? _self.festival
           : festival // ignore: cast_nullable_to_non_nullable
@@ -708,6 +750,20 @@ class __$OrderCopyWithImpl<$Res> implements _$OrderCopyWith<$Res> {
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
+  }
+
+  /// Create a copy of Order
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_self.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_self.user!, (value) {
+      return _then(_self.copyWith(user: value));
+    });
   }
 
   /// Create a copy of Order

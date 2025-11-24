@@ -5,6 +5,7 @@ import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/image_data.dart';
 import 'package:ltfest/pages/shop/provider/shop_provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../components/favorite_button.dart';
 import '../../../components/share_button.dart';
 import '../../../data/models/product/product.dart';
@@ -165,6 +166,162 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
     return variation.stockQuantity > 0;
   }
 
+  Widget _buildSkeleton(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Palette.background,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Shimmer.fromColors(
+                  baseColor: Palette.shimmerBase,
+                  highlightColor: Palette.shimmerHighlight,
+                  child: AspectRatio(
+                    aspectRatio: 1.0,
+                    child: Container(color: Colors.white),
+                  ),
+                ),
+                Container(
+                  decoration: Decor.base,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  width: double.infinity,
+                  child: Shimmer.fromColors(
+                    baseColor: Palette.shimmerBase,
+                    highlightColor: Palette.shimmerHighlight,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            height: 24,
+                            width: 200,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4))),
+                        const SizedBox(height: 8),
+                        Container(
+                            height: 20,
+                            width: 100,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4))),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Container(
+                  decoration: Decor.base,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  width: double.infinity,
+                  child: Shimmer.fromColors(
+                    baseColor: Palette.shimmerBase,
+                    highlightColor: Palette.shimmerHighlight,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            height: 14,
+                            width: 120,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4))),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: List.generate(
+                              4,
+                              (index) => Container(
+                                  margin: const EdgeInsets.only(right: 8),
+                                  width: 50,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8)))),
+                        ),
+                        const SizedBox(height: 24),
+                        Container(
+                            height: 14,
+                            width: 80,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4))),
+                        const SizedBox(height: 16),
+                        Container(
+                            height: 12,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4))),
+                        const SizedBox(height: 8),
+                        Container(
+                            height: 12,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4))),
+                        const SizedBox(height: 8),
+                        Container(
+                            height: 12,
+                            width: 200,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4))),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              child: LTAppBar(),
+            ),
+          ),
+
+          // Заглушка нижней панели
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Palette.white,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Center(
+                child: Shimmer.fromColors(
+                  baseColor: Palette.shimmerBase,
+                  highlightColor: Palette.shimmerHighlight,
+                  child: Container(
+                    height: 50,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final productDetailsAsync = ref.watch(productByIdProvider(widget.id));
@@ -194,7 +351,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
       body: productDetailsAsync.when(
         data: (product) {
           if (selectedVariation == null) {
-            return const Center(child: CircularProgressIndicator());
+            return _buildSkeleton(context);
           }
 
           final cart = cartAsync.valueOrNull;
@@ -242,7 +399,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                             postfixWidget: Row(
                               children: [
                                 ShareButton(
-                                  link: "https://ltfest.ru",
+                                  link: "https://ltfest.ru/shop/${product.id}",
                                   color: Palette.primaryLime,
                                 ),
                                 const SizedBox(width: 8),
@@ -417,10 +574,10 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                         style: Styles.b2,
                                       ),
                                       if (product.productMaterials.isNotEmpty)
-                                      Text(
-                                        product.productMaterials[0].title,
-                                        style: Styles.b2,
-                                      )
+                                        Text(
+                                          product.productMaterials[0].title,
+                                          style: Styles.b2,
+                                        )
                                     ],
                                   ),
                                 ),
@@ -480,7 +637,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                       postfixWidget: Row(
                         children: [
                           ShareButton(
-                            link: "https://ltfest.ru",
+                            link: "https://ltfest.ru/shop/${product.id}",
                             color: Palette.primaryLime,
                           ),
                           const SizedBox(width: 8),
@@ -512,10 +669,19 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
         },
         error: (_, st) {
           debugPrint(st.toString());
-          return Text("This is error, $st");
+          return Stack(
+            children: [
+              Center(child: Text("Ошибка загрузки: $st")),
+              const Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: SafeArea(child: LTAppBar())),
+            ],
+          );
         },
         loading: () {
-          return const Text("loading.......");
+          return _buildSkeleton(context);
         },
       ),
     );
@@ -541,7 +707,7 @@ class CartBottomBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     bool isAvailableQuantity = true;
 
-    if(cartItem != null) {
+    if (cartItem != null) {
       final productStock = cartItem!.productInStock!;
 
       if (cartItem!.quantity >= productStock.stockQuantity) {

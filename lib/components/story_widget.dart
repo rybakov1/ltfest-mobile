@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/components/story_viewer.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../constants.dart';
 import '../providers/story_provider.dart';
 
@@ -34,7 +33,6 @@ class StoryWidget extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final story = stories[index];
                   return _buildStoryPreview(
-                    context: context,
                     imageUrl:
                         'http://37.46.132.144:1337${story.preview!.formats?.thumbnail?.url}',
                     onTap: () {
@@ -66,7 +64,6 @@ class StoryWidget extends ConsumerWidget {
   }
 
   Widget _buildStoryPreview({
-    required BuildContext context,
     required String imageUrl,
     required VoidCallback onTap,
   }) {
@@ -76,13 +73,13 @@ class StoryWidget extends ConsumerWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
             border: Border.all(width: 1.5, color: Palette.primaryLime),
           ),
           child: Padding(
             padding: const EdgeInsets.all(2.0),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
               child: imageUrl.startsWith('http')
                   ? Image.network(
                       imageUrl,
@@ -115,15 +112,15 @@ class StoryWidget extends ConsumerWidget {
       highlightColor: Palette.shimmerHighlight,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: 5, // Отображаем 5 заглушек
+        itemCount: 5,
         itemBuilder: (_, __) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3.0),
           child: Container(
             width: 96,
             height: 96,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.black,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
           ),
         ),

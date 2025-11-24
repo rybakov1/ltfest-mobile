@@ -32,6 +32,16 @@
 
                 <data android:scheme="ltfestapp" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Принимаем ссылки https://ltfest.ru/shop/... -->
+                <data android:scheme="https" />
+                <data android:host="ltfest.ru" />
+                <data android:pathPrefix="/shop" />
+            </intent-filter>
         </activity>
 
         <meta-data

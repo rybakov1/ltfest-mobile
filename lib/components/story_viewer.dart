@@ -32,7 +32,7 @@ class StoryViewerState extends State<StoryViewer> {
     // Initialize a StoryController for each story group
     _storyControllers = List.generate(
       widget.stories.length,
-          (index) => StoryController(),
+      (index) => StoryController(),
     );
   }
 
@@ -56,7 +56,7 @@ class StoryViewerState extends State<StoryViewer> {
   }
 
   // Build StoryView for a single story group
-  Widget _buildStoryView(LTStory story, StoryController controller, int storyIndex) {
+  Widget _buildStoryView(LTStory story, StoryController controller) {
     final List<ImageData> mediaItems = story.media!;
     final List<StoryItem> storyItems = mediaItems.map((mediaItem) {
       final mediaUrl = 'http://37.46.132.144:1337${mediaItem.url}';
@@ -170,10 +170,7 @@ class StoryViewerState extends State<StoryViewer> {
         },
         itemBuilder: (context, index) {
           return _buildStoryView(
-            widget.stories[index],
-            _storyControllers[index],
-            index,
-          );
+              widget.stories[index], _storyControllers[index]);
         },
       ),
     );

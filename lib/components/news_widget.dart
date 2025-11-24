@@ -87,9 +87,9 @@ class NewsWidget extends ConsumerWidget {
                   Container(
                     height: 170,
                     width: double.infinity,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.black,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -114,7 +114,7 @@ class NewsWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
           child: Image.network(
             "http://37.46.132.144:1337$imageUrl",
             height: 160,

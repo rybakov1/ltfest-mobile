@@ -15,7 +15,7 @@ class ShareButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
@@ -23,7 +23,7 @@ class ShareButton extends StatelessWidget {
           width: 40,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
           ),
           child: IconButton(
             padding: EdgeInsets.zero,

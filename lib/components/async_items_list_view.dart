@@ -42,9 +42,7 @@ class AsyncItemsListView extends StatelessWidget {
               ),
             );
           }
-          // Успешная загрузка и есть данные для отображения
           return ListView.builder(
-            //shrinkWrap: true,
             controller: scrollController,
             physics: const ClampingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 12),

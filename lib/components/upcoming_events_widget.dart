@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../constants.dart';
 import '../data/models/upcoming_events.dart';
 import '../pages/home/more_items_page.dart';
@@ -41,8 +40,8 @@ class UpcomingEventsWidget extends ConsumerWidget {
                         context.push('/lab/${event.id}');
                       }
                     },
-                    child: _buildEventCard(
-                        event: event, imageUrl: event.image!, ref: ref),
+                    child:
+                        _buildEventCard(event: event, imageUrl: event.image!),
                   ),
                 );
               },
@@ -54,7 +53,7 @@ class UpcomingEventsWidget extends ConsumerWidget {
           ),
         ),
       ],
-    ); // --- Ближайшие мероприятия ---
+    );
   }
 
   Widget _buildSectionHeader(
@@ -83,11 +82,8 @@ class UpcomingEventsWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildEventCard({
-    required UpcomingEvent event,
-    required String imageUrl,
-    required WidgetRef ref, // Требуется для доступа к провайдерам
-  }) {
+  Widget _buildEventCard(
+      {required UpcomingEvent event, required String imageUrl}) {
     final location =
         event.address != null && event.address!.toLowerCase().contains('онлайн')
             ? event.address!
@@ -173,9 +169,9 @@ class UpcomingEventsWidget extends ConsumerWidget {
                 Container(
                   height: 150,
                   width: double.infinity,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.black,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
                 const SizedBox(height: 12),

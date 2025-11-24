@@ -43,7 +43,8 @@ class CustomChip extends ConsumerWidget {
                       height: 4,
                       decoration: BoxDecoration(
                         color: Palette.stroke,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -197,7 +198,7 @@ class CustomChip extends ConsumerWidget {
             height: 32,
             decoration: BoxDecoration(
               color: displayColor,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
@@ -233,7 +234,7 @@ class CustomChipWithName extends StatelessWidget {
         color: selectedDirection == 'Танцы'
             ? Palette.primaryPink
             : Palette.primaryLime,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
       child: Wrap(

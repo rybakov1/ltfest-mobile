@@ -1,4 +1,48 @@
-include: package:flutter_lints/flutter.yaml
-analyzer:
-  errors:
-    use_build_context_synchronously: ignore
+#include: package:flutter_lints/flutter.yaml
+#analyzer:
+#  errors:
+#    use_build_context_synchronously: ignore
+#
+#dcm:
+#  metrics:
+#    cyclomatic-complexity: 20
+#    number-of-parameters: 4
+#    maximum-nesting-level: 5
+
+include: package:flutter_lints/flutter.yaml  # Базовые Flutter линты (DCM их дополнит)
+
+dcm:
+  # Включаем все free-правила по группам (Common, Flutter, Bloc)
+  presets:
+    - package:dart_code_metrics_presets/common.yaml  # 57 common правил
+    - package:dart_code_metrics_presets/flutter.yaml  # 21 Flutter правил
+    - package:dart_code_metrics_presets/bloc.yaml     # 22 Bloc правил
+
+  # Или вручную (пример для нескольких):
+  rules:
+    # Common
+    - avoid-dynamic
+    - avoid-unused-parameters
+    - no-magic-number
+    # Flutter
+    - avoid-unnecessary-stateful-widgets
+    - prefer-const-border-radius
+    # Bloc
+    - avoid-bloc-public-fields
+    - prefer-immutable-bloc-state
+
+  # Метрики (free поддерживает базовые, с порогами)
+  metrics:
+    cyclomatic-complexity:
+      threshold: 15  # Warning если >15
+    lines-of-code:
+      threshold: 100  # Per file
+
+  # Исключения (glob-паттерны)
+  exclude:
+    rules:
+      - lib/generated/**  # Игнор generated файлов
+      - test/**           # Тесты отдельно
+    metrics: [lib/utils.dart]  # Не мерить метрики в utils
+
+  formatter: false   # Автоформатирование (опционально)

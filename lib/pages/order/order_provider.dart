@@ -380,7 +380,7 @@ class OrderNotifier extends StateNotifier<OrderState> {
         'amount': totalAmount,
         'type': _mapOrderTypeToStrapi(state.orderType),
         'details': orderedDetailsList,
-        'users_permissions_user': user?.id,
+        'user': user?.id ?? 0,
         'festival_tariff':
             state.payableItem is FestivalTariff ? state.payableItem?.id : null,
         'laboratory_learning_type':

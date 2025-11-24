@@ -56,7 +56,8 @@ class LtConciergePage extends StatelessWidget {
                     child: Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
                           child: Image.asset(
                             "assets/images/concierge_first.png",
                             fit: BoxFit.cover,
@@ -78,7 +79,8 @@ class LtConciergePage extends StatelessWidget {
                     child: Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
                           child: Image.asset(
                             "assets/images/concierge_2.png",
                             fit: BoxFit.cover,
@@ -103,7 +105,7 @@ class LtConciergePage extends StatelessWidget {
                 child: Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
                       child: Image.asset(
                         "assets/images/concierge_3.png",
                         fit: BoxFit.cover,
@@ -128,7 +130,8 @@ class LtConciergePage extends StatelessWidget {
                     child: Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
                           child: Image.asset(
                             "assets/images/concierge_4.png",
                             fit: BoxFit.cover,
@@ -150,7 +153,8 @@ class LtConciergePage extends StatelessWidget {
                     child: Stack(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
                           child: Image.asset(
                             "assets/images/concierge_5.png",
                             fit: BoxFit.cover,
@@ -175,7 +179,7 @@ class LtConciergePage extends StatelessWidget {
                 child: Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
                       child: Image.asset(
                         "assets/images/concierge_6.png",
                         fit: BoxFit.cover,

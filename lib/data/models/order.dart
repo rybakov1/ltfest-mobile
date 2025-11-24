@@ -19,7 +19,7 @@ abstract class Order with _$Order {
     required Map<String, dynamic>? details,
     String? paymentId,
     String? paymentStatus,
-    // User? user,
+    User? user,
     Festival? festival,
     Laboratory? laboratory,
     @JsonKey(name: 'product_in_stock') ProductInStock? productInStock,

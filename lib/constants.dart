@@ -12,15 +12,29 @@ extension ColorsExt on Color {
     final int primaryValue = (a << 24) | (r << 16) | (g << 8) | b;
     final Map<int, Color> shades = <int, Color>{};
 
-    final List<double> strengths = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+    final List<double> strengths = [
+      0.05,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ];
 
     for (int i = 0; i < strengths.length; i++) {
       final double strength = strengths[i];
       final double ds = 0.5 - strength;
 
-      final int shadeR = (r + ((ds < 0 ? r : (255 - r)) * ds).round()).round() & 0xff;
-      final int shadeG = (g + ((ds < 0 ? g : (255 - g)) * ds).round()).round() & 0xff;
-      final int shadeB = (b + ((ds < 0 ? b : (255 - b)) * ds).round()).round() & 0xff;
+      final int shadeR =
+          (r + ((ds < 0 ? r : (255 - r)) * ds).round()).round() & 0xff;
+      final int shadeG =
+          (g + ((ds < 0 ? g : (255 - g)) * ds).round()).round() & 0xff;
+      final int shadeB =
+          (b + ((ds < 0 ? b : (255 - b)) * ds).round()).round() & 0xff;
 
       final int shadeIndex = ((strength * 1000).round() / 100 * 100).round();
       shades[shadeIndex] = Color.fromARGB(a, shadeR, shadeG, shadeB);
@@ -155,7 +169,7 @@ class Styles {
 class Decor {
   static BoxDecoration base = BoxDecoration(
     color: Palette.white,
-    borderRadius: BorderRadius.circular(12),
+    borderRadius: const BorderRadius.all(Radius.circular(12)),
   );
 }
 
@@ -180,7 +194,8 @@ class LTButtons {
         disabledForegroundColor: disabledForegroundColor ?? Palette.gray,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: borderRadius ?? BorderRadius.circular(12),
+          borderRadius:
+              borderRadius ?? const BorderRadius.all(Radius.circular(12)),
         ),
         padding:
             padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -209,7 +224,8 @@ class LTButtons {
         foregroundColor: foregroundColor ?? Palette.black,
         disabledForegroundColor: disabledForegroundColor ?? Palette.stroke,
         shape: RoundedRectangleBorder(
-          borderRadius: borderRadius ?? BorderRadius.circular(8),
+          borderRadius:
+              borderRadius ?? const BorderRadius.all(Radius.circular(8)),
         ),
         padding:
             padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -226,7 +242,6 @@ class LTButtons {
     Color? disabledBackgroundColor,
     Color? foregroundColor,
     Color? disabledForegroundColor,
-    BorderRadius? borderRadius,
     EdgeInsets? padding,
     Size? minimumSize,
   }) {
@@ -239,7 +254,8 @@ class LTButtons {
         disabledForegroundColor: disabledForegroundColor ?? Palette.gray,
         elevation: 0,
         side: BorderSide(color: disabledBackgroundColor ?? Palette.stroke),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12))),
         padding:
             padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         minimumSize: minimumSize ?? const Size(double.infinity, 42),

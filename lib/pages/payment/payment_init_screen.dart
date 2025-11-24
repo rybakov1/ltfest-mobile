@@ -1,10 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ltfest/router/app_routes.dart'; // Убедитесь, что импорт верный
+import 'package:ltfest/router/app_routes.dart';
 
 class PaymentInitScreen extends ConsumerStatefulWidget {
   final String paymentUrl;
@@ -46,15 +45,8 @@ class _PaymentInitScreenState extends ConsumerState<PaymentInitScreen>
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.resumed && _browserOpened && !_isNavigating) {
-      // Не перенаправляем сразу, а даем диплинку шанс отработать.
-      // Ждем короткое время.
       Future.delayed(const Duration(milliseconds: 500), () {
-        // Проверяем, активен ли еще этот виджет.
-        // Если GoRouter перенаправил пользователя по диплинку,
-        // то `mounted` будет `false`, и мы ничего не делаем.
         if (mounted && !_isNavigating) {
-          // Если мы все еще здесь, значит, диплинка не было.
-          // Это была ручная отмена.
           debugPrint("Deep link not detected, navigating to failure screen.");
           _navigateToFailureScreen();
         }
@@ -63,7 +55,7 @@ class _PaymentInitScreenState extends ConsumerState<PaymentInitScreen>
   }
 
   void _navigateToFailureScreen() {
-    if (mounted && !_isNavigating) { // Дополнительная проверка
+    if (mounted && !_isNavigating) {
       _isNavigating = true;
       context.go(AppRoutes.paymentFailure.replaceFirst(':id', widget.orderId));
     }
@@ -71,10 +63,8 @@ class _PaymentInitScreenState extends ConsumerState<PaymentInitScreen>
 
   Future<void> _launchPaymentBrowser() async {
     if (_browserOpened) return;
-
     try {
       _browserOpened = true;
-
       await launchUrl(
         Uri.parse(widget.paymentUrl),
         customTabsOptions: CustomTabsOptions(
