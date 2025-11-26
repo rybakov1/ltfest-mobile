@@ -119,11 +119,7 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                         final Uri uri = Uri.parse(
                           laboratory.url!,
                         );
-                        await launchUrl(
-                          uri,
-                          mode: LaunchMode.externalApplication,
-                        );
-                        Navigator.pop(context);
+                        await launchUrl(uri);
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),

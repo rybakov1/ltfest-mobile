@@ -334,6 +334,16 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
       ),
       child: Column(
         children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Palette.primaryLime.withValues(alpha: 0.1),
+              border: Border.all(color: Palette.primaryLime),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+            ),
+            child:  Text("Рекомендуем оплачивать через СБП", style: Styles.b2),
+          ),
+          const SizedBox(height: 8),
           LTButtons.elevatedButton(
             onPressed: () {
               // Используем новый метод валидации

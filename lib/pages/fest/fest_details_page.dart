@@ -114,13 +114,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
-                        final Uri uri = Uri.parse(
-                          festival.pdfurl!,
-                        );
-                        await launchUrl(
-                          uri,
-                          mode: LaunchMode.externalApplication,
-                        );
+                        await launchUrl(Uri.parse(festival.pdfurl!));
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -483,12 +477,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
         const SizedBox(height: 16),
         LTButtons.outlinedButton(
           onPressed: () async {
-            await launchUrl(
-              Uri.parse(
-                festival.pdfurl!,
-              ),
-              mode: LaunchMode.externalApplication,
-            );
+            await launchUrl(Uri.parse(festival.pdfurl!));
           },
           child: Text(
             "Подробнее в положении",

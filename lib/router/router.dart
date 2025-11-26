@@ -28,6 +28,7 @@ import 'package:ltfest/pages/home/more_items_page.dart';
 import '../data/models/festival_tariff.dart';
 import '../pages/auth/input_code_page.dart';
 import '../pages/cart/cart_page.dart';
+import '../pages/more/delete_account_page.dart';
 import '../pages/more/favorites_page.dart';
 import '../pages/no_internet_page.dart';
 import '../pages/payment/payment_failure_screen.dart';
@@ -224,6 +225,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.about,
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AboutAppPage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.deleteAccount,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: DeleteAccountPage(),
         ),
       ),
       GoRoute(

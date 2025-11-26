@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,7 +12,7 @@ import 'package:ltfest/data/models/user.dart';
 import 'package:ltfest/providers/age_category_provider.dart';
 import 'package:ltfest/providers/auth_state.dart';
 import 'package:ltfest/providers/user_provider.dart';
-
+import 'package:ltfest/router/app_routes.dart';
 import '../../components/modal.dart';
 import '../../data/models/age_category.dart';
 import '../../data/models/direction.dart';
@@ -52,25 +51,6 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
   void _loadInitialData() {
     final authState = ref.read(authNotifierProvider);
-
-    // String formattedBirthDate;
-    // try {
-    //   final DateFormat outputFormat = DateFormat('yyyy-MM-dd');
-    //   formattedBirthDate = outputFormat.format(parsedDate);
-    // } catch (e) {
-    //   if (mounted) {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(
-    //         content:
-    //         Text('Ошибка форматирования даты рождения. Проверьте поле.'),
-    //         backgroundColor: Palette.error,
-    //       ),
-    //     );
-    //   }
-    //   setState(() => _isLoading = false);
-    //   return;
-    // }
-
     if (authState.value is Authenticated) {
       final user = (authState.value as Authenticated).user;
       String formattedBirthDate;
@@ -160,7 +140,9 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         collectiveCity: _collectiveCityController.text.trim(),
         educationPlace: _educationController.text.trim(),
         masterName: _masterFioController.text.trim(),
-        count_participant: _collectiveCountParticipateController.text.isEmpty ? 0 : int.parse(_collectiveCountParticipateController.text.trim()),
+        count_participant: _collectiveCountParticipateController.text.isEmpty
+            ? 0
+            : int.parse(_collectiveCountParticipateController.text.trim()),
         ageCategoryId: _selectedAgeCategory?.id,
       );
     }
@@ -282,6 +264,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
           children: [
             SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const LTAppBar(title: "Настройки аккаунта"),
                   _buildReadOnlySection(user!),
@@ -358,6 +341,18 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                                   Styles.button2.copyWith(color: Palette.gray)),
                           SvgPicture.asset("assets/icons/exit_from_app.svg"),
                         ],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => context.push(AppRoutes.deleteAccount),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.only(
+                          top: 24, bottom: 27, right: 12, left: 12),
+                      child: Text(
+                        "Удалить аккаунт",
+                        style: Styles.button2.copyWith(color: Palette.gray),
                       ),
                     ),
                   ),

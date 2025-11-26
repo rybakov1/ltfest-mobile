@@ -752,6 +752,34 @@ class ApiService {
     }
   }
 
+  Future<void> createAccountDeletionRequest({
+    required int userId,
+    required String reason,
+  }) async {
+    try {
+      final data = {
+        'data': {
+          'users_permissions_user': userId,
+          'reason': reason,
+          'request_status': 'pending',
+        }
+      };
+
+      _logRequest('POST', ApiEndpoints.accountDeletionRequests, data);
+
+      final response = await _dio.post(
+        ApiEndpoints.accountDeletionRequests,
+        data: data,
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw ApiException(message: 'Не удалось создать заявку на удаление');
+      }
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
   String getImageUrl(String? relativeUrl) {
     if (relativeUrl == null || relativeUrl.isEmpty) {
       return '';

@@ -39,4 +39,6 @@ class AppRoutes {
   static const String paymentFailure = '/fail/:id';
 
   static const String noInternet = '/no-internet';
+
+  static const String deleteAccount = '/delete';
 }

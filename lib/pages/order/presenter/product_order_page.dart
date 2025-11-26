@@ -373,25 +373,39 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
         color: Palette.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       ),
-      child: LTButtons.elevatedButton(
-        onPressed: orderState.isLoading
-            ? null
-            : () {
-                if (!_validateForm()) return; // Используем новый метод
-                ref
-                    .read(orderProvider.notifier)
-                    .placeOrderAndPay(context, finalTotal);
-              },
-        child: orderState.isLoading
-            ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Text("Оплатить", style: Styles.button1),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Palette.primaryLime.withValues(alpha: 0.1),
+              border: Border.all(color: Palette.primaryLime),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+            ),
+            child:  Text("Рекомендуем оплачивать через СБП", style: Styles.b2),
+          ),
+          const SizedBox(height: 8),
+          LTButtons.elevatedButton(
+            onPressed: orderState.isLoading
+                ? null
+                : () {
+                    if (!_validateForm()) return;
+                    ref
+                        .read(orderProvider.notifier)
+                        .placeOrderAndPay(context, finalTotal);
+                  },
+            child: orderState.isLoading
+                ? const SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text("Оплатить", style: Styles.button1),
+          ),
+        ],
       ),
     );
   }
