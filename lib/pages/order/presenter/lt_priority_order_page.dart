@@ -308,13 +308,13 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
+            width: double.infinity,
             decoration: BoxDecoration(
               color: Palette.primaryLime.withValues(alpha: 0.1),
               border: Border.all(color: Palette.primaryLime),
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
-            child: Text("Рекомендуем оплачивать через СБП",
-                style: Styles.b2),
+            child: Center(child: Text("Рекомендуем оплачивать через СБП", style: Styles.b2)),
           ),
           const SizedBox(height: 8),
           LTButtons.elevatedButton(

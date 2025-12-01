@@ -16,6 +16,7 @@ import 'package:ltfest/providers/user_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/models/festival.dart';
+import '../../data/models/festival_order_args_model.dart';
 import '../../router/app_routes.dart';
 
 class FestivalDetailPage extends ConsumerStatefulWidget {
@@ -670,7 +671,13 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                   bonuses:
                       tariff.feature.map((feature) => feature.title).toList(),
                   onBuyPressed: () {
-                    context.push(AppRoutes.festivalOrder, extra: tariff);
+                    context.push(
+                      AppRoutes.festivalOrder,
+                      extra: FestivalOrderArgs(
+                        festival: festival,
+                        tariff: tariff,
+                      ),
+                    );
                   },
                   onSecondaryBuyPressed: () async {
                     final Uri uri = Uri.parse("https://t.me/LTPay_Later_bot");

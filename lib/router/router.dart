@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/data/models/laboratory_learning_type.dart';
+import 'package:ltfest/data/models/laboratory_order_args_model.dart';
 import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:ltfest/pages/more/about_app_page.dart';
 import 'package:ltfest/pages/more/account_settings_page.dart';
@@ -25,6 +26,7 @@ import 'package:ltfest/pages/lab/lab_page.dart';
 import 'package:ltfest/pages/main_screen.dart';
 import 'package:ltfest/pages/more/more_page.dart';
 import 'package:ltfest/pages/home/more_items_page.dart';
+import '../data/models/festival_order_args_model.dart';
 import '../data/models/festival_tariff.dart';
 import '../pages/auth/input_code_page.dart';
 import '../pages/cart/cart_page.dart';
@@ -325,15 +327,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.festivalOrder,
         pageBuilder: (context, state) {
-          final tariff = state.extra as FestivalTariff;
-          return NoTransitionPage(child: FestivalOrderPage(tariff: tariff));
+          final args = state.extra as FestivalOrderArgs;
+          return NoTransitionPage(
+            child: FestivalOrderPage(args: args),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.laboratoryOrder,
         pageBuilder: (context, state) {
-          final learningType = state.extra as LearningType;
-          return NoTransitionPage(child: LaboratoryOrderPage(learningType: learningType));
+          final args = state.extra as LaboratoryOrderArgsModel;
+          return NoTransitionPage(
+            child: LaboratoryOrderPage(args: args),
+          );
         },
       ),
       GoRoute(

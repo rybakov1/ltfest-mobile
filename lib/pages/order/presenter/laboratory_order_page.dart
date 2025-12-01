@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:ltfest/data/models/laboratory_learning_type.dart';
+import 'package:ltfest/data/models/laboratory_order_args_model.dart';
 
 import '../../../components/lt_appbar.dart';
 import '../../../constants.dart';
@@ -43,9 +42,9 @@ final laboratoryFormValidationProvider =
         (ref) => const LaboratoryFormValidationState());
 
 class LaboratoryOrderPage extends ConsumerStatefulWidget {
-  final LearningType learningType;
+  final LaboratoryOrderArgsModel args;
 
-  const LaboratoryOrderPage({super.key, required this.learningType});
+  const LaboratoryOrderPage({super.key, required this.args});
 
   @override
   ConsumerState<LaboratoryOrderPage> createState() =>
@@ -71,7 +70,8 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
     super.initState();
     ref.read(orderProvider.notifier).startOrder(
           type: OrderType.laboratory,
-          item: widget.learningType,
+          item: widget.args.learningType,
+          laboratory: widget.args.laboratory,
         );
 
     final state = ref.read(orderProvider);
@@ -274,7 +274,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                           buildLoyaltyOrPromoSection(
                             context,
                             user!,
-                            widget.learningType.type.toString(),
+                            widget.args.learningType.type.toString(),
                             ref,
                             loyaltyCardController,
                             promocodeController,
@@ -336,12 +336,15 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
+            width: double.infinity,
             decoration: BoxDecoration(
               color: Palette.primaryLime.withValues(alpha: 0.1),
               border: Border.all(color: Palette.primaryLime),
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
-            child:  Text("Рекомендуем оплачивать через СБП", style: Styles.b2),
+            child: Center(
+                child:
+                    Text("Рекомендуем оплачивать через СБП", style: Styles.b2)),
           ),
           const SizedBox(height: 8),
           LTButtons.elevatedButton(

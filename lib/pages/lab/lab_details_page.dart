@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/components/lt_appbar.dart';
+import 'package:ltfest/data/models/laboratory_order_args_model.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
@@ -370,8 +371,13 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                       laboratory.learningTypes!.isNotEmpty) {
                     final selectedLearningType =
                         laboratory.learningTypes![selectedIndex];
-                    context.push(AppRoutes.laboratoryOrder,
-                        extra: selectedLearningType);
+                    context.push(
+                      AppRoutes.laboratoryOrder,
+                      extra: LaboratoryOrderArgsModel(
+                        learningType: selectedLearningType,
+                        laboratory: laboratory,
+                      ),
+                    );
                   }
                 },
                 child: Text("Оплатить", style: Styles.button1),

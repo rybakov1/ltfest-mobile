@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ltfest/data/models/festival_order_args_model.dart';
 
 import '../../../components/lt_appbar.dart';
 import '../../../constants.dart';
-import '../../../data/models/festival_tariff.dart';
 import '../../../providers/user_provider.dart';
 import '../components/loyalty_promo_section.dart';
 import '../order_provider.dart';
@@ -36,9 +36,9 @@ final formValidationProvider =
     StateProvider<FormValidationState>((ref) => const FormValidationState());
 
 class FestivalOrderPage extends ConsumerStatefulWidget {
-  final FestivalTariff tariff;
+  final FestivalOrderArgs args;
 
-  const FestivalOrderPage({super.key, required this.tariff});
+  const FestivalOrderPage({super.key, required this.args});
 
   @override
   ConsumerState<FestivalOrderPage> createState() => _FestivalOrderPageState();
@@ -59,7 +59,8 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
 
     ref.read(orderProvider.notifier).startOrder(
           type: OrderType.festival,
-          item: widget.tariff,
+          item: widget.args.tariff,
+          festival: widget.args.festival,
         );
 
     final state = ref.read(orderProvider);
@@ -213,7 +214,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                           buildLoyaltyOrPromoSection(
                             context,
                             user!,
-                            'Тариф "${widget.tariff.title}"',
+                            'Тариф "${widget.args.tariff.title}"',
                             ref,
                             loyaltyCardController,
                             promocodeController,
@@ -274,12 +275,13 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
+            width: double.infinity,
             decoration: BoxDecoration(
               color: Palette.primaryLime.withValues(alpha: 0.1),
               border: Border.all(color: Palette.primaryLime),
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
-            child:  Text("Рекомендуем оплачивать через СБП", style: Styles.b2),
+            child: Center(child: Text("Рекомендуем оплачивать через СБП", style: Styles.b2)),
           ),
           const SizedBox(height: 8),
           LTButtons.elevatedButton(

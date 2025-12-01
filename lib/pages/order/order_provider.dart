@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/data/models/festival.dart';
+import 'package:ltfest/data/models/laboratory.dart';
 import 'package:ltfest/data/models/laboratory_learning_type.dart';
 import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:ltfest/data/services/api_exception.dart';
@@ -49,6 +50,8 @@ class OrderState {
   final String residence; // Имена участников через запятую
 
   final dynamic payableItem;
+  final Laboratory? laboratory;
+  final Festival? festival;
 
   const OrderState({
     // Общие
@@ -62,6 +65,8 @@ class OrderState {
     // Товары
     this.deliveryMethod = DeliveryMethod.onFestival,
     this.selectedFestival,
+    this.festival,
+    this.laboratory,
     this.deliveryAddress = '',
 
     // Фестиваль
@@ -75,24 +80,27 @@ class OrderState {
     this.payableItem,
   });
 
-  OrderState copyWith(
-      {OrderType? orderType,
-      String? payerName,
-      String? email,
-      String? phone,
-      bool? isLoading,
-      DeliveryMethod? deliveryMethod,
-      Festival? selectedFestival,
-      String? deliveryAddress,
-      String? collectiveName,
-      String? collectiveInfo,
-      String? education,
-      String? participantNames,
-      String? passport,
-      String? residence,
-      String? birthdate,
-      int? seatCount,
-      dynamic payableItem}) {
+  OrderState copyWith({
+    Festival? festival,
+    Laboratory? laboratory,
+    OrderType? orderType,
+    String? payerName,
+    String? email,
+    String? phone,
+    bool? isLoading,
+    DeliveryMethod? deliveryMethod,
+    Festival? selectedFestival,
+    String? deliveryAddress,
+    String? collectiveName,
+    String? collectiveInfo,
+    String? education,
+    String? participantNames,
+    String? passport,
+    String? residence,
+    String? birthdate,
+    int? seatCount,
+    dynamic payableItem,
+  }) {
     return OrderState(
       orderType: orderType ?? this.orderType,
       payerName: payerName ?? this.payerName,
@@ -111,6 +119,8 @@ class OrderState {
       residence: residence ?? this.residence,
       payableItem: payableItem ?? this.payableItem,
       birthdate: birthdate ?? this.birthdate,
+      festival: festival ?? this.festival,
+      laboratory: laboratory ?? this.laboratory,
     );
   }
 }
@@ -194,11 +204,18 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
   OrderNotifier(this._ref) : super(const OrderState());
 
-  void startOrder({required OrderType type, required dynamic item}) {
+  void startOrder({
+    required OrderType type,
+    required dynamic item,
+    Festival? festival,
+    Laboratory? laboratory,
+  }) {
     state = const OrderState().copyWith(
       orderType: type,
       payableItem: item,
       seatCount: 1,
+      selectedFestival: festival,
+      laboratory: laboratory,
     );
 
     _prefillUserData();
@@ -207,15 +224,14 @@ class OrderNotifier extends StateNotifier<OrderState> {
   void _prefillUserData() {
     final user = _ref.read(userProvider);
 
-
-    
     if (user != null) {
       String formattedBirthDate;
       final DateFormat inputFormat = DateFormat('yyyy-MM-dd');
-      final DateTime parsedDate = inputFormat.parse(user.birthdate.toString().split(" ")[0]);
+      final DateTime parsedDate =
+          inputFormat.parse(user.birthdate.toString().split(" ")[0]);
       final DateFormat outputFormat = DateFormat('dd.MM.yyyy');
       formattedBirthDate = outputFormat.format(parsedDate);
-      
+
       state = state.copyWith(
         payerName: user.lastname!.trim(),
         email: user.email,
@@ -311,7 +327,6 @@ class OrderNotifier extends StateNotifier<OrderState> {
       switch (state.orderType) {
         case OrderType.products:
           details['Название коллектива'] = state.collectiveName;
-
           if (cartAsync.value?.items != null) {
             details['Корзина'] = cartAsync.value!.items
                 .where((item) => item.productInStock != null)
@@ -327,15 +342,12 @@ class OrderNotifier extends StateNotifier<OrderState> {
                 )
                 .toList();
           }
-
           details['Метод доставки'] = state.deliveryMethod.name == "onFestival"
               ? "Заберу на фестивале"
               : "Доставка до адреса";
-
           if (state.deliveryAddress.isNotEmpty) {
             details['Адрес доставки'] = state.deliveryAddress;
           }
-
           if (state.selectedFestival?.title != null) {
             details['Фестиваль'] = state.selectedFestival!.title;
           }
@@ -344,19 +356,25 @@ class OrderNotifier extends StateNotifier<OrderState> {
           details['Имя коллектива'] = state.collectiveName;
           details['Имена участников'] = state.participantNames;
           details['Количество мест'] = state.seatCount;
+          if (state.selectedFestival != null) {
+            details['Фестиваль'] = state.selectedFestival!.title;
+          }
+          if (state.payableItem is PriorityTariff) {
+            details['Тариф'] = state.payableItem?.title;
+          }
           break;
         case OrderType.laboratory:
+          details['Название коллектива'] = state.collectiveName;
+          details['Информация о коллективе'] = state.collectiveInfo;
+          details['Дата рождения'] = state.birthdate;
+          details['Образование'] = state.education;
+          details['Количество мест'] = state.seatCount;
           if (state.payableItem is LearningType) {
             final learningType = state.payableItem as LearningType;
-            details['Название коллектива'] = state.collectiveName;
-            details['Информация о коллективе'] = state.collectiveInfo;
-
-            details['Дата рождения'] = state.birthdate;
-            details['Образование'] = state.education;
-
-            details['ID типа обучения'] = learningType.id;
+            if (state.laboratory != null) {
+              details['Лаборатория'] = state.laboratory!.title;
+            }
             details['Тип обучения'] = learningType.type;
-            details['Количество мест'] = state.seatCount;
           }
           break;
         case OrderType.ltpriority:
