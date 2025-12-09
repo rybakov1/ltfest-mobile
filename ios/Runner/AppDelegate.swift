@@ -18,10 +18,9 @@ import SafariServices
     options: [UIApplication.OpenURLOptionsKey : Any] = [:]
   ) -> Bool {
     if url.scheme == "ltfestapp" {
-      guard let rootViewController = window?.rootViewController else {
-        return false
+      if let rootViewController = window?.rootViewController {
+        rootViewController.dismiss(animated: true, completion: nil)
       }
-      rootViewController.dismiss(animated: true, completion: nil)
     }
 
     return super.application(app, open: url, options: options)

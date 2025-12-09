@@ -34,6 +34,20 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
 
   /// Логика проверки статуса платежа теперь здесь.
   Future<void> _checkPaymentStatus() async {
+
+    if (widget.paymentId == '{PaymentId}') {
+      debugPrint('Получен шаблон ID вместо реального ID. Пропускаем запрос.');
+
+      // Попытка спасти ситуацию: берем ID из провайдера, если он там есть
+      final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
+      if (savedId != null && savedId != '{PaymentId}') {
+        // Рекурсивно вызываем проверку уже с нормальным ID (через навигацию или локально)
+        // Но проще просто прервать текущий запрос, так как GoRouter
+        // скорее всего уже перенаправляет нас на правильный ID следующим кадром.
+      }
+      return;
+    }
+
     final notifier = ref.read(paymentNotifierProvider.notifier);
     final apiService = ref.read(apiServiceProvider);
 

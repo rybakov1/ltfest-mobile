@@ -363,56 +363,75 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: PaymentInitScreen(
               paymentUrl: extra["paymentUrl"],
               orderId: extra["orderId"],
+              paymentId: extra["paymentId"],
             ),
           );
         },
       ),
       GoRoute(
-        path: AppRoutes.paymentSuccess,
-        redirect: (BuildContext context, GoRouterState state) {
-          var paymentIdFromUrl = state.pathParameters['id'];
-          if (paymentIdFromUrl == '{PaymentId}') {
-            final ref = ProviderScope.containerOf(context, listen: false);
-            final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
-
-            if (savedId != null && savedId.isNotEmpty) {
-              debugPrint(
-                  'GoRouter redirect: replacing {PaymentId} with $savedId');
-              return '/success/$savedId';
-            }
-          }
-          return null;
-        },
+        path: AppRoutes.paymentSuccess, // Это '/success/:id'
+        name: 'payment_success', // Полезно дать имя
         builder: (context, state) {
-          final correctPaymentId = state.pathParameters['id']!;
-          debugPrint(
-              'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
-          return PaymentSuccessScreen(paymentId: correctPaymentId);
+          final paymentId = state.pathParameters['id']!;
+          debugPrint('DeepLink Success: $paymentId');
+          return PaymentSuccessScreen(paymentId: paymentId);
         },
       ),
       GoRoute(
-        path: AppRoutes.paymentFailure,
-        redirect: (BuildContext context, GoRouterState state) {
-          var paymentIdFromUrl = state.pathParameters['id'];
-          if (paymentIdFromUrl == '{PaymentId}') {
-            final ref = ProviderScope.containerOf(context, listen: false);
-            final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
-
-            if (savedId != null && savedId.isNotEmpty) {
-              debugPrint(
-                  'GoRouter redirect: replacing {PaymentId} with $savedId');
-              return '/fail/$savedId';
-            }
-          }
-          return null;
-        },
+        path: AppRoutes.paymentFailure, // Это '/fail/:id'
+        name: 'payment_failure',
         builder: (context, state) {
-          final correctPaymentId = state.pathParameters['id']!;
-          debugPrint(
-              'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
-          return PaymentFailureScreen(paymentId: correctPaymentId);
+          final paymentId = state.pathParameters['id']!;
+          debugPrint('DeepLink Failure: $paymentId');
+          return PaymentFailureScreen(paymentId: paymentId);
         },
       ),
+      // GoRoute(
+      //   path: AppRoutes.paymentSuccess,
+      //   redirect: (BuildContext context, GoRouterState state) {
+      //     var paymentIdFromUrl = state.pathParameters['id'];
+      //     if (paymentIdFromUrl == '{PaymentId}') {
+      //       final ref = ProviderScope.containerOf(context, listen: false);
+      //       final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
+      //
+      //       if (savedId != null && savedId.isNotEmpty) {
+      //         debugPrint(
+      //             'GoRouter redirect: replacing {PaymentId} with $savedId');
+      //         return '/success/$savedId';
+      //       }
+      //     }
+      //     return null;
+      //   },
+      //   builder: (context, state) {
+      //     final correctPaymentId = state.pathParameters['id']!;
+      //     debugPrint(
+      //         'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
+      //     return PaymentSuccessScreen(paymentId: correctPaymentId);
+      //   },
+      // ),
+      // GoRoute(
+      //   path: AppRoutes.paymentFailure,
+      //   redirect: (BuildContext context, GoRouterState state) {
+      //     var paymentIdFromUrl = state.pathParameters['id'];
+      //     if (paymentIdFromUrl == '{PaymentId}') {
+      //       final ref = ProviderScope.containerOf(context, listen: false);
+      //       final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
+      //
+      //       if (savedId != null && savedId.isNotEmpty) {
+      //         debugPrint(
+      //             'GoRouter redirect: replacing {PaymentId} with $savedId');
+      //         return '/fail/$savedId';
+      //       }
+      //     }
+      //     return null;
+      //   },
+      //   builder: (context, state) {
+      //     final correctPaymentId = state.pathParameters['id']!;
+      //     debugPrint(
+      //         'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
+      //     return PaymentFailureScreen(paymentId: correctPaymentId);
+      //   },
+      // ),
     ],
   );
 });

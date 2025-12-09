@@ -430,6 +430,7 @@ class OrderNotifier extends StateNotifier<OrderState> {
           context.push(AppRoutes.paymentInit, extra: {
             'paymentUrl': paymentResponse.paymentUrl!,
             'orderId': paymentResponse.orderId ?? '',
+            'paymentId': paymentResponse.paymentId.toString(),
           });
         }
       } else {
