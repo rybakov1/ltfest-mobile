@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/data/models/laboratory_learning_type.dart';
 import 'package:ltfest/pages/payment/payment_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 
+import '../../data/models/festival_order_args_model.dart';
+import '../../data/models/festival_tariff.dart';
+import '../../data/models/laboratory_order_args_model.dart';
 import '../order/order_provider.dart';
 
 class PaymentFailureScreen extends ConsumerWidget {
@@ -74,12 +78,31 @@ class PaymentFailureScreen extends ConsumerWidget {
                                     context.push('/order/products');
                                     break;
                                   case OrderType.festival:
-                                    context.push(AppRoutes.festivalOrder,
-                                        extra: orderState.payableItem);
+                                    if (orderState.selectedFestival != null &&
+                                        orderState.payableItem
+                                        is FestivalTariff) {
+                                      final args = FestivalOrderArgs(
+                                        festival: orderState.selectedFestival!,
+                                        tariff: orderState.payableItem
+                                        as FestivalTariff,
+                                      );
+                                      context.push(AppRoutes.festivalOrder,
+                                          extra: args);
+                                    }
                                     break;
+
                                   case OrderType.laboratory:
-                                    context.push(AppRoutes.laboratoryOrder,
-                                        extra: orderState.payableItem);
+                                    if (orderState.laboratory != null &&
+                                        orderState.payableItem
+                                        is LearningType) {
+                                      final args = LaboratoryOrderArgsModel(
+                                        laboratory: orderState.laboratory!,
+                                        learningType: orderState.payableItem
+                                        as LearningType,
+                                      );
+                                      context.push(AppRoutes.laboratoryOrder,
+                                          extra: args);
+                                    }
                                     break;
                                   case OrderType.ltpriority:
                                     context.push(AppRoutes.priorityOrder,

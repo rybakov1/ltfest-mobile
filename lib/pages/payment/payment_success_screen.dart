@@ -5,6 +5,7 @@ import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/payment.dart';
 import 'package:ltfest/data/services/api_service.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
+import 'package:ltfest/pages/order/order_provider.dart';
 import 'package:ltfest/pages/payment/payment_failure_screen.dart';
 import 'package:ltfest/pages/payment/payment_provider.dart';
 import 'package:ltfest/pages/shop/presenter/shop_widget.dart';
@@ -34,7 +35,6 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
 
   /// Логика проверки статуса платежа теперь здесь.
   Future<void> _checkPaymentStatus() async {
-
     if (widget.paymentId == '{PaymentId}') {
       debugPrint('Получен шаблон ID вместо реального ID. Пропускаем запрос.');
 
@@ -85,6 +85,7 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     final paymentAsync = ref.watch(paymentNotifierProvider);
+    final orderState = ref.watch(orderProvider);
 
     return Scaffold(
       backgroundColor: Palette.white,
@@ -102,7 +103,19 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                   const SizedBox(height: 16),
                   Text("Заявка успешно оформлена!",
                       style: Styles.h3, textAlign: TextAlign.center),
-                  const SizedBox(height: 56),
+                  if (orderState.orderType == OrderType.laboratory) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      "Cкоро свяжемся с вами, чтобы передать ссылку на просмотр",
+                      textAlign: TextAlign.center,
+                      style: Styles.b1,
+                    ),
+                    const SizedBox(height: 18),
+                  ],
+                  if (orderState.orderType != OrderType.laboratory) ...[
+                    const SizedBox(height: 40),
+                  ],
+                  const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 24),
