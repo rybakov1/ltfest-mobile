@@ -35,7 +35,7 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
             crossAxisCount: 2,
             crossAxisSpacing: 8,
             mainAxisSpacing: 16,
-            mainAxisExtent: 235,
+            mainAxisExtent: 256,
           ),
           itemCount: productList.length,
           itemBuilder: (context, index) {
@@ -94,12 +94,11 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                   const SizedBox(height: 4),
                   Text(
                     product.name,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: Styles.b2.copyWith(
-                      color: Palette.gray,
-                    ),
+                    style: Styles.b2.copyWith(color: Palette.gray),
                   ),
+                  const Spacer(),
                   const SizedBox(height: 4),
                   Text(
                     sizes,

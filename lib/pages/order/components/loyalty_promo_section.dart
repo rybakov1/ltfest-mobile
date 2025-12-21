@@ -7,16 +7,15 @@ import '../../../providers/loyalty_card_provider.dart';
 import '../../../providers/promocode_provider.dart';
 import 'custom_text_fields.dart';
 
-Widget buildLoyaltyOrPromoSection(
-  BuildContext context,
-  User user,
-  String? type,
-  WidgetRef ref,
-  TextEditingController loyaltyCardController,
-  TextEditingController promocodeController, {
-  required int cartTotal,
-  required int finalTotal,
-}) {
+Widget buildLoyaltyOrPromoSection(BuildContext context,
+    User user,
+    String? type,
+    WidgetRef ref,
+    TextEditingController loyaltyCardController,
+    TextEditingController promocodeController, {
+      required int cartTotal,
+      required int finalTotal,
+    }) {
   final promoCodeState = ref.watch(promoCodeNotifierProvider);
   final promoCodeNotifier = ref.read(promoCodeNotifierProvider.notifier);
 
@@ -30,26 +29,28 @@ Widget buildLoyaltyOrPromoSection(
       final card = successState.loyaltyCard;
       return 'Скидка по карте (${card.discountPercent}%)';
     },
-    orElse: () => promoCodeState.maybeMap(
-      success: (successState) {
-        final promo = successState.promoCode;
-        if (promo.discountType == 'percentage') {
-          return 'Скидка (${promo.discountValue.toStringAsFixed(0)}%)';
-        } else {
-          return 'Скидка (${promo.discountValue.round()} ₽)';
-        }
-      },
-      orElse: () => 'Скидка',
-    ),
+    orElse: () =>
+        promoCodeState.maybeMap(
+          success: (successState) {
+            final promo = successState.promoCode;
+            if (promo.discountType == 'percentage') {
+              return 'Скидка (${promo.discountValue.toStringAsFixed(0)}%)';
+            } else {
+              return 'Скидка (${promo.discountValue.round()} ₽)';
+            }
+          },
+          orElse: () => 'Скидка',
+        ),
   );
 
   // final bool isLoading = loyaltyCardState is  _Loading || promoCodeState is _Loading;
   String? errorMessage;
 
-  loyaltyCardState.mapOrNull(error: (e) => errorMessage = e.message);
+  loyaltyCardState.mapOrNull(
+      error: (e) => errorMessage = 'Карта лояльности не найдена');
 
   if (errorMessage == null) {
-    promoCodeState.mapOrNull(error: (e) => errorMessage = e.message);
+    promoCodeState.mapOrNull(error: (e) => errorMessage = 'Промокод не найден');
   }
 
   return Column(
@@ -58,7 +59,6 @@ Widget buildLoyaltyOrPromoSection(
       Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Поля ввода остаются как есть
           if (user.activity!.title == "Руководитель коллектива") ...[
             Expanded(
               child: buildTextField(
@@ -73,21 +73,22 @@ Widget buildLoyaltyOrPromoSection(
                 },
               ),
             ),
-          ] else ...[
-            Expanded(
-              child: buildTextField(
-                controller: promocodeController,
-                label: "Промокод",
-                hint: "Введите промокод",
-                onChanged: (val) {
-                  promoCodeState.maybeMap(
-                    loading: (_) {},
-                    orElse: () => promoCodeNotifier.reset(),
-                  );
-                },
+          ] else
+            ...[
+              Expanded(
+                child: buildTextField(
+                  controller: promocodeController,
+                  label: "Промокод",
+                  hint: "Введите промокод",
+                  onChanged: (val) {
+                    promoCodeState.maybeMap(
+                      loading: (_) {},
+                      orElse: () => promoCodeNotifier.reset(),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
           const SizedBox(width: 8),
           ValueListenableBuilder<TextEditingValue>(
             valueListenable: loyaltyCardController,
@@ -95,8 +96,8 @@ Widget buildLoyaltyOrPromoSection(
               return ValueListenableBuilder<TextEditingValue>(
                 valueListenable: promocodeController,
                 builder: (context, promoValue, child) {
-
-                  final bool isButtonActive = user.activity!.title == "Руководитель коллектива"
+                  final bool isButtonActive = user.activity!.title ==
+                      "Руководитель коллектива"
                       ? loyaltyValue.text.isNotEmpty
                       : promoValue.text.isNotEmpty;
 
@@ -133,7 +134,8 @@ Widget buildLoyaltyOrPromoSection(
         ],
       ),
       promoCodeState.maybeWhen(
-        loading: () => const Padding(
+        loading: () =>
+        const Padding(
           padding: EdgeInsets.only(top: 8.0),
           child: LinearProgressIndicator(),
         ),
@@ -145,8 +147,7 @@ Widget buildLoyaltyOrPromoSection(
         //     textAlign: TextAlign.right,
         //   ),
         // ),
-        orElse: () =>
-            const SizedBox.shrink(), // Ничего не показываем в др. случаях
+        orElse: () => const SizedBox.shrink(), // Ничего не показываем в др. случаях
       ),
 
       // if (isLoading)

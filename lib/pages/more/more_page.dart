@@ -41,11 +41,11 @@ class MorePage extends ConsumerWidget {
                 ],
               ),
             ),
-            if (user.activity!.title == "Руководитель коллектива")
-              Padding(
-                padding: const EdgeInsets.all(4),
-                child: ProfileCard(status: user.ltpriority),
-              ),
+            // if (user.activity!.title == "Руководитель коллектива")
+            //   Padding(
+            //     padding: const EdgeInsets.all(4),
+            //     child: ProfileCard(status: user.ltpriority),
+            //   ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Row(

@@ -152,7 +152,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 8,
                                     mainAxisSpacing: 16,
-                                    mainAxisExtent: 288,
+                                    mainAxisExtent: 292,
                                   ),
                                   itemCount: productList.length,
                                   itemBuilder: (context, index) {
@@ -262,9 +262,10 @@ class ProductCard extends StatelessWidget {
           Text(
             product.name,
             style: Styles.b2.copyWith(color: Palette.gray),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+          const Spacer(),
           const SizedBox(height: 4),
           if (availableSizes.isNotEmpty)
             Text(
