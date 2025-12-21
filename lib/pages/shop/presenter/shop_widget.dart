@@ -37,7 +37,7 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
             mainAxisSpacing: 16,
             mainAxisExtent: 256,
           ),
-          itemCount: productList.length,
+          itemCount: 4,
           itemBuilder: (context, index) {
             final product = productList[index];
             String sizes = "";
@@ -64,10 +64,10 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                           loadingBuilder: (context, child, progress) {
                             return progress == null
                                 ? child
-                                : Container(
+                                : const SizedBox(
                                     height: 160,
                                     width: double.infinity,
-                                    child: const Center(
+                                    child: Center(
                                       child: CircularProgressIndicator(),
                                     ),
                                   );

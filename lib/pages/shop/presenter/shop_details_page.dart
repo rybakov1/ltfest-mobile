@@ -566,8 +566,7 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                 SizedBox(
                                   height: 36,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Материал",
@@ -575,9 +574,9 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                       ),
                                       if (product.productMaterials.isNotEmpty)
                                         Text(
-                                          product.productMaterials[0].title,
+                                          product.productMaterials.map((m) => m.title).join(', '),
                                           style: Styles.b2,
-                                        )
+                                        ),
                                     ],
                                   ),
                                 ),

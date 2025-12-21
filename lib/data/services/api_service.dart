@@ -431,11 +431,13 @@ class ApiService {
     }
   }
 
-  Future<List<Product>> getProductsForCatalog() async {
+  Future<List<Product>> getProductsForCatalog({int page = 1, int pageSize = 20}) async {
     try {
       final response = await _dio.get(
         ApiEndpoints.products,
         queryParameters: {
+          'pagination[page]': page,
+          'pagination[pageSize]': pageSize,
           'populate[0]': 'product_in_stocks',
           'populate[1]': 'product_in_stocks.product_color',
           'populate[2]': 'product_in_stocks.product_size',
@@ -443,14 +445,67 @@ class ApiService {
           'populate[4]': 'product_materials',
         },
       );
-      final List<dynamic> data = response.data['data'];
-      return data
-          .map((json) => Product.fromJson(json as Map<String, dynamic>))
+
+      // 1. Проверяем, что ответ вообще существует
+      if (response.data == null) {
+        debugPrint('⚠️ Strapi returned null response body');
+        return [];
+      }
+
+      final dynamic rawData = response.data['data'];
+
+      // 2. Если данных нет (конец пагинации), Strapi может вернуть null или []
+      if (rawData == null) {
+        debugPrint('ℹ️ No more data (data field is null)');
+        return [];
+      }
+
+      if (rawData is! List) {
+        debugPrint('⚠️ Expected List but got ${rawData.runtimeType}');
+        return [];
+      }
+
+      // 3. Безопасно парсим каждый элемент
+      return rawData
+          .map((json) {
+        if (json == null) return null; // Пропускаем, если элемент списка null
+        try {
+          // Важно: проверяем, что json это действительно Map перед кастом
+          return Product.fromJson(json as Map<String, dynamic>);
+        } catch (e) {
+          debugPrint('❌ Error parsing individual product: $e');
+          return null;
+        }
+      })
+          .whereType<Product>() // Удаляет все null элементы из итогового списка
           .toList();
+
     } catch (e) {
+      // Используем ваш метод обработки ошибок
       _handleError(e);
     }
   }
+
+  // Future<List<Product>> getProductsForCatalog() async {
+  //   try {
+  //     final response = await _dio.get(
+  //       ApiEndpoints.products,
+  //       queryParameters: {
+  //         'populate[0]': 'product_in_stocks',
+  //         'populate[1]': 'product_in_stocks.product_color',
+  //         'populate[2]': 'product_in_stocks.product_size',
+  //         'populate[3]': 'product_in_stocks.images',
+  //         'populate[4]': 'product_materials',
+  //       },
+  //     );
+  //     final List<dynamic> data = response.data['data'];
+  //     return data
+  //         .map((json) => Product.fromJson(json as Map<String, dynamic>))
+  //         .toList();
+  //   } catch (e) {
+  //     _handleError(e);
+  //   }
+  // }
 
   Future<Product> getProductDetailsById(String id) async {
     try {

@@ -105,10 +105,13 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                       style: Styles.h3, textAlign: TextAlign.center),
                   if (orderState.orderType == OrderType.laboratory) ...[
                     const SizedBox(height: 8),
-                    Text(
-                      "Cкоро свяжемся с вами, чтобы передать ссылку на просмотр",
-                      textAlign: TextAlign.center,
-                      style: Styles.b1,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        "Cкоро свяжемся с вами, чтобы передать ссылку на просмотр",
+                        textAlign: TextAlign.center,
+                        style: Styles.b1,
+                      ),
                     ),
                     const SizedBox(height: 18),
                   ],

@@ -24,18 +24,28 @@ class ShopPage extends ConsumerStatefulWidget {
 
 class _ShopPageState extends ConsumerState<ShopPage> {
   late final TextEditingController _searchController;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
     final initialQuery =
         ref.read(laboratoriesNotifierProvider).valueOrNull?.searchQuery ?? '';
     _searchController = TextEditingController(text: initialQuery);
   }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      ref.read(productsNotifierProvider.notifier).fetchNextPage();
+    }
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -95,7 +105,8 @@ class _ShopPageState extends ConsumerState<ShopPage> {
       backgroundColor: Palette.background,
       body: SafeArea(
         child: CustomScrollView(
-          physics: const NeverScrollableScrollPhysics(),
+          controller: _scrollController, // 3. Привязываем контроллер
+          physics: const BouncingScrollPhysics(), // 4. Меняем физику на рабочую
           slivers: [
             SliverToBoxAdapter(
               child: LTAppBar(
@@ -120,79 +131,68 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                 ),
               ),
             ),
-            SliverFillRemaining(
+            SliverToBoxAdapter(
               child: Container(
-                margin: const EdgeInsets.all(4),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: Palette.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            // TODO: const BannerCarousel(),
-                            const SizedBox(height: 24),
-                            products.when(
-                              data: (productList) {
-                                if (productList.isEmpty) {
-                                  return const Center(
-                                      child: Text('Товары не найдены'));
-                                }
+                child: products.when(
+                  data: (productList) {
+                    if (productList.isEmpty) {
+                      return const Center(child: Text('Товары не найдены'));
+                    }
 
-                                return GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 16,
-                                    mainAxisExtent: 292,
-                                  ),
-                                  itemCount: productList.length,
-                                  itemBuilder: (context, index) {
-                                    final product = productList[index];
-                                    return ProductCard(product: product);
-                                  },
-                                );
-                              },
-                              error: (_, st) {
-                                return Text("This is error, $st");
-                              },
-                              loading: () {
-                                return GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 16,
-                                    mainAxisExtent: 288,
-                                  ),
-                                  itemCount: 4, // Показываем 4 заглушки
-                                  itemBuilder: (context, index) {
-                                    return _buildShimmerProductCard();
-                                  },
-                                );
-                              },
-                            ),
-                          ],
+                    return Column(
+                      children: [
+                        const SizedBox(height: 24),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(), // GridView внутри скролла не должен скроллиться сам
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 16,
+                            mainAxisExtent: 292,
+                          ),
+                          itemCount: productList.length,
+                          itemBuilder: (context, index) {
+                            return ProductCard(product: productList[index]);
+                          },
                         ),
-                      ),
-                    )
-                  ],
+                        if (products.isLoading)
+                          const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        const SizedBox(height: 20),
+                      ],
+                    );
+                  },
+                  error: (err, st) => Text("Error: $err"),
+                  loading: () => _buildShimmerGrid(),
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildShimmerGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 16,
+        mainAxisExtent: 288,
+      ),
+      itemCount: 6,
+      itemBuilder: (context, index) => _buildShimmerProductCard(),
     );
   }
 }
