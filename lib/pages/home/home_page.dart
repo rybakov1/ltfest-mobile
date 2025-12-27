@@ -184,6 +184,12 @@ class HomePage extends ConsumerWidget {
                                   await launchUrl(Uri.parse("https://t.me/ltfest_travel"));
                                 },
                               ),
+                              _buildServiceCard(
+                                imagePath: 'assets/images/lt_shop.png',
+                                label: 'LT Shop',
+                                isSmall: true,
+                                onTap: () => context.push(AppRoutes.shop),
+                              ),
                               // () => context.push(AppRoutes.ltTravel),
                               // _buildServiceCard(
                               //   imagePath: 'assets/images/lt_priority.png',

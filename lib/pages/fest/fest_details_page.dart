@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,6 +14,7 @@ import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/providers/festival_tariff_provider.dart';
 import 'package:ltfest/providers/user_provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/models/festival.dart';
@@ -220,6 +222,67 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
     );
   }
 
+  Widget _buildPageLoading(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Palette.shimmerBase,
+      highlightColor: Palette.shimmerHighlight,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                height: 250,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                width: double.infinity,
+                height: 100,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                width: double.infinity,
+                height: 100,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                width: double.infinity,
+                height: 100,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                width: double.infinity,
+                height: 124,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final festivalAsync = ref.watch(festivalByIdProvider(widget.id));
@@ -241,11 +304,22 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                           bottomLeft: Radius.circular(12),
                           bottomRight: Radius.circular(12),
                         ),
-                        child: Image.network(
-                          'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
                           height: 340,
                           width: double.infinity,
                           fit: BoxFit.cover,
+                          placeholder: (context, url) => Shimmer.fromColors(
+                            baseColor: Palette.shimmerBase,
+                            highlightColor: Palette.shimmerHighlight,
+                            child: Container(
+                              height: 340,
+                              width: double.infinity,
+                              color: Colors.white,
+                            ),
+                          ),
+                          fadeOutDuration: const Duration(milliseconds: 100),
                         ),
                       ),
                       SafeArea(
@@ -319,8 +393,8 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                 ],
               ),
             ),
-            loading: () => const SingleChildScrollView(),
-            error: (error, stack) => Container(),
+            loading: () => _buildPageLoading(context),
+            error: (error, stack) => _buildPageLoading(context),
           ),
           Positioned(
             left: 0,
@@ -511,7 +585,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Совсем скоро здесь повится информация о членах жюри",
+                    "Совсем скоро здесь появится информация о членах жюри",
                     textAlign: TextAlign.center,
                     style: Styles.b2.copyWith(color: Palette.gray),
                   ),
@@ -540,19 +614,25 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
                                       height: 150,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              Image.asset(
-                                        'assets/images/jury_placeholder.png',
-                                        height: 150,
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
+                                      placeholder: (context, url) =>
+                                          Shimmer.fromColors(
+                                        baseColor: Palette.shimmerBase,
+                                        highlightColor:
+                                            Palette.shimmerHighlight,
+                                        child: Container(
+                                          height: 150,
+                                          width: double.infinity,
+                                          color: Colors.white,
+                                        ),
                                       ),
+                                      fadeOutDuration:
+                                          const Duration(milliseconds: 100),
                                     ),
                                   ),
                                   const SizedBox(height: 12),

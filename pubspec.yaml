@@ -40,6 +40,9 @@ dependencies:
   sentry_flutter: ^9.7.0
   flutter_native_splash: ^2.4.7
   connectivity_plus: ^7.0.0
+  cached_network_image: ^3.4.1
+  dio_cache_interceptor: ^4.0.5
+  http_cache_hive_store: ^5.0.1
 
 dev_dependencies:
   sentry_dart_plugin: ^3.1.1

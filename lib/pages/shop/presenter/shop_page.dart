@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -149,8 +150,10 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                         const SizedBox(height: 24),
                         GridView.builder(
                           shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(), // GridView внутри скролла не должен скроллиться сам
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          physics: const NeverScrollableScrollPhysics(),
+                          // GridView внутри скролла не должен скроллиться сам
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: 8,
                             mainAxisSpacing: 16,
@@ -222,23 +225,24 @@ class ProductCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: (firstVariation.images.isNotEmpty)
-                    ? Image.network(
-                        'http://37.46.132.144:1337${firstVariation.images.first.url}',
-                        height: 196,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.error),
-                      )
-                    : Container(
-                        height: 196,
-                        color: Palette.stroke,
-                        child: const Center(
-                          child: Icon(Icons.image_not_supported,
-                              color: Colors.grey),
-                        ),
-                      ),
+                child: CachedNetworkImage(
+                  imageUrl:
+                      'http://37.46.132.144:1337${firstVariation.images.first.url}',
+                  height: 196,
+                  memCacheHeight: (196 * MediaQuery.of(context).devicePixelRatio).round(),
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: Palette.shimmerBase,
+                    highlightColor: Palette.shimmerHighlight,
+                    child: Container(
+                      height: 196,
+                      width: double.infinity,
+                      color: Colors.white,
+                    ),
+                  ),
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 8, right: 8),

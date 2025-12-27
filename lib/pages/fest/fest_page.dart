@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -330,17 +331,17 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FadeTransition(
-                      opacity: _storiesAnimation,
-                      child: SizeTransition(
-                        axisAlignment: -1.0,
-                        sizeFactor: _storiesAnimation,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 24.0),
-                          child: StoryWidget(category: widget.category),
-                        ),
-                      ),
-                    ),
+                    // FadeTransition(
+                    //   opacity: _storiesAnimation,
+                    //   child: SizeTransition(
+                    //     axisAlignment: -1.0,
+                    //     sizeFactor: _storiesAnimation,
+                    //     child: Padding(
+                    //       padding: const EdgeInsets.only(bottom: 24.0),
+                    //       child: StoryWidget(category: widget.category),
+                    //     ),
+                    //   ),
+                    // ),
                     Row(
                       children: [
                         GestureDetector(
@@ -532,6 +533,10 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
     required BuildContext context,
     required Festival festival,
   }) {
+    // Формируем URL заранее для чистоты кода
+    final String imageUrl =
+        'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}';
+
     return GestureDetector(
       onTap: () {
         context
@@ -544,23 +549,31 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
                   height: 180,
+                  fadeInDuration: const Duration(milliseconds: 150),
+                  fadeOutDuration: const Duration(milliseconds: 150),
+                  fadeInCurve: Curves.easeIn,
+                  fadeOutCurve: Curves.easeOut,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Shimmer.fromColors(
-                      baseColor: Palette.shimmerBase,
-                      highlightColor: Palette.shimmerHighlight,
-                      child: Container(
-                        height: 180,
-                        width: double.infinity,
-                        color: Colors.white,
-                      ),
-                    );
-                  },
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: Palette.shimmerBase,
+                    highlightColor: Palette.shimmerHighlight,
+                    child: Container(
+                      height: 180,
+                      width: double.infinity,
+                      color: Colors.white,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    height: 180,
+                    width: double.infinity,
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.image_not_supported,
+                        color: Colors.grey),
+                  ),
                 ),
               ),
               Padding(
@@ -589,10 +602,11 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
             children: [
               Text(festival.address ?? 'Не указано',
                   style: Styles.b2.copyWith(color: Palette.gray)),
-              Text(
-                "${DateFormat("dd.MM.yyyy", "ru").format(festival.dateStart!)} - ${DateFormat("dd.MM.yyyy", "ru").format(festival.dateEnd!)}",
-                style: Styles.b2.copyWith(color: Palette.black),
-              ),
+              if (festival.dateStart != null && festival.dateEnd != null)
+                Text(
+                  "${DateFormat("dd.MM.yyyy", "ru").format(festival.dateStart!)} - ${DateFormat("dd.MM.yyyy", "ru").format(festival.dateEnd!)}",
+                  style: Styles.b2.copyWith(color: Palette.black),
+                ),
             ],
           )
         ],

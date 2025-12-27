@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,6 +10,7 @@ import 'package:ltfest/data/models/laboratory_order_args_model.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/custom_tab_control.dart';
@@ -256,11 +258,22 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12),
                           ),
-                          child: Image.network(
-                            'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}',
+                          child: CachedNetworkImage(
+                            imageUrl:
+                                'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}',
                             height: 340,
                             width: double.infinity,
                             fit: BoxFit.cover,
+                            placeholder: (context, url) => Shimmer.fromColors(
+                              baseColor: Palette.shimmerBase,
+                              highlightColor: Palette.shimmerHighlight,
+                              child: Container(
+                                height: 340,
+                                width: double.infinity,
+                                color: Colors.white,
+                              ),
+                            ),
+                            fadeOutDuration: const Duration(milliseconds: 100),
                           ),
                         ),
                         SafeArea(child: content(context, ref, laboratory)),
@@ -499,27 +512,26 @@ class _LaboratoryDetailPageState extends ConsumerState<LaboratoryDetailPage> {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: entry.value.image != null
-                                        ? Image.network(
-                                            'http://37.46.132.144:1337${entry.value.image?.formats?.medium?.url ?? entry.value.image?.url ?? ''}',
-                                            height: 150,
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    Image.asset(
-                                              'assets/images/jury_placeholder.png',
-                                              height: 150,
-                                              width: double.infinity,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          )
-                                        : Image.asset(
-                                            'assets/images/jury_placeholder.png',
-                                            height: 150,
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                          ),
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          'http://37.46.132.144:1337${entry.value.image?.formats?.medium?.url ?? entry.value.image?.url ?? ''}',
+                                      height: 150,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) =>
+                                          Shimmer.fromColors(
+                                        baseColor: Palette.shimmerBase,
+                                        highlightColor:
+                                            Palette.shimmerHighlight,
+                                        child: Container(
+                                          height: 150,
+                                          width: double.infinity,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      fadeOutDuration:
+                                          const Duration(milliseconds: 100),
+                                    ),
                                   ),
                                   const SizedBox(height: 12),
                                   Column(

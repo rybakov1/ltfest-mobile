@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -643,6 +644,9 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
     required String category,
     required BuildContext context,
   }) {
+    String url =
+        'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}';
+
     return GestureDetector(
       onTap: () {
         context.push('${AppRoutes.laboratories}/${laboratory.id}');
@@ -654,8 +658,18 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}',
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: Palette.shimmerBase,
+                    highlightColor: Palette.shimmerHighlight,
+                    child: Container(
+                      height: 180,
+                      width: double.infinity,
+                      color: Colors.white,
+                    ),
+                  ),
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,

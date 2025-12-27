@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -566,7 +567,8 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                 SizedBox(
                                   height: 36,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Материал",
@@ -574,7 +576,9 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
                                       ),
                                       if (product.productMaterials.isNotEmpty)
                                         Text(
-                                          product.productMaterials.map((m) => m.title).join(', '),
+                                          product.productMaterials
+                                              .map((m) => m.title)
+                                              .join(', '),
                                           style: Styles.b2,
                                         ),
                                     ],
@@ -842,19 +846,20 @@ class ProductImageCarousel extends ConsumerWidget {
             },
             itemBuilder: (context, index) {
               final imageUrl = "http://37.46.132.144:1337${images[index].url}";
-              return Image.network(
-                imageUrl,
+              return CachedNetworkImage(
+                imageUrl: imageUrl,
                 fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(child: CircularProgressIndicator());
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return const Center(
-                    child:
-                        Icon(Icons.error_outline, color: Colors.grey, size: 48),
-                  );
-                },
+                fadeInDuration: const Duration(milliseconds: 50),
+                fadeOutDuration: const Duration(milliseconds: 50),
+                placeholder: (context, url) => Shimmer.fromColors(
+                  baseColor: Palette.shimmerBase,
+                  highlightColor: Palette.shimmerHighlight,
+                  child: Container(
+                    height: double.infinity,
+                    width: double.infinity,
+                    color: Colors.white,
+                  ),
+                ),
               );
             },
           ),

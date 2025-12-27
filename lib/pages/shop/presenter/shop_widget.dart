@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/router/app_routes.dart';
+import 'package:shimmer/shimmer.dart';
 import '../provider/shop_provider.dart';
 
 class ShopWidget extends ConsumerStatefulWidget {
@@ -56,30 +58,23 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                       ClipRRect(
                         borderRadius:
                             const BorderRadius.all(Radius.circular(12)),
-                        child: Image.network(
+                        child: CachedNetworkImage(
+                          imageUrl:
                           'http://37.46.132.144:1337${product.variations[0].images[0].url}',
                           height: 160,
+                          memCacheHeight: (160 * MediaQuery.of(context).devicePixelRatio).round(),
+                          placeholder: (context, url) => Shimmer.fromColors(
+                            baseColor: Palette.shimmerBase,
+                            highlightColor: Palette.shimmerHighlight,
+                            child: Container(
+                              height: 160,
+                              width: double.infinity,
+                              color: Colors.white,
+                            ),
+                          ),
+                          fadeInDuration: const Duration(milliseconds: 200),
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          loadingBuilder: (context, child, progress) {
-                            return progress == null
-                                ? child
-                                : const SizedBox(
-                                    height: 160,
-                                    width: double.infinity,
-                                    child: Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 160,
-                              color: Colors.grey[200],
-                              child: const Icon(Icons.broken_image,
-                                  color: Colors.grey),
-                            );
-                          },
                         ),
                       ),
                     ],
