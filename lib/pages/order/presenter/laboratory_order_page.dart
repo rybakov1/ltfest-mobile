@@ -227,17 +227,17 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                             style: Styles.b3,
                           ),
                           const SizedBox(height: 16),
-                          if (user?.activity!.title ==
-                              "Руководитель коллектива")
-                            buildTextField(
-                              controller: _collectiveInfoController,
-                              label:
-                                  "Руководителем какого коллектива/театра Вы являетесь? Сколько лет коллективу",
-                              hint: "Название коллектива",
-                              keyboardType: TextInputType.number,
-                              func: _resetValidationState,
-                              onChanged: orderNotifier.updateCollectiveInfo,
-                            ),
+                          // if (user?.activity!.title ==
+                          //     "Руководитель коллектива")
+                          //   buildTextField(
+                          //     controller: _collectiveInfoController,
+                          //     label:
+                          //         "Руководителем какого коллектива/театра Вы являетесь? Сколько лет коллективу",
+                          //     hint: "Название коллектива",
+                          //     keyboardType: TextInputType.number,
+                          //     func: _resetValidationState,
+                          //     onChanged: orderNotifier.updateCollectiveInfo,
+                          //   ),
                           if (validationState.hasErrors)
                             Padding(
                               padding: const EdgeInsets.only(top: 32),

@@ -359,8 +359,9 @@ class OrderNotifier extends StateNotifier<OrderState> {
           if (state.selectedFestival != null) {
             details['Фестиваль'] = state.selectedFestival!.title;
           }
-          if (state.payableItem is PriorityTariff) {
-            details['Тариф'] = state.payableItem?.title;
+          if (state.payableItem is FestivalTariff) {
+            final tariff = state.payableItem as FestivalTariff;
+            details['Тариф'] = tariff.title;
           }
           break;
         case OrderType.laboratory:

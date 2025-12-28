@@ -105,78 +105,97 @@ class _ShopPageState extends ConsumerState<ShopPage> {
     return Scaffold(
       backgroundColor: Palette.background,
       body: SafeArea(
-        child: CustomScrollView(
-          controller: _scrollController, // 3. Привязываем контроллер
-          physics: const BouncingScrollPhysics(), // 4. Меняем физику на рабочую
-          slivers: [
-            SliverToBoxAdapter(
-              child: LTAppBar(
-                title: "LT Shop",
-                postfixWidget: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Palette.primaryLime,
+        child: Stack(
+          children: [
+            CustomScrollView(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 100.0,
+                  floating: true,
+                  pinned: false,
+                  snap: true,
+                  backgroundColor: Palette.background,
+                  automaticallyImplyLeading: false,
+                  elevation: 0,
+                  flexibleSpace: FlexibleSpaceBar(
+                    collapseMode: CollapseMode.pin,
+                    background: Builder(builder: (innerContext) {
+                      return Container(
+                        color: Palette.background,
+                        child: LTAppBar(
+                          title: "LT Shop",
+                          postfixWidget: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Palette.primaryLime,
+                            ),
+                            child: IconButton(
+                              onPressed: () => context.push(AppRoutes.cart),
+                              icon: Icon(
+                                cartIsNotEmpty > 0
+                                    ? Icons.shopping_cart
+                                    : Icons.shopping_cart_outlined,
+                                color: Palette.white,
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
                   ),
-                  child: IconButton(
-                    onPressed: () => context.push(AppRoutes.cart),
-                    icon: Icon(
-                      cartIsNotEmpty > 0
-                          ? Icons.shopping_cart
-                          : Icons.shopping_cart_outlined,
+                ),
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
                       color: Palette.white,
-                      size: 24,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: products.when(
+                      data: (productList) {
+                        if (productList.isEmpty) {
+                          return const Center(child: Text('Товары не найдены'));
+                        }
+
+                        return Column(
+                          children: [
+                            const SizedBox(height: 24),
+                            GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              // GridView внутри скролла не должен скроллиться сам
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 16,
+                                mainAxisExtent: 292,
+                              ),
+                              itemCount: productList.length,
+                              itemBuilder: (context, index) {
+                                return ProductCard(product: productList[index]);
+                              },
+                            ),
+                            if (products.isLoading)
+                              const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            const SizedBox(height: 20),
+                          ],
+                        );
+                      },
+                      error: (err, st) => Text("Error: $err"),
+                      loading: () => _buildShimmerGrid(),
                     ),
                   ),
                 ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: Palette.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: products.when(
-                  data: (productList) {
-                    if (productList.isEmpty) {
-                      return const Center(child: Text('Товары не найдены'));
-                    }
-
-                    return Column(
-                      children: [
-                        const SizedBox(height: 24),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          // GridView внутри скролла не должен скроллиться сам
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 16,
-                            mainAxisExtent: 292,
-                          ),
-                          itemCount: productList.length,
-                          itemBuilder: (context, index) {
-                            return ProductCard(product: productList[index]);
-                          },
-                        ),
-                        if (products.isLoading)
-                          const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        const SizedBox(height: 20),
-                      ],
-                    );
-                  },
-                  error: (err, st) => Text("Error: $err"),
-                  loading: () => _buildShimmerGrid(),
-                ),
-              ),
+              ],
             ),
           ],
         ),
@@ -229,7 +248,8 @@ class ProductCard extends StatelessWidget {
                   imageUrl:
                       'http://37.46.132.144:1337${firstVariation.images.first.url}',
                   height: 196,
-                  memCacheHeight: (196 * MediaQuery.of(context).devicePixelRatio).round(),
+                  memCacheHeight:
+                      (196 * MediaQuery.of(context).devicePixelRatio).round(),
                   placeholder: (context, url) => Shimmer.fromColors(
                     baseColor: Palette.shimmerBase,
                     highlightColor: Palette.shimmerHighlight,
