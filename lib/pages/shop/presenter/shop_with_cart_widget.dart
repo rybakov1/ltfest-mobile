@@ -21,7 +21,7 @@ class _ShopWithCartWidgetState extends ConsumerState<ShopWithCartWidget> {
 
     return productsAsync.when(
       data: (productList) {
-        if (productList.isEmpty) {
+        if (productList.products.isEmpty) {
           return Center(
             child: Text(
               'Продукты не найдены',
@@ -40,9 +40,9 @@ class _ShopWithCartWidgetState extends ConsumerState<ShopWithCartWidget> {
             mainAxisSpacing: 16,
             mainAxisExtent: 235,
           ),
-          itemCount: productList.length,
+          itemCount: productList.products.length,
           itemBuilder: (context, index) {
-            final product = productList[index];
+            final product = productList.products[index];
 
             // Логика: для карточки в каталоге работаем с первой вариацией (дефолтной)
             // Если вариаций нет, товар нельзя купить через каталог

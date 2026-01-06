@@ -4,22 +4,42 @@ import '../../../data/services/api_service.dart';
 
 part 'shop_provider.g.dart';
 
+class ShopState {
+  final List<Product> products;
+  final bool hasMore;
+
+  ShopState({
+    required this.products,
+    required this.hasMore,
+  });
+
+  ShopState copyWith({List<Product>? products, bool? hasMore}) {
+    return ShopState(
+      products: products ?? this.products,
+      hasMore: hasMore ?? this.hasMore,
+    );
+  }
+}
+
 @Riverpod(keepAlive: true)
 class ProductsNotifier extends _$ProductsNotifier {
   int _currentPage = 1;
-  bool _hasMore = true;
   bool _isLoadingMore = false;
 
   @override
-  Future<List<Product>> build() async {
+  Future<ShopState> build() async {
     _currentPage = 1;
-    _hasMore = true;
+    _isLoadingMore = false;
+
     final apiService = ref.read(apiServiceProvider);
-    return await apiService.getProductsForCatalog(page: _currentPage);
+    final products = await apiService.getProductsForCatalog(page: _currentPage);
+
+    return ShopState(products: products, hasMore: products.isNotEmpty);
   }
 
   Future<void> fetchNextPage() async {
-    if (_isLoadingMore || !_hasMore) return;
+    final currentState = state.value;
+    if (currentState == null || _isLoadingMore || !currentState.hasMore) return;
 
     _isLoadingMore = true;
     final apiService = ref.read(apiServiceProvider);
@@ -29,16 +49,16 @@ class ProductsNotifier extends _$ProductsNotifier {
       final newProducts = await apiService.getProductsForCatalog(page: nextPage);
 
       if (newProducts.isEmpty) {
-        _hasMore = false;
-        // Принудительно обновляем состояние, чтобы убрать индикатор загрузки, если он был
-        state = AsyncData(state.value ?? []);
+        state = AsyncData(currentState.copyWith(hasMore: false));
       } else {
         _currentPage = nextPage;
-        state = AsyncData([...state.value ?? [], ...newProducts]);
+        state = AsyncData(ShopState(
+          products: [...currentState.products, ...newProducts],
+          hasMore: true,
+        ));
       }
-    } catch (e, st) {
+    } catch (e) {
       print('Error loading more products: $e');
-      // Опционально: state = AsyncError(e, st);
     } finally {
       _isLoadingMore = false;
     }
@@ -46,7 +66,7 @@ class ProductsNotifier extends _$ProductsNotifier {
 }
 
 final productByIdProvider = FutureProvider.family<Product, String>(
-  (ref, id) {
+      (ref, id) {
     final apiService = ref.watch(apiServiceProvider);
     return apiService.getProductDetailsById(id);
   },

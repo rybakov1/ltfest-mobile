@@ -158,7 +158,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                     ),
                     child: products.when(
                       data: (productList) {
-                        if (productList.isEmpty) {
+                        if (productList.products.isEmpty) {
                           return const Center(child: Text('Товары не найдены'));
                         }
 
@@ -176,9 +176,9 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                                 mainAxisSpacing: 16,
                                 mainAxisExtent: 292,
                               ),
-                              itemCount: productList.length,
+                              itemCount: productList.products.length,
                               itemBuilder: (context, index) {
-                                return ProductCard(product: productList[index]);
+                                return ProductCard(product: productList.products[index]);
                               },
                             ),
                             if (products.isLoading)
