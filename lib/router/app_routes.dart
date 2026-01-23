@@ -41,4 +41,5 @@ class AppRoutes {
   static const String noInternet = '/no-internet';
 
   static const String deleteAccount = '/delete';
+  static const String support = '/support';
 }

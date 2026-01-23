@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ltfest/data/models/laboratory_learning_type.dart';
 import 'package:ltfest/data/models/laboratory_order_args_model.dart';
 import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:ltfest/pages/more/about_app_page.dart';
@@ -27,7 +26,6 @@ import 'package:ltfest/pages/main_screen.dart';
 import 'package:ltfest/pages/more/more_page.dart';
 import 'package:ltfest/pages/home/more_items_page.dart';
 import '../data/models/festival_order_args_model.dart';
-import '../data/models/festival_tariff.dart';
 import '../pages/auth/input_code_page.dart';
 import '../pages/cart/cart_page.dart';
 import '../pages/more/delete_account_page.dart';
@@ -35,7 +33,6 @@ import '../pages/more/favorites_page.dart';
 import '../pages/no_internet_page.dart';
 import '../pages/payment/payment_failure_screen.dart';
 import '../pages/payment/payment_init_screen.dart';
-import '../pages/payment/payment_provider.dart';
 import '../pages/payment/payment_success_screen.dart';
 import '../pages/reference/presenter/lt_coin_page.dart';
 import '../pages/reference/presenter/lt_concierge_page.dart';
@@ -46,6 +43,7 @@ import '../pages/splash_page.dart';
 import '../providers/auth_state.dart';
 import '../providers/connectivity_provider.dart';
 import '../providers/user_provider.dart';
+import 'package:ltfest/features/support/presentation/pages/support_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final listenable = ValueNotifier<int>(0);
@@ -201,6 +199,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.more,
             pageBuilder: (context, state) => const NoTransitionPage(
               child: MorePage(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.support,
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: SupportPage(),
             ),
           ),
         ],
@@ -386,52 +390,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           return PaymentFailureScreen(paymentId: paymentId);
         },
       ),
-      // GoRoute(
-      //   path: AppRoutes.paymentSuccess,
-      //   redirect: (BuildContext context, GoRouterState state) {
-      //     var paymentIdFromUrl = state.pathParameters['id'];
-      //     if (paymentIdFromUrl == '{PaymentId}') {
-      //       final ref = ProviderScope.containerOf(context, listen: false);
-      //       final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
-      //
-      //       if (savedId != null && savedId.isNotEmpty) {
-      //         debugPrint(
-      //             'GoRouter redirect: replacing {PaymentId} with $savedId');
-      //         return '/success/$savedId';
-      //       }
-      //     }
-      //     return null;
-      //   },
-      //   builder: (context, state) {
-      //     final correctPaymentId = state.pathParameters['id']!;
-      //     debugPrint(
-      //         'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
-      //     return PaymentSuccessScreen(paymentId: correctPaymentId);
-      //   },
-      // ),
-      // GoRoute(
-      //   path: AppRoutes.paymentFailure,
-      //   redirect: (BuildContext context, GoRouterState state) {
-      //     var paymentIdFromUrl = state.pathParameters['id'];
-      //     if (paymentIdFromUrl == '{PaymentId}') {
-      //       final ref = ProviderScope.containerOf(context, listen: false);
-      //       final savedId = ref.read(paymentNotifierProvider).value?.paymentId;
-      //
-      //       if (savedId != null && savedId.isNotEmpty) {
-      //         debugPrint(
-      //             'GoRouter redirect: replacing {PaymentId} with $savedId');
-      //         return '/fail/$savedId';
-      //       }
-      //     }
-      //     return null;
-      //   },
-      //   builder: (context, state) {
-      //     final correctPaymentId = state.pathParameters['id']!;
-      //     debugPrint(
-      //         'GoRouter builder: creating PaymentSuccessScreen with id: $correctPaymentId');
-      //     return PaymentFailureScreen(paymentId: correctPaymentId);
-      //   },
-      // ),
     ],
   );
 });

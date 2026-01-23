@@ -841,4 +841,52 @@ class ApiService {
     }
     return '${_dio.options.baseUrl}$relativeUrl';
   }
+
+  Future<void> sendSupportMessage({
+    required String email,
+    required String phone,
+    required String reason,
+    required String message,
+    List<int>? attachmentIds,
+  }) async {
+    try {
+      final Map<String, dynamic> data = {
+        'email': email,
+        'phone': phone,
+        'reason': reason,
+        'message': message,
+      };
+
+      if (attachmentIds != null && attachmentIds.isNotEmpty) {
+        data['attachments'] = attachmentIds;
+      }
+
+      await _dio.post(ApiEndpoints.supportMessages, data: {
+        'data': data,
+      });
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  Future<int> uploadFile(String filePath) async {
+    try {
+      final fileName = filePath.split('/').last;
+      final formData = FormData.fromMap({
+        'files': await MultipartFile.fromFile(filePath, filename: fileName),
+      });
+
+      final response = await _dio.post('/api/upload', data: formData);
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        if (data.isNotEmpty) {
+          return data[0]['id'];
+        }
+      }
+      throw ApiException(message: 'File upload failed');
+    } catch (e) {
+       _handleError(e);
+    }
+  }
 }
