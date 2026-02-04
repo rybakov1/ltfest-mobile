@@ -9,6 +9,7 @@ import 'package:ltfest/providers/favorites_provider.dart';
 
 import '../../components/custom_chip.dart';
 import '../../data/models/favorite.dart';
+import '../../data/services/api_endpoints.dart';
 import '../../router/app_routes.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
@@ -233,7 +234,7 @@ class _FavoriteCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  'http://37.46.132.144:1337${item.image ?? ''}',
+                  '${ApiEndpoints.baseStrapiUrl}${item.image ?? ''}',
                   height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -284,7 +285,7 @@ class _FavoriteCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  'http://37.46.132.144:1337${item.image ?? ''}',
+                  '${ApiEndpoints.baseStrapiUrl}${item.image ?? ''}',
                   width: double.infinity,
                   height: 196,
                   fit: BoxFit.cover,

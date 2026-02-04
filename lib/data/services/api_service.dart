@@ -807,6 +807,33 @@ class ApiService {
     }
   }
 
+  Future<void> registerPushToken({
+    required int userId,
+    required String token,
+    required String provider,
+    required String platform,
+  }) async {
+    try {
+      final data = {
+        'data': {
+          'users_permissions_user': userId,
+          'token': token,
+          'provider': provider,
+          'platform': platform,
+        }
+      };
+
+      _logRequest('POST', ApiEndpoints.pushTokens, data);
+
+      final response = await _dio.post(ApiEndpoints.pushTokens, data: data);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw ApiException(message: 'Не удалось зарегистрировать push token');
+      }
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
   Future<void> createAccountDeletionRequest({
     required int userId,
     required String reason,
@@ -871,20 +898,31 @@ class ApiService {
 
   Future<int> uploadFile(String filePath) async {
     try {
-      final fileName = filePath.split('/').last;
+      final fileName = filePath.split(RegExp(r'[\\/]+')).last;
       final formData = FormData.fromMap({
         'files': await MultipartFile.fromFile(filePath, filename: fileName),
       });
 
       final response = await _dio.post('/api/upload', data: formData);
-      
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        if (data.isNotEmpty) {
-          return data[0]['id'];
+
+      final statusCode = response.statusCode;
+      if (statusCode == 200 || statusCode == 201) {
+        final data = response.data;
+        if (data is List && data.isNotEmpty) {
+          final first = data.first;
+          if (first is Map<String, dynamic>) {
+            final id = first['id'];
+            if (id is int) return id;
+            if (id is num) return id.toInt();
+          }
         }
       }
-      throw ApiException(message: 'File upload failed');
+
+      throw ApiException(
+        message: 'File upload failed',
+        statusCode: statusCode,
+        data: response.data,
+      );
     } catch (e) {
        _handleError(e);
     }

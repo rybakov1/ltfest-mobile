@@ -79,7 +79,8 @@ class AuthInterceptor extends Interceptor {
 Dio dio(Ref ref) {
   final dio = Dio(
     BaseOptions(
-      baseUrl: 'http://37.46.132.144:1337',
+      // baseUrl: 'http://37.46.132.144:1337',
+      baseUrl: 'http://37.46.132.144:1338',
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 60),
       headers: {'Content-Type': 'application/json; charset=utf-8'},

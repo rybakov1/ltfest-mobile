@@ -9,7 +9,6 @@ import 'package:ltfest/pages/order/order_provider.dart';
 import 'package:ltfest/pages/payment/payment_failure_screen.dart';
 import 'package:ltfest/pages/payment/payment_provider.dart';
 import 'package:ltfest/pages/shop/presenter/shop_widget.dart';
-import 'package:ltfest/pages/shop/presenter/shop_with_cart_widget.dart';
 import 'package:ltfest/router/app_routes.dart';
 
 class PaymentSuccessScreen extends ConsumerStatefulWidget {

@@ -12,6 +12,7 @@ import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/laboratory.dart';
+import 'package:ltfest/data/services/api_endpoints.dart';
 import 'package:ltfest/providers/direction_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:shimmer/shimmer.dart';
@@ -645,7 +646,7 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
     required BuildContext context,
   }) {
     String url =
-        'http://37.46.132.144:1337${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}';
+        '${ApiEndpoints.baseStrapiUrl}${laboratory.image?.formats?.medium?.url ?? laboratory.image?.url ?? ''}';
 
     return GestureDetector(
       onTap: () {

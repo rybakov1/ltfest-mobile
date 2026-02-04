@@ -8,6 +8,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../constants.dart';
 import '../../data/models/news.dart';
+import '../../data/services/api_endpoints.dart';
 import '../../providers/news_provider.dart';
 
 class NewsPage extends ConsumerWidget {
@@ -171,7 +172,7 @@ class NewsPage extends ConsumerWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
-              'http://37.46.132.144:1337${news.image?.formats?.medium?.url ?? news.image?.url ?? ''}',
+              '${ApiEndpoints.baseStrapiUrl}${news.image?.formats?.medium?.url ?? news.image?.url ?? ''}',
               height: 160,
               width: double.infinity,
               fit: BoxFit.cover,

@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../constants.dart';
 import '../../data/models/ltstory.dart';
 import '../data/models/image_data.dart';
+import '../data/services/api_endpoints.dart';
 
 class StoryViewer extends StatefulWidget {
   final List<LTStory> stories;
@@ -59,7 +60,7 @@ class StoryViewerState extends State<StoryViewer> {
   Widget _buildStoryView(LTStory story, StoryController controller) {
     final List<ImageData> mediaItems = story.media!;
     final List<StoryItem> storyItems = mediaItems.map((mediaItem) {
-      final mediaUrl = 'http://37.46.132.144:1337${mediaItem.url}';
+      final mediaUrl = '${ApiEndpoints.baseStrapiUrl}${mediaItem.url}';
       final bool isVideo = mediaItem.mime.startsWith('video/');
 
       if (isVideo) {

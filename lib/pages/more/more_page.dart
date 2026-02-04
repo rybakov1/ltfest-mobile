@@ -107,20 +107,6 @@ class MorePage extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: Decor.base,
-                child: _MenuTile(
-                  iconPath:  'assets/icons/favourite.svg',
-                  title: "Написать в поддержку",
-                  onTap: () => context.push(AppRoutes.support),
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                decoration: Decor.base,
                 child: Column(
                   children: [
                     _MenuTile(
@@ -157,6 +143,12 @@ class MorePage extends ConsumerWidget {
                         context.push(AppRoutes.user);
                       },
                     ),
+                    _MenuTile(
+                      iconPath: 'assets/icons/tech_support.svg',
+                      title: "Написать в поддержку",
+                      onTap: () => context.push(AppRoutes.support),
+                    ),
+
                     // TODO: Notification
                     // _MenuTile(
                     //   iconPath: 'assets/icons/settings.svg',

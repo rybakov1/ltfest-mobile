@@ -7,6 +7,7 @@ import 'package:ltfest/constants.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 
+import '../../data/services/api_endpoints.dart';
 import '../../providers/favorites_provider.dart';
 import 'models/cart_item.dart';
 
@@ -260,7 +261,7 @@ class CartItemCard extends ConsumerWidget {
               borderRadius: BorderRadius.circular(8),
               child: (productStock.images.isNotEmpty)
                   ? Image.network(
-                      'http://37.46.132.144:1337${productStock.images.first.url}',
+                      '${ApiEndpoints.baseStrapiUrl}${productStock.images.first.url}',
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,

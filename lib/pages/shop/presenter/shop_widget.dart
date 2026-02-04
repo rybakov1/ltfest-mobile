@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:shimmer/shimmer.dart';
+import '../provider/shop_catalog_provider.dart';
 import '../provider/shop_provider.dart';
 
 class ShopWidget extends ConsumerStatefulWidget {
@@ -17,24 +18,23 @@ class ShopWidget extends ConsumerStatefulWidget {
 
 class _ShopWidgetState extends ConsumerState<ShopWidget> {
   int _visibleCount = 4;
-  final int _incrementCount = 4;
+  final int _incrementCount = 8;
   bool _isBtnLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    final shopStateAsync = ref.watch(productsNotifierProvider);
+    final catalogAsync = ref.watch(shopCatalogProvider);
 
-    return shopStateAsync.when(
-      data: (shopState) {
-        final productList = shopState.products;
-
-        if (productList.isEmpty) {
+    return catalogAsync.when(
+      data: (catalogState) {
+        final groups = catalogState.groups;
+        if (groups.isEmpty) {
           return Center(child: Text('Продукты не найдены', style: Styles.b1));
         }
 
-        final currentDisplayCount = min(_visibleCount, productList.length);
+        final currentDisplayCount = min(_visibleCount, groups.length);
         final bool showButton =
-            (_visibleCount < productList.length) || shopState.hasMore;
+            (_visibleCount < groups.length) || catalogState.hasMore;
 
         return Column(
           children: [
@@ -49,24 +49,12 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
               ),
               itemCount: currentDisplayCount,
               itemBuilder: (context, index) {
-                final product = productList[index];
-                String sizes = "";
-                if (product.variations.isNotEmpty) {
-                  for (var v in product.variations) {
-                    sizes += "${v.productSize.title} ";
-                  }
-                }
-                final firstVariation = product.variations.isNotEmpty
-                    ? product.variations[0]
-                    : null;
-                final imageUrl = (firstVariation != null &&
-                        firstVariation.images.isNotEmpty)
-                    ? 'http://37.46.132.144:1337${firstVariation.images[0].url}'
-                    : '';
-                final price = firstVariation?.price.toInt() ?? 0;
+                final group = groups[index];
+                final product = group.product;
 
                 return GestureDetector(
-                  onTap: () => context.push('${AppRoutes.shop}/${product.id}'),
+                  onTap: () => context.push(
+                      '${AppRoutes.shop}/${product.id}?colorId=${group.color.id}'),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -76,7 +64,7 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(12)),
                             child: CachedNetworkImage(
-                              imageUrl: imageUrl,
+                              imageUrl: group.imageUrl,
                               height: 160,
                               width: double.infinity,
                               fit: BoxFit.cover,
@@ -99,7 +87,7 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text(Utils.formatMoney(price), style: Styles.h5),
+                      Text(Utils.formatMoney(group.minPrice), style: Styles.h5),
                       const SizedBox(height: 4),
                       Text(product.name,
                           maxLines: 2,
@@ -107,7 +95,7 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                           style: Styles.b2.copyWith(color: Palette.gray)),
                       const Spacer(),
                       const SizedBox(height: 4),
-                      Text(sizes,
+                      Text(group.subtitle,
                           overflow: TextOverflow.ellipsis, style: Styles.b3),
                     ],
                   ),
@@ -123,7 +111,7 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                   onPressed: _isBtnLoading
                       ? null
                       : () async {
-                          if (_visibleCount < productList.length) {
+                          if (_visibleCount < groups.length) {
                             setState(() {
                               _visibleCount += _incrementCount;
                             });
@@ -149,9 +137,14 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
                           height: 24,
                           width: 24,
                           child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2))
-                      : Text("Посмотреть все",
-                          style: Styles.b1.copyWith(color: Colors.white)),
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          "Посмотреть больше",
+                          style: Styles.b1.copyWith(color: Colors.white),
+                        ),
                 ),
               ),
             ],
@@ -163,7 +156,6 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
     );
   }
 
-  // Shimmer метод тот же самый, что и был
   Widget _buildShimmerLoading() {
     return GridView.builder(
       shrinkWrap: true,
@@ -183,10 +175,12 @@ class _ShopWidgetState extends ConsumerState<ShopWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                  height: 160,
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12))),
+                height: 160,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               const SizedBox(height: 8),
               Container(height: 20, width: 80, color: Colors.white),
               const SizedBox(height: 4),

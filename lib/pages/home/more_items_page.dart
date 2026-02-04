@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../components/favorite_button.dart';
 import '../../data/models/news.dart';
 import '../../data/models/upcoming_events.dart';
+import '../../data/services/api_endpoints.dart';
 import '../../providers/favorites_provider.dart';
 
 class AllItemsPage<T> extends ConsumerWidget {
@@ -150,7 +151,7 @@ Widget buildEventCard({
               borderRadius: BorderRadius.circular(12),
               child: event.image != null
                   ? Image.network(
-                      "http://37.46.132.144:1337${event.image}",
+                      "${ApiEndpoints.baseStrapiUrl}${event.image}",
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -237,8 +238,8 @@ Widget buildNewsCard({required News news}) {
               ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.asset(
-                  'http://37.46.132.144:1337${news.image?.formats?.medium?.url ?? news.image?.url ?? ''}',
+                child: Image.network(
+                  '${ApiEndpoints.baseStrapiUrl}${news.image?.formats?.medium?.url ?? news.image?.url ?? ''}',
                   height: 170,
                   width: double.infinity,
                   fit: BoxFit.cover,

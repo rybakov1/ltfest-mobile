@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/components/story_viewer.dart';
 import 'package:shimmer/shimmer.dart';
+import '../data/services/api_endpoints.dart';
 import '../constants.dart';
 import '../providers/story_provider.dart';
 
@@ -34,7 +35,7 @@ class StoryWidget extends ConsumerWidget {
                   final story = stories[index];
                   return _buildStoryPreview(
                     imageUrl:
-                        'http://37.46.132.144:1337${story.preview!.formats?.thumbnail?.url}',
+                        '${ApiEndpoints.baseStrapiUrl}${story.preview!.formats?.thumbnail?.url}',
                     onTap: () {
                       Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(

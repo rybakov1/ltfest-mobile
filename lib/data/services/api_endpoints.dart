@@ -55,6 +55,7 @@ abstract class ApiEndpoints {
   static const String loyaltyCards = '/api/loyalty-cards';
   static const String accountDeletionRequests = '/api/account-deletion-requests';
   static const String supportMessages = '/api/support-messages';
+  static const String pushTokens = '/api/push-tokens';
 
-  static const String baseStrapiUrl = 'http://37.46.132.144:1337';
+  static const String baseStrapiUrl = 'http://37.46.132.144:1338';
 }

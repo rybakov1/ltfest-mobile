@@ -1,12 +1,28 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ltfest/components/modal.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/features/support/presentation/providers/support_provider.dart';
+import 'package:ltfest/providers/user_provider.dart';
+import 'package:ltfest/router/app_routes.dart';
+
+const List<String> _supportReasons = [
+  'Нашёл(а) ошибку в приложении',
+  'Ошибка при оплате',
+  'Предложение по улучшению',
+  'Другое',
+];
+
+final supportReasonsProvider = FutureProvider<List<String>>((ref) async {
+  return _supportReasons;
+});
 
 class SupportPage extends ConsumerStatefulWidget {
   const SupportPage({super.key});
@@ -22,19 +38,23 @@ class _SupportPageState extends ConsumerState<SupportPage> {
 
   String? _selectedReason;
   final List<String> _selectedFiles = [];
+  bool _showRequiredErrors = false;
 
   final _phoneFormatter = MaskTextInputFormatter(
-    mask: '+7 (###) ###-##-##',
+    mask: '+7(###)###-##-##',
     filter: {"#": RegExp(r'[0-9]')},
     type: MaskAutoCompletionType.lazy,
   );
 
-  final List<String> _reasons = [
-    'Техническая ошибка',
-    'Вопрос по заказу',
-    'Предложение по улучшению',
-    'Другое',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    final user = ref.read(userProvider);
+    if (user != null) {
+      _emailController.text = user.email ?? '';
+      _phoneController.text = _formatPhoneForDisplay(user.phone ?? '');
+    }
+  }
 
   @override
   void dispose() {
@@ -67,16 +87,27 @@ class _SupportPageState extends ConsumerState<SupportPage> {
     });
   }
 
-  Future<void> _submit() async {
-    if (_emailController.text.isEmpty ||
-        _phoneController.text.isEmpty ||
-        _selectedReason == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Пожалуйста, заполните обязательные поля')),
-      );
-      return;
+  String _formatPhoneForDisplay(String raw) {
+    final alreadyFormatted =
+        RegExp(r'^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$').hasMatch(raw);
+    if (alreadyFormatted) return raw;
+
+    var digits = raw.replaceAll(RegExp(r'\D'), '');
+    if (digits.startsWith('7') && digits.length == 11) {
+      digits = digits.substring(1);
     }
+
+    if (digits.length != 10) return raw;
+    return _phoneFormatter.maskText(digits);
+  }
+
+  Future<void> _submit() async {
+    setState(() => _showRequiredErrors = true);
+
+    final hasErrors = _emailController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _selectedReason == null;
+    if (hasErrors) return;
 
     await ref.read(supportProvider.notifier).submit(
           email: _emailController.text,
@@ -93,10 +124,7 @@ class _SupportPageState extends ConsumerState<SupportPage> {
 
     ref.listen(supportProvider, (previous, next) {
       if (next is AsyncData && previous is AsyncLoading) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Сообщение отправлено')),
-        );
-        context.pop();
+        context.go(AppRoutes.supportSuccess);
       } else if (next is AsyncError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Ошибка: ${next.error}')),
@@ -114,7 +142,7 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                 children: [
                   const LTAppBar(title: "Написать в поддержку"),
                   Container(
-                    decoration: Decor.base.copyWith(color: Palette.error),
+                    decoration: Decor.base,
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -127,19 +155,37 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                           children: [
                             Expanded(
                               child: _buildTextField(
-                                  "Email*", _emailController, "email@mail.com"),
+                                "Email*",
+                                _emailController,
+                                "email@mail.com",
+                                enabled: false,
+                                errorText: _showRequiredErrors &&
+                                        _emailController.text.isEmpty
+                                    ? 'Обязательное поле'
+                                    : null,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: _buildTextField("Номер телефона*",
                                   _phoneController, "+79099990011",
-                                  formatter: _phoneFormatter),
+                                  formatter: _phoneFormatter,
+                                  enabled: false,
+                                  errorText: _showRequiredErrors &&
+                                          _phoneController.text.isEmpty
+                                      ? 'Обязательное поле'
+                                      : null),
                             )
                           ],
                         ),
                         const SizedBox(height: 16),
                         _buildLabel("Причина обращения*"),
-                        _buildDropdown(),
+                        _buildReasonModalPicker(
+                          errorText:
+                              _showRequiredErrors && _selectedReason == null
+                                  ? 'Обязательное поле'
+                                  : null,
+                        ),
                         const SizedBox(height: 16),
                         _buildLabel("Комментарий"),
                         _buildCommentField(),
@@ -151,7 +197,7 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 250 + MediaQuery.of(context).padding.bottom),
+                  SizedBox(height: 50 + MediaQuery.of(context).padding.bottom),
                 ],
               ),
             ),
@@ -198,69 +244,112 @@ class _SupportPageState extends ConsumerState<SupportPage> {
 
   Widget _buildTextField(
       String text, TextEditingController controller, String hint,
-      {MaskTextInputFormatter? formatter}) {
+      {MaskTextInputFormatter? formatter,
+      bool enabled = true,
+      String? errorText}) {
+    final borderColor = errorText != null ? Palette.error : Palette.stroke;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 6),
-          child: Text(text, style: Styles.b3.copyWith(color: Palette.gray)),
+          child: Text(
+            text,
+            style: Styles.b3.copyWith(color: Palette.gray),
+          ),
         ),
         Container(
-          height: 43,
+          height: 46,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Palette.white,
+            color: enabled ? Palette.white : Palette.background,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Palette.stroke),
+            border: Border.all(color: borderColor),
           ),
           child: TextField(
+            enabled: enabled,
+            readOnly: !enabled,
             controller: controller,
             inputFormatters: formatter != null ? [formatter] : [],
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: Styles.b2
-                  .copyWith(color: Palette.gray.withValues(alpha: 0.5)),
+              hintStyle: Styles.b2.copyWith(color: Palette.gray),
               border: InputBorder.none,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
-            style: Styles.b2,
+            style: Styles.b2
+                .copyWith(color: enabled ? Palette.black : Palette.gray),
           ),
         ),
+        if (errorText != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            errorText,
+            style: Styles.b3.copyWith(color: Palette.error),
+          ),
+        ],
       ],
     );
   }
 
-  Widget _buildDropdown() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Palette.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Palette.stroke),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _selectedReason,
-          isExpanded: true,
-          hint: Text("Выберите",
-              style: Styles.b2
-                  .copyWith(color: Palette.gray.withValues(alpha: 0.5))),
-          icon: const Icon(Icons.arrow_forward_ios, size: 16),
-          items: _reasons.map((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value, style: Styles.b2),
-            );
-          }).toList(),
-          onChanged: (newValue) {
-            setState(() {
-              _selectedReason = newValue;
-            });
-          },
+  void _showReasonModalPicker() {
+    showModalPicker<String>(
+      context: context,
+      title: 'Причина обращения',
+      provider: supportReasonsProvider,
+      isNoNeedSize: true,
+      itemBuilder: (reason) => reason,
+      initialValue: _selectedReason,
+      onConfirm: (reason) {
+        if (reason == null) return;
+        setState(() => _selectedReason = reason);
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  Widget _buildReasonModalPicker({String? errorText}) {
+    final displayText = _selectedReason ?? 'Выберите';
+    final displayColor = _selectedReason == null ? Palette.gray : Palette.black;
+    final borderColor = errorText != null ? Palette.error : Palette.stroke;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: _showReasonModalPicker,
+          child: Container(
+            height: 43,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Palette.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    displayText,
+                    style: Styles.b2.copyWith(color: displayColor),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios, size: 16),
+              ],
+            ),
+          ),
         ),
-      ),
+        if (errorText != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            errorText,
+            style: Styles.b3.copyWith(color: Palette.error),
+          ),
+        ],
+      ],
     );
   }
 
@@ -313,8 +402,13 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                   ),
                 ),
                 child: Center(
-                  child: Icon(Icons.add_photo_alternate_outlined,
-                      color: Palette.primaryLime),
+                  child: SvgPicture.asset(
+                    "assets/icons/add_a_photo.svg",
+                    colorFilter:
+                        ColorFilter.mode(Palette.primaryLime, BlendMode.srcIn),
+                    width: 24,
+                    height: 24,
+                  ),
                 ),
               ),
             );
@@ -339,14 +433,25 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                 right: 4,
                 child: GestureDetector(
                   onTap: () => _removeImage(index),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: const Color(0x8E8A8A80).withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: SvgPicture.asset(
+                          "assets/icons/bin_trash.svg",
+                          colorFilter:
+                              ColorFilter.mode(Palette.white, BlendMode.srcIn),
+                          width: 24,
+                          height: 24,
+                        ),
+                      ),
                     ),
-                    child: const Icon(Icons.delete_outline,
-                        size: 20, color: Colors.white),
                   ),
                 ),
               ),

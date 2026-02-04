@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/components/share_button.dart';
 import '../../data/models/news.dart';
+import '../../data/services/api_endpoints.dart';
 
 class NewsDetailsPage extends ConsumerStatefulWidget {
   final String id;
@@ -63,7 +64,7 @@ class _NewsDetailsPageState extends ConsumerState<NewsDetailsPage> {
                         bottom: Radius.circular(12),
                       ),
                       child: Image.network(
-                        'http://37.46.132.144:1337${news.image?.formats?.medium?.url ?? news.image?.url ?? ''}',
+                        '${ApiEndpoints.baseStrapiUrl}${news.image?.formats?.medium?.url ?? news.image?.url ?? ''}',
                         height: 360,
                         width: double.infinity,
                         fit: BoxFit.cover,

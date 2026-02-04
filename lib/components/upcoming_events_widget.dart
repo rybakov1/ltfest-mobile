@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import '../constants.dart';
 import '../data/models/upcoming_events.dart';
+import '../data/services/api_endpoints.dart';
 import '../pages/home/more_items_page.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/upcoming_provider.dart';
@@ -101,7 +102,7 @@ class UpcomingEventsWidget extends ConsumerWidget {
                     const BorderRadius.vertical(top: Radius.circular(12)),
                 child: imageUrl.isNotEmpty
                     ? Image.network(
-                        "http://37.46.132.144:1337$imageUrl",
+                        "${ApiEndpoints.baseStrapiUrl}$imageUrl",
                         height: 150,
                         width: double.infinity,
                         fit: BoxFit.cover,

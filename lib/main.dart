@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ltfest/notifications/push/push_notifications.dart';
+import 'package:ltfest/notifications/push/push_token_sync_provider.dart';
 import 'package:ltfest/router/router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -9,6 +11,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 Future<void> main() async {
  WidgetsFlutterBinding.ensureInitialized();
  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+
+  await PushNotifications.init();
 
   await SentryFlutter.init(
     (options) {
@@ -18,8 +22,6 @@ Future<void> main() async {
     },
     appRunner: () => runApp(SentryWidget(child: const ProviderScope(child: MyApp()))),
   );
-
-  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -27,6 +29,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(pushTokenSyncProvider);
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(

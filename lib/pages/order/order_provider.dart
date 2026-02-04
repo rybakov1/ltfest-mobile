@@ -386,6 +386,25 @@ class OrderNotifier extends StateNotifier<OrderState> {
           break;
       }
 
+      final basePrice = _ref.read(orderBasePriceProvider);
+      final discountAmount = max(0, basePrice - totalAmount);
+
+      promoState.whenOrNull(
+        success: (promoCode) {
+          details['Промокод'] = {
+            'Код': promoCode.code,
+            'Тип скидки': promoCode.discountType,
+            'Значение скидки': promoCode.discountValue,
+            if (discountAmount > 0) 'Скидка (₽)': discountAmount,
+          };
+        },
+      );
+
+      if (discountAmount > 0) {
+        details['Сумма без скидки (₽)'] = basePrice;
+        details['Итого (₽)'] = totalAmount;
+      }
+
       details.removeWhere((key, value) =>
           value == null || value == '' || (value is int && value == 0));
 

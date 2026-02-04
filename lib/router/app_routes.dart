@@ -42,4 +42,5 @@ class AppRoutes {
 
   static const String deleteAccount = '/delete';
   static const String support = '/support';
+  static const String supportSuccess = '/support/success';
 }

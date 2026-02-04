@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,14 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
+import 'package:ltfest/pages/shop/provider/shop_catalog_provider.dart';
 import 'package:ltfest/pages/shop/provider/shop_provider.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/laboratory_provider.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:shimmer/shimmer.dart';
-
-import '../../../data/models/product/product.dart';
 
 class ShopPage extends ConsumerStatefulWidget {
   const ShopPage({super.key});
@@ -99,7 +96,7 @@ class _ShopPageState extends ConsumerState<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
-    final products = ref.watch(productsNotifierProvider);
+    final catalog = ref.watch(shopCatalogProvider);
     final cartIsNotEmpty = ref.watch(cartTotalItemsProvider);
 
     return Scaffold(
@@ -156,9 +153,9 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                       color: Palette.white,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: products.when(
-                      data: (productList) {
-                        if (productList.products.isEmpty) {
+                    child: catalog.when(
+                      data: (catalogState) {
+                        if (catalogState.groups.isEmpty) {
                           return const Center(child: Text('Товары не найдены'));
                         }
 
@@ -168,7 +165,6 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                             GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              // GridView внутри скролла не должен скроллиться сам
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
@@ -176,16 +172,11 @@ class _ShopPageState extends ConsumerState<ShopPage> {
                                 mainAxisSpacing: 16,
                                 mainAxisExtent: 292,
                               ),
-                              itemCount: productList.products.length,
+                              itemCount: catalogState.groups.length,
                               itemBuilder: (context, index) {
-                                return ProductCard(product: productList.products[index]);
+                                return ProductCard(group: catalogState.groups[index]);
                               },
                             ),
-                            if (products.isLoading)
-                              const Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: CircularProgressIndicator(),
-                              ),
                             const SizedBox(height: 20),
                           ],
                         );
@@ -220,23 +211,15 @@ class _ShopPageState extends ConsumerState<ShopPage> {
 }
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key, required this.product});
+  const ProductCard({super.key, required this.group});
 
-  final Product product;
+  final ShopColorGroup group;
 
   @override
   Widget build(BuildContext context) {
-    if (product.variations.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    final firstVariation = product.variations.first;
-    final minPrice = product.variations.map((v) => v.price).reduce(min);
-    final availableSizes =
-        product.variations.map((v) => v.productSize.title).toSet().join(', ');
-
     return GestureDetector(
-      onTap: () => context.push('${AppRoutes.shop}/${product.id}'),
+      onTap: () => context.push(
+          '${AppRoutes.shop}/${group.product.id}?colorId=${group.color.id}'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -245,8 +228,7 @@ class ProductCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: CachedNetworkImage(
-                  imageUrl:
-                      'http://37.46.132.144:1337${firstVariation.images.first.url}',
+                  imageUrl: group.imageUrl,
                   height: 196,
                   memCacheHeight:
                       (196 * MediaQuery.of(context).devicePixelRatio).round(),
@@ -269,7 +251,7 @@ class ProductCard extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: FavoriteButton(
-                    id: product.id,
+                    id: group.product.id,
                     type: EventType.product,
                     color: const Color(0x8E8A8A80),
                   ),
@@ -279,24 +261,23 @@ class ProductCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            Utils.formatMoney(minPrice),
+            Utils.formatMoney(group.minPrice),
             style: Styles.h5,
           ),
           const SizedBox(height: 4),
           Text(
-            product.name,
+            group.product.name,
             style: Styles.b2.copyWith(color: Palette.gray),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           const Spacer(),
           const SizedBox(height: 4),
-          if (availableSizes.isNotEmpty)
-            Text(
-              availableSizes,
-              overflow: TextOverflow.ellipsis,
-              style: Styles.b3,
-            ),
+          Text(
+            group.subtitle,
+            overflow: TextOverflow.ellipsis,
+            style: Styles.b3,
+          ),
         ],
       ),
     );

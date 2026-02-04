@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/image_data.dart';
+import 'package:ltfest/data/services/api_endpoints.dart';
 import 'package:ltfest/pages/shop/provider/shop_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../components/favorite_button.dart';
@@ -25,8 +26,9 @@ final carouselPageIndexProvider =
 
 class ShopDetailsPage extends ConsumerStatefulWidget {
   final String id;
+  final int? initialColorId;
 
-  const ShopDetailsPage({super.key, required this.id});
+  const ShopDetailsPage({super.key, required this.id, this.initialColorId});
 
   @override
   ConsumerState<ShopDetailsPage> createState() => _ShopDetailsPageState();
@@ -336,9 +338,21 @@ class _ShopDetailsPageState extends ConsumerState<ShopDetailsPage> {
       if (!next.isLoading && next.hasValue && selectedVariation == null) {
         final variations = next.value!.variations;
         if (variations.isNotEmpty) {
-          ProductInStock initialVariation = variations.firstWhere(
+          final requestedColorId = widget.initialColorId;
+          Iterable<ProductInStock> candidates = variations;
+          if (requestedColorId != null) {
+            final filtered = variations
+                .where((v) => v.productColor.id == requestedColorId)
+                .toList(growable: false);
+            if (filtered.isNotEmpty) {
+              candidates = filtered;
+            }
+          }
+
+          final listCandidates = candidates.toList(growable: false);
+          final ProductInStock initialVariation = listCandidates.firstWhere(
             (v) => v.images.isNotEmpty,
-            orElse: () => variations.first,
+            orElse: () => listCandidates.first,
           );
           ref
               .read(productSelectionProvider(widget.id).notifier)
@@ -845,7 +859,8 @@ class ProductImageCarousel extends ConsumerWidget {
                   .state = page;
             },
             itemBuilder: (context, index) {
-              final imageUrl = "http://37.46.132.144:1337${images[index].url}";
+              final imageUrl =
+                  "${ApiEndpoints.baseStrapiUrl}${images[index].url}";
               return CachedNetworkImage(
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,

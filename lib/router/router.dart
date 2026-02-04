@@ -44,6 +44,7 @@ import '../providers/auth_state.dart';
 import '../providers/connectivity_provider.dart';
 import '../providers/user_provider.dart';
 import 'package:ltfest/features/support/presentation/pages/support_page.dart';
+import 'package:ltfest/features/support/presentation/pages/support_success_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final listenable = ValueNotifier<int>(0);
@@ -210,6 +211,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
+        path: AppRoutes.supportSuccess,
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: SupportSuccessPage(),
+        ),
+      ),
+      GoRoute(
         path: AppRoutes.user,
         pageBuilder: (context, state) => const NoTransitionPage(
           child: AccountSettingsPage(),
@@ -274,8 +281,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '${AppRoutes.shop}/:id',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
+          final initialColorId =
+              int.tryParse(state.uri.queryParameters['colorId'] ?? '');
           return NoTransitionPage(
-            child: ShopDetailsPage(id: id),
+            child: ShopDetailsPage(id: id, initialColorId: initialColorId),
           );
         },
       ),

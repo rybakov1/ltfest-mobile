@@ -7,9 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:ltfest/components/async_items_list_view.dart';
 import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/components/favorite_button.dart';
-import 'package:ltfest/components/story_widget.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/festival.dart';
+import 'package:ltfest/data/services/api_endpoints.dart';
 import 'package:ltfest/providers/festival_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:shimmer/shimmer.dart';
@@ -34,7 +34,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
   late final TextEditingController _searchController;
   late final ScrollController _scrollController;
   late final AnimationController _storiesAnimationController;
-  late final Animation<double> _storiesAnimation;
+  // late final Animation<double> _storiesAnimation;
 
   Map<String, Color> categoryColors = {
     'Театр': Palette.primaryLime,
@@ -58,10 +58,10 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
       vsync: this,
     );
 
-    _storiesAnimation = CurvedAnimation(
-      parent: _storiesAnimationController,
-      curve: Curves.easeOut,
-    );
+    // _storiesAnimation = CurvedAnimation(
+    //   parent: _storiesAnimationController,
+    //   curve: Curves.easeOut,
+    // );
 
     _storiesAnimationController.value = 1.0;
   }
@@ -535,7 +535,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
   }) {
     // Формируем URL заранее для чистоты кода
     final String imageUrl =
-        'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}';
+        '${ApiEndpoints.baseStrapiUrl}${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}';
 
     return GestureDetector(
       onTap: () {

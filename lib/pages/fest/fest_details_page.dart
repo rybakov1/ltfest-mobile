@@ -8,6 +8,7 @@ import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/components/share_button.dart';
 import 'package:ltfest/data/models/person.dart';
+import 'package:ltfest/data/services/api_endpoints.dart';
 import 'package:ltfest/pages/shop/presenter/shop_widget.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
 import 'package:ltfest/providers/festival_provider.dart';
@@ -186,7 +187,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
+                  '${ApiEndpoints.baseStrapiUrl}${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
                   height: 240,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -306,7 +307,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                         ),
                         child: CachedNetworkImage(
                           imageUrl:
-                              'http://37.46.132.144:1337${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
+                              '${ApiEndpoints.baseStrapiUrl}${festival.image?.formats?.medium?.url ?? festival.image?.url ?? ''}',
                           height: 340,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -616,7 +617,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                                     borderRadius: BorderRadius.circular(12),
                                     child: CachedNetworkImage(
                                       imageUrl:
-                                          'http://37.46.132.144:1337${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
+                                          '${ApiEndpoints.baseStrapiUrl}${person.image?.formats?.medium?.url ?? person.image?.url ?? ''}',
                                       height: 150,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
