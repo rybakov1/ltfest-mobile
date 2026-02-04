@@ -80,33 +80,72 @@ class HomePage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildCategoryButton(
-                                color: Palette.primaryLime,
-                                imagePath: 'assets/images/teatr.png',
-                                label: 'Театр',
-                                size: 90,
-                                offset: 30,
-                                onTap: () => context
-                                    .push("${AppRoutes.festivals}/Театр"),
+                        GestureDetector(
+                          onTap: () =>
+                              context.push("${AppRoutes.festivals}/Театр"),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: AlignmentDirectional.topEnd,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 84,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color.fromRGBO(240, 242, 245, 1),
+                                      Color.fromRGBO(231, 234, 237, 1),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 22.0, top: 32),
+                                  child: Text("Фестивали", style: Styles.h4),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              child: _buildCategoryButton(
-                                color: Palette.primaryPink,
-                                imagePath: 'assets/images/dance.png',
-                                label: 'Танцы',
-                                size: 80,
-                                offset: 20,
-                                onTap: () => context
-                                    .push("${AppRoutes.festivals}/Танцы"),
+                              Positioned(
+                                top: -40,
+                                right: 15,
+                                child: Image.asset(
+                                  'assets/images/teatr.png',
+                                  width: 125,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+
+                        // Row(
+                        //   children: [
+                        //     Expanded(
+                        //       child: _buildCategoryButton(
+                        //         color: Palette.primaryLime,
+                        //         imagePath: 'assets/images/teatr.png',
+                        //         label: 'Театр',
+                        //         size: 90,
+                        //         offset: 30,
+                        //         onTap: () => context
+                        //             .push("${AppRoutes.festivals}/Театр"),
+                        //       ),
+                        //     ),
+                        //     const SizedBox(width: 24),
+                        //     Expanded(
+                        //       child: _buildCategoryButton(
+                        //         color: Palette.primaryPink,
+                        //         imagePath: 'assets/images/dance.png',
+                        //         label: 'Танцы',
+                        //         size: 80,
+                        //         offset: 20,
+                        //         onTap: () => context
+                        //             .push("${AppRoutes.festivals}/Танцы"),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
                         const SizedBox(height: 24),
                         SizedBox(
                           height: 194,
@@ -181,7 +220,8 @@ class HomePage extends ConsumerWidget {
                                 label: 'LT Travel',
                                 isSmall: true,
                                 onTap: () async {
-                                  await launchUrl(Uri.parse("https://t.me/ltfest_travel"));
+                                  await launchUrl(
+                                      Uri.parse("https://t.me/ltfest_travel"));
                                 },
                               ),
                               _buildServiceCard(

@@ -12,7 +12,7 @@ Future<void> main() async {
  WidgetsFlutterBinding.ensureInitialized();
  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
 
-  await PushNotifications.init();
+  // await PushNotifications.init();
 
   await SentryFlutter.init(
     (options) {
@@ -29,7 +29,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(pushTokenSyncProvider);
+    // ref.watch(pushTokenSyncProvider);
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
