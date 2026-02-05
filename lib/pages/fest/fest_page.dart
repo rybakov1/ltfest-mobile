@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/async_items_list_view.dart';
-import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/festival.dart';
@@ -579,11 +578,8 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    CustomChipWithName(
-                      selectedDirection: festival.direction.title,
-                    ),
                     FavoriteButton(
                       id: festival.id,
                       type: EventType.festival,

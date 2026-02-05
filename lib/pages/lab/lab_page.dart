@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ltfest/components/async_items_list_view.dart';
-import 'package:ltfest/components/custom_chip.dart';
 import 'package:ltfest/components/favorite_button.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/providers/favorites_provider.dart';
@@ -430,14 +429,6 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                         padding: const EdgeInsets.only(top: 16, bottom: 16),
                         child: Row(
                           children: [
-                            CustomChip(
-                              onDirectionSelected: (direction) {
-                                ref
-                                    .read(selectedDirectionProvider.notifier)
-                                    .state = direction;
-                              },
-                            ),
-                            const SizedBox(width: 8),
                             GestureDetector(
                               onTap: () => _showLearningTypeBottomSheet(
                                   laboratoryState, selectedDirection),
@@ -622,7 +613,6 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
                                   padding: const EdgeInsets.only(bottom: 20.0),
                                   child: _buildEventCard(
                                     laboratory: laboratory,
-                                    category: selectedDirection ?? 'Театр',
                                     context: context,
                                   ),
                                 );
@@ -642,7 +632,6 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
 
   Widget _buildEventCard({
     required Laboratory laboratory,
-    required String category,
     required BuildContext context,
   }) {
     String url =
@@ -679,11 +668,8 @@ class _LaboratoryPageState extends ConsumerState<LaboratoryPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    CustomChipWithName(
-                      selectedDirection: laboratory.direction.title,
-                    ),
                     FavoriteButton(
                       id: laboratory.id,
                       type: EventType.laboratory,
