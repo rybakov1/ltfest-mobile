@@ -318,7 +318,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
         child: CustomScrollView(
           physics: const NeverScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(child: LTAppBar(title: title)),
+            const SliverToBoxAdapter(child: LTAppBar(title: "Фестивали")),
             SliverFillRemaining(
               child: Container(
                 padding:

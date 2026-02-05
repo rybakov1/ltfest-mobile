@@ -7,7 +7,7 @@ import 'package:ltfest/notifications/push/push_token_sync_provider.dart';
 import 'package:ltfest/router/router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-// 11.10 build
+// 05.02 build
 Future<void> main() async {
  WidgetsFlutterBinding.ensureInitialized();
  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);

@@ -15,8 +15,6 @@ import 'package:ltfest/providers/user_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
 import '../../components/modal.dart';
 import '../../data/models/age_category.dart';
-import '../../data/models/direction.dart';
-import '../../providers/direction_provider.dart';
 
 class AccountSettingsPage extends ConsumerStatefulWidget {
   const AccountSettingsPage({super.key});
@@ -29,7 +27,6 @@ class AccountSettingsPage extends ConsumerStatefulWidget {
 class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
   int _selectedIndex = 0;
   bool _isLoading = false;
-  Direction? _selectedDirection;
   AgeCategory? _selectedAgeCategory;
 
   final _emailController = TextEditingController();
@@ -38,7 +35,6 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
   final _educationController = TextEditingController();
   final _masterFioController = TextEditingController();
   final _collectiveNameController = TextEditingController();
-  final _collectiveDirectionController = TextEditingController();
   final _collectiveCityController = TextEditingController();
   final _collectiveAgeCategoryController = TextEditingController();
   final _collectiveCountParticipateController = TextEditingController();
@@ -66,14 +62,12 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       _educationController.text = user.educationPlace ?? '';
       _masterFioController.text = user.masterName ?? '';
       _collectiveNameController.text = user.collectiveName ?? '';
-      _collectiveDirectionController.text = user.direction?.title ?? '';
       _collectiveCityController.text = user.collectiveCity ?? '';
       _collectiveAgeCategoryController.text = user.age_category?.title ?? '';
       _collectiveCountParticipateController.text =
           user.count_participant.toString() != "null"
               ? user.count_participant.toString()
               : '';
-      _selectedDirection = user.direction;
       _selectedAgeCategory = user.age_category;
     }
   }
@@ -86,7 +80,6 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
     _educationController.dispose();
     _masterFioController.dispose();
     _collectiveNameController.dispose();
-    _collectiveDirectionController.dispose();
     _collectiveCityController.dispose();
     _collectiveAgeCategoryController.dispose();
     _collectiveCountParticipateController.dispose();
@@ -115,8 +108,8 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text('Ошибка форматирования даты рождения. Проверьте поле.'),
+            content: const Text(
+                'Ошибка форматирования даты рождения. Проверьте поле.'),
             backgroundColor: Palette.error,
           ),
         );
@@ -134,7 +127,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         email: _emailController.text.trim(),
         birthDate: formattedBirthDate,
         residence: _cityController.text.trim(),
-        directionId: _selectedDirection!.id,
+        directionId: null,
         activityId: user.activity?.id ?? 0,
         collectiveName: _collectiveNameController.text.trim(),
         collectiveCity: _collectiveCityController.text.trim(),
@@ -155,21 +148,6 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       );
       setState(() => _isLoading = false);
     }
-  }
-
-  void _showDirectionPicker() {
-    showModalPicker<Direction>(
-      context: context,
-      title: 'Направление',
-      isNoNeedSize: true,
-      provider: directionsProvider,
-      itemBuilder: (direction) => direction.title,
-      initialValue: _selectedDirection,
-      onConfirm: (direction) {
-        setState(() => _selectedDirection = direction);
-        Navigator.pop(context);
-      },
-    );
   }
 
   void _showAgeCategoryPicker() {
@@ -306,11 +284,8 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                                 child: _CollectiveForm(
                                   collectiveNameController:
                                       _collectiveNameController,
-                                  collectiveDirectionController:
-                                      _collectiveDirectionController,
                                   collectiveCityController:
                                       _collectiveCityController,
-                                  showDirectionPicker: _showDirectionPicker,
                                   showAgeCategoryPicker: _showAgeCategoryPicker,
                                   collectiveAgeCategoryController:
                                       _collectiveAgeCategoryController,
@@ -652,19 +627,15 @@ Widget _buildModalSelectorField({
 // --- Форма "Коллектив" ---
 class _CollectiveForm extends StatelessWidget {
   final TextEditingController collectiveNameController;
-  final TextEditingController collectiveDirectionController;
   final TextEditingController collectiveCityController;
   final TextEditingController collectiveAgeCategoryController;
   final TextEditingController collectiveCountParticipateController;
 
-  final VoidCallback showDirectionPicker; // Добавляем параметр
   final VoidCallback showAgeCategoryPicker; // Добавляем параметр
 
   const _CollectiveForm({
     required this.collectiveNameController,
-    required this.collectiveDirectionController,
     required this.collectiveCityController,
-    required this.showDirectionPicker,
     required this.collectiveAgeCategoryController,
     required this.collectiveCountParticipateController,
     required this.showAgeCategoryPicker,
@@ -673,7 +644,6 @@ class _CollectiveForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.findAncestorStateOfType<_AccountSettingsPageState>();
-    final selectedDirection = state?._selectedDirection;
     final selectedAgeCategory = state?._selectedAgeCategory;
 
     return Padding(
@@ -684,15 +654,6 @@ class _CollectiveForm extends StatelessWidget {
             label: 'Название коллектива',
             controller: collectiveNameController,
             isRequired: false,
-          ),
-          const SizedBox(height: 16),
-          _buildModalSelectorField(
-            label: 'Направление*',
-            value: selectedDirection?.title,
-            hint: 'Выберите направление',
-            onTap: showDirectionPicker,
-            validator: (_) =>
-                selectedDirection == null ? 'Выберите направление' : null,
           ),
           const SizedBox(height: 16),
           _buildEditableField(

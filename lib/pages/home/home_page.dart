@@ -82,7 +82,7 @@ class HomePage extends ConsumerWidget {
                         const SizedBox(height: 20),
                         GestureDetector(
                           onTap: () =>
-                              context.push("${AppRoutes.festivals}/Театр"),
+                              context.push("${AppRoutes.festivals}/Фестивали"),
                           child: Stack(
                             clipBehavior: Clip.none,
                             alignment: AlignmentDirectional.topEnd,

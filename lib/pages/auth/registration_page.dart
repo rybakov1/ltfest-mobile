@@ -15,27 +15,7 @@ import 'package:ltfest/router/app_routes.dart';
 import '../../components/modal.dart';
 import '../../data/models/activity.dart';
 import '../../data/models/age_category.dart';
-import '../../data/models/direction.dart';
 import '../../data/services/api_service.dart';
-
-final directionsProvider = FutureProvider<List<Direction>>((ref) async {
-  final api = ref.watch(apiServiceProvider);
-  try {
-    // Добавляем таймаут на 10 секунд
-    final directions = await api.getDirections().timeout(
-      const Duration(seconds: 10),
-      onTimeout: () {
-        throw TimeoutException(
-            'Запрос к API directions превысил время ожидания');
-      },
-    );
-    print('Directions loaded: ${directions.length}'); // Отладка
-    return directions;
-  } catch (e, stackTrace) {
-    print('Error in directionsProvider: $e\n$stackTrace'); // Отладка
-    rethrow; // Пробрасываем ошибку для обработки в asyncValue.when
-  }
-});
 
 final activitiesProvider = FutureProvider<List<Activity>>((ref) async {
   final api = ref.watch(apiServiceProvider);
@@ -78,10 +58,8 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
   final _collectiveCityController = TextEditingController();
   final _participantCountController = TextEditingController();
 
-  Direction? _selectedDirection;
   Activity? _selectedActivity;
   AgeCategory? _selectedAgeCategory;
-
 
   bool _isSecondStep = false;
   bool _isLoading = false;
@@ -154,7 +132,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         email: _emailController.text.trim(),
         birthDate: formattedBirthDate,
         residence: _residenceCityController.text.trim(),
-        directionId: _selectedDirection!.id,
+        directionId: null,
         activityId: _selectedActivity!.id,
         collectiveName: _collectiveNameController.text.trim(),
         collectiveCity: _collectiveCityController.text.trim(),
@@ -388,14 +366,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           validator: (_) => _selectedActivity == null ? 'Выберите' : null,
         ),
         const SizedBox(height: 16),
-        _buildModalSelectorField(
-          label: 'Направление*',
-          value: _selectedDirection?.title,
-          hint: 'Выберите',
-          onTap: () => _showDirectionPicker(),
-          validator: (_) => _selectedDirection == null ? 'Выберите' : null,
-        ),
-        const SizedBox(height: 16),
         _buildTextFormField(
           'Название коллектива',
           "Название",
@@ -449,7 +419,9 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       children: [
         Text(label,
             style: Styles.b3.copyWith(
-                color: enabled ? Palette.gray : Palette.gray.withValues(alpha: 0.5))),
+                color: enabled
+                    ? Palette.gray
+                    : Palette.gray.withValues(alpha: 0.5))),
         const SizedBox(height: 6),
         TextFormField(
           enabled: enabled,
@@ -501,21 +473,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
           },
         ),
       ],
-    );
-  }
-
-  void _showDirectionPicker() {
-    showModalPicker<Direction>(
-      context: context,
-      title: 'Направление',
-      isNoNeedSize: true,
-      provider: directionsProvider,
-      itemBuilder: (direction) => direction.title,
-      initialValue: _selectedDirection,
-      onConfirm: (direction) {
-        setState(() => _selectedDirection = direction);
-        Navigator.pop(context);
-      },
     );
   }
 
