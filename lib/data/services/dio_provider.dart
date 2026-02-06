@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:io';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
+import 'package:sentry_dio/sentry_dio.dart';
 import '../../providers/connectivity_provider.dart';
 import 'token_storage.dart';
 
@@ -79,8 +80,8 @@ class AuthInterceptor extends Interceptor {
 Dio dio(Ref ref) {
   final dio = Dio(
     BaseOptions(
-      // baseUrl: 'http://37.46.132.144:1337',
-      baseUrl: 'http://37.46.132.144:1338',
+      baseUrl: 'http://37.46.132.144:1337', // prod
+      // baseUrl: 'http://37.46.132.144:1338', // staging
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 60),
       headers: {'Content-Type': 'application/json; charset=utf-8'},
@@ -106,6 +107,7 @@ Dio dio(Ref ref) {
   ));
 
   dio.interceptors.add(AuthInterceptor(ref));
+  dio.addSentry();
 
   return dio;
 }

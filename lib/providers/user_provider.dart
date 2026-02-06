@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../data/models/user.dart';
 import '../data/services/api_service.dart';
 import '../data/services/token_storage.dart';
@@ -29,11 +30,24 @@ class AuthNotifier extends _$AuthNotifier {
         state = AuthState.needsRegistration(user: user);
       } else {
         state = AuthState.authenticated(user: user);
+        
+        // Sentry User Context
+        Sentry.configureScope((scope) {
+          scope.setUser(SentryUser(
+            id: user.id.toString(),
+            email: user.email,
+            username: user.phone,
+            data: {
+              'name': user.firstname,
+            },
+          ));
+        });
       }
     } catch (e) {
       if (e is DioException && e.response?.statusCode == 401) {
         await _tokenStorage.clearToken();
         state = const AuthState.unauthenticated();
+        Sentry.configureScope((scope) => scope.setUser(null));
       } else {
         state = const AuthState.unauthenticated();
       }
@@ -67,11 +81,23 @@ class AuthNotifier extends _$AuthNotifier {
         if (user.firstname == user.phone || user.firstname == "Unknown") {
           return AuthState.needsRegistration(user: user);
         } else {
+           // Sentry User Context
+          Sentry.configureScope((scope) {
+            scope.setUser(SentryUser(
+              id: user.id.toString(),
+              email: user.email,
+              username: user.phone,
+              data: {
+                'name': user.firstname,
+              },
+            ));
+          });
           return AuthState.authenticated(user: user);
         }
       } catch (e) {
         print('Error verifying OTP or loading user: ${e.toString()}');
         //await _tokenStorage.clearToken(); // Очистка токена при ошибке
+        Sentry.captureException(e, stackTrace: StackTrace.current);
         return const AuthState
             .unauthenticated(); // Возвращаем дефолтное состояние
       }
@@ -84,7 +110,6 @@ class AuthNotifier extends _$AuthNotifier {
     required String email,
     required String birthDate,
     required String residence,
-    int? directionId,
     int? activityId,
     String? collectiveName,
     String? collectiveCity,
@@ -110,7 +135,6 @@ class AuthNotifier extends _$AuthNotifier {
           email: email,
           birthDate: birthDate,
           residence: residence,
-          directionId: directionId,
           activityId: activityId,
           collectiveName: collectiveName,
           collectiveCity: collectiveCity,
@@ -120,9 +144,23 @@ class AuthNotifier extends _$AuthNotifier {
           ageCategoryId: ageCategoryId,
           userId: userId!,
         );
+
+         // Update Sentry User Context
+        Sentry.configureScope((scope) {
+          scope.setUser(SentryUser(
+            id: updatedUser.id.toString(),
+            email: updatedUser.email,
+            username: updatedUser.phone,
+            data: {
+              'name': updatedUser.firstname,
+            },
+          ));
+        });
+
         return AuthState.authenticated(user: updatedUser);
-      } catch (e) {
+      } catch (e, stackTrace) {
         print('Error updating profile: $e');
+        Sentry.captureException(e, stackTrace: stackTrace);
         return currentState!;
       }
     });
@@ -133,8 +171,10 @@ class AuthNotifier extends _$AuthNotifier {
     try {
       await _tokenStorage.clearToken();
       state = const AsyncData(AuthState.unauthenticated());
+      Sentry.configureScope((scope) => scope.setUser(null));
     } catch (e, st) {
       state = AsyncError(e, st);
+      Sentry.captureException(e, stackTrace: st);
     }
   }
 }

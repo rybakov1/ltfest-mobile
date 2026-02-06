@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -19,6 +20,7 @@ Future<void> main() async {
       options.dsn = 'https://143ecd79de653a2d4c96a9a5ffc84ace@o4510202029801472.ingest.de.sentry.io/4510202031112272';
       options.tracesSampleRate = 1.0;
       options.profilesSampleRate = 1.0;
+      options.environment = kDebugMode ? 'development' : 'production';
     },
     appRunner: () => runApp(SentryWidget(child: const ProviderScope(child: MyApp()))),
   );

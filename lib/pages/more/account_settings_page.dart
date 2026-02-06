@@ -127,7 +127,6 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         email: _emailController.text.trim(),
         birthDate: formattedBirthDate,
         residence: _cityController.text.trim(),
-        directionId: null,
         activityId: user.activity?.id ?? 0,
         collectiveName: _collectiveNameController.text.trim(),
         collectiveCity: _collectiveCityController.text.trim(),

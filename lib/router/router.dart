@@ -45,6 +45,7 @@ import '../providers/connectivity_provider.dart';
 import '../providers/user_provider.dart';
 import 'package:ltfest/features/support/presentation/pages/support_page.dart';
 import 'package:ltfest/features/support/presentation/pages/support_success_page.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final listenable = ValueNotifier<int>(0);
@@ -54,6 +55,9 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.splash,
     refreshListenable: listenable,
+    observers: [
+      SentryNavigatorObserver(),
+    ],
     redirect: (BuildContext context, GoRouterState state) {
       final connectivity = ref.read(connectivityStatusProvider).value;
       final currentLocation = state.uri.path;

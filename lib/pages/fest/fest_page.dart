@@ -285,8 +285,6 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
 
   @override
   Widget build(BuildContext context) {
-    final String title = widget.category;
-
     final festivalsAsync =
         ref.watch(festivalsNotifierProvider(widget.category));
     final festivalState = festivalsAsync.valueOrNull ?? const FestivalsState();

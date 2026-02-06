@@ -132,7 +132,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         email: _emailController.text.trim(),
         birthDate: formattedBirthDate,
         residence: _residenceCityController.text.trim(),
-        directionId: null,
         activityId: _selectedActivity!.id,
         collectiveName: _collectiveNameController.text.trim(),
         collectiveCity: _collectiveCityController.text.trim(),
