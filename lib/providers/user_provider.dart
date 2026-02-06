@@ -17,39 +17,42 @@ class AuthNotifier extends _$AuthNotifier {
   @override
   FutureOr<AuthState> build() async {
     final start = DateTime.now();
+    ref.watch(authInvalidationProvider);
     final accessToken = await _tokenStorage.getJwt();
     AuthState state;
 
     if (accessToken == null) {
       state = const AuthState.unauthenticated();
-    }
-
-    try {
-      final user = await _apiService.getMe();
-      if (user.firstname == user.phone || user.firstname == "Unknown") {
-        state = AuthState.needsRegistration(user: user);
-      } else {
-        state = AuthState.authenticated(user: user);
-        
-        // Sentry User Context
-        Sentry.configureScope((scope) {
-          scope.setUser(SentryUser(
-            id: user.id.toString(),
-            email: user.email,
-            username: user.phone,
-            data: {
-              'name': user.firstname,
-            },
-          ));
-        });
-      }
-    } catch (e) {
-      if (e is DioException && e.response?.statusCode == 401) {
-        await _tokenStorage.clearToken();
-        state = const AuthState.unauthenticated();
-        Sentry.configureScope((scope) => scope.setUser(null));
-      } else {
-        state = const AuthState.unauthenticated();
+      Sentry.configureScope((scope) => scope.setUser(null));
+    } else {
+      try {
+        final user = await _apiService.getMe();
+        if (user.firstname == user.phone || user.firstname == "Unknown") {
+          state = AuthState.needsRegistration(user: user);
+        } else {
+          state = AuthState.authenticated(user: user);
+          Sentry.configureScope((scope) {
+            scope.setUser(SentryUser(
+              id: user.id.toString(),
+              email: user.email,
+              username: user.phone,
+              data: {
+                'name': user.firstname,
+              },
+            ));
+          });
+        }
+      } catch (e) {
+        if (e is DioException &&
+            (e.response?.statusCode == 401 ||
+                e.response?.statusCode == 403)) {
+          await _tokenStorage.clearToken();
+          state = const AuthState.unauthenticated();
+          Sentry.configureScope((scope) => scope.setUser(null));
+        } else {
+          state = const AuthState.unauthenticated();
+          Sentry.configureScope((scope) => scope.setUser(null));
+        }
       }
     }
 

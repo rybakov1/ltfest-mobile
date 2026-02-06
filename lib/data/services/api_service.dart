@@ -94,7 +94,10 @@ class ApiService {
           throw ApiException(
               message: 'Invalid response: Missing jwt or user data');
         }
-        await _tokenStorage.saveToken(jwt: jwt);
+        await _tokenStorage.saveToken(
+          jwt: jwt,
+          serverBaseUrl: _dio.options.baseUrl,
+        );
         return User.fromJson(userData);
       } else {
         throw ApiException(

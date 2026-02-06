@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:sentry_dio/sentry_dio.dart';
 import '../../providers/connectivity_provider.dart';
+import 'api_endpoints.dart';
 import 'token_storage.dart';
 
 part 'dio_provider.g.dart';
@@ -61,9 +62,9 @@ class AuthInterceptor extends Interceptor {
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     print('Error: ${err.message}, Response: ${err.response?.data}, Status: ${err.response?.statusCode}');
 
-    if (err.response?.statusCode == 401) {
-      // Очищаем токен, если он невалиден
+    if (err.response?.statusCode == 401 || err.response?.statusCode == 403) {
       await _ref.read(tokenStorageProvider).clearToken();
+      _ref.read(authInvalidationProvider.notifier).state++;
     }
 
     return super.onError(err, handler);
@@ -80,8 +81,7 @@ class AuthInterceptor extends Interceptor {
 Dio dio(Ref ref) {
   final dio = Dio(
     BaseOptions(
-      baseUrl: 'http://37.46.132.144:1337', // prod
-      // baseUrl: 'http://37.46.132.144:1338', // staging
+      baseUrl: ApiEndpoints.baseStrapiUrl,
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 60),
       headers: {'Content-Type': 'application/json; charset=utf-8'},

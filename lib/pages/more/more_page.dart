@@ -60,10 +60,10 @@ class MorePage extends ConsumerWidget {
                   ),
                   const SizedBox(width: 4),
                   _ActionCard(
-                    iconPath: 'assets/icons/social/wa.svg',
-                    title: "Связаться с нами",
+                    iconPath: 'assets/icons/phone.svg',
+                    title: "8 800-707-4487",
                     onTap: () {
-                      launchUrl(Uri.parse('https://t.me/ltfest'),
+                      launchUrl(Uri.parse('tel:88007074487'),
                           mode: LaunchMode.externalApplication);
                     },
                   ),
