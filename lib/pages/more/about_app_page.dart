@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 Future<void> _launchUrl(String urlString) async {
   final uri = Uri.parse(urlString);
   await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -66,7 +65,7 @@ class AboutAppPage extends StatelessWidget {
                     const SizedBox(height: 24),
                     Image.asset('assets/images/logo_black.png', height: 60),
                     const SizedBox(height: 16),
-                    Text('Версия 0.1.1, сборка 3',
+                    Text('Версия 0.2.0, сборка 25',
                         style: Styles.b2.copyWith(color: Palette.gray)),
                     const SizedBox(height: 24),
                     _buildContactInfo(),
@@ -105,13 +104,17 @@ class AboutAppPage extends StatelessWidget {
         const Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            _SocialIcon(iconPath: 'assets/icons/social/vk.svg', url: 'https://vk.com/lt_fest'),
-            SizedBox(width: 8),
             _SocialIcon(
-                iconPath: 'assets/icons/social/yt.svg',
-                url: 'https://youtube.com'),
+                iconPath: 'assets/icons/social/vk.svg',
+                url: 'https://vk.com/lt_fest'),
             SizedBox(width: 8),
-            _SocialIcon(iconPath: 'assets/icons/social/tg.svg', url: 'https://t.me'),
+            // _SocialIcon(
+            //     iconPath: 'assets/icons/social/yt.svg',
+            //     url: 'https://youtube.com'),
+            // SizedBox(width: 8),
+            _SocialIcon(
+                iconPath: 'assets/icons/social/tg.svg',
+                url: 'https://t.me/ltfest'),
           ],
         ),
       ],
@@ -145,7 +148,11 @@ class AboutAppPage extends StatelessWidget {
     return const Column(
       children: [
         _InfoLinkTile(
-            title: 'Политика обработки персональных данных',
+            title: 'Политика обработки персональных данных ООО «МФД ЛТ»',
+            url: 'https://lt-world.ru/policy'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+            title: 'Политика обработки персональных данных ООО «ЛТ Фест»',
             url: 'https://ltfest.ru/privacy'),
         SizedBox(height: 8),
         _InfoLinkTile(
@@ -154,38 +161,28 @@ class AboutAppPage extends StatelessWidget {
                 'https://drive.google.com/file/d/186cxovf8pIoNBP2-jQk7pE_hBB8cK12U/view'),
         SizedBox(height: 8),
         _InfoLinkTile(
-          title: 'Сценическая речь',
-          url:
-              'https://drive.google.com/file/d/1aH7Pxm-mCRl0GzoxvhE_fpIhduvHLlY1/view',
-        ),
+            title: 'Сценическая речь',
+            url:
+                'https://drive.google.com/file/d/1aH7Pxm-mCRl0GzoxvhE_fpIhduvHLlY1/view'),
         SizedBox(height: 8),
         _InfoLinkTile(
-            title: 'ПУБЛИЧНЫЙ ДОГОВОР-ОФЕРТА',
+            title: 'Публичный договор-оферта',
             url: 'https://ltfest.ru/offerdoc'),
         SizedBox(height: 8),
         _InfoLinkTile(
-            title: 'ДОПОЛНЕНИЕ К ПУБЛИЧНОМУ ДОГОВОРУ-ОФЕРТЕ',
+            title: 'Дополнение к публичному договору-оферте',
             url: 'https://ltfest.ru/offerdoc/add'),
         SizedBox(height: 8),
         _InfoLinkTile(
-            title: 'ПУБЛИЧНЫЙ ДОГОВОР-ОФЕРТА',
-            url: 'https://ltfest.ru/offerdoc'),
-        SizedBox(height: 8),
-        _InfoLinkTile(
-            title:
-                'ДОГОВОР-ОФЕРТА О ПРЕДОСТАВЛЕНИИ КАРТЫ ЛОЯЛЬНОСТИ "LT PRIORITY"',
-            url: 'https://ltfest.ru/offercards'),
-        SizedBox(height: 8),
-        _InfoLinkTile(
-            title: 'ПУБЛИЧНЫЙ ДОГОВОР-ОФЕРТА LT Счастливчик',
+            title: 'Публичный договор-оферта «LT Счастливчик»',
             url: 'https://ltfest.ru/winner'),
         SizedBox(height: 8),
         _InfoLinkTile(
-            title: 'ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ «LT Консьерж»',
+            title: 'Пользовательское соглашение «LT Консьерж»',
             url: 'https://ltfest.ru/concierge'),
         SizedBox(height: 8),
         _InfoLinkTile(
-          title: 'ПУБЛИЧНЫЙ ДОГОВОР-ОФЕРТА (международные фестивали)',
+          title: 'Публичный договор-оферта (международные фестивали)',
           url: 'https://ltfest.ru/offerglobal',
         ),
       ],
@@ -193,7 +190,6 @@ class AboutAppPage extends StatelessWidget {
   }
 }
 
-// Переиспользуемый виджет для иконки соц. сети
 class _SocialIcon extends StatelessWidget {
   final String iconPath;
   final String url;
@@ -210,7 +206,6 @@ class _SocialIcon extends StatelessWidget {
   }
 }
 
-// Переиспользуемый виджет для ссылок внизу
 class _InfoLinkTile extends StatelessWidget {
   final String title;
   final String url;

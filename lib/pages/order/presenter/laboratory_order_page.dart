@@ -68,27 +68,46 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
   @override
   void initState() {
     super.initState();
-    ref.read(orderProvider.notifier).startOrder(
-          type: OrderType.laboratory,
-          item: widget.args.learningType,
-          laboratory: widget.args.laboratory,
-        );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(orderProvider.notifier).startOrder(
+            type: OrderType.laboratory,
+            item: widget.args.learningType,
+            laboratory: widget.args.laboratory,
+          );
 
-    final state = ref.read(orderProvider);
-    final user = ref.read(userProvider);
+      // Обновляем контроллеры значениями из стейта, если они там уже есть
+      final state = ref.read(orderProvider);
+      final user = ref.read(userProvider);
 
-    _nameController = TextEditingController(text: state.payerName);
-    _emailController = TextEditingController(text: state.email);
-    _phoneController = TextEditingController(text: state.phone);
+      if (_nameController.text != state.payerName) {
+        _nameController.text = state.payerName;
+      }
+      if (_emailController.text != state.email) {
+        _emailController.text = state.email;
+      }
+      if (_phoneController.text != state.phone) {
+        _phoneController.text = state.phone;
+      }
+      if (_birthDateController.text != state.birthdate) {
+        _birthDateController.text = state.birthdate;
+      }
+      if (_cityController.text != (user?.residence ?? '')) {
+        _cityController.text = user?.residence ?? '';
+      }
+      if (_collectiveNameController.text != state.collectiveName) {
+        _collectiveNameController.text = state.collectiveName;
+      }
+    });
 
-    _birthDateController = TextEditingController(text: state.birthdate);
-    _cityController = TextEditingController(text: user?.residence ?? '');
-
-    _collectiveNameController =
-        TextEditingController(text: state.collectiveName);
+    // Инициализируем контроллеры пустыми значениями
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _birthDateController = TextEditingController();
+    _cityController = TextEditingController();
+    _collectiveNameController = TextEditingController();
     _educationController = TextEditingController();
     _collectiveInfoController = TextEditingController();
-
     loyaltyCardController = TextEditingController();
     promocodeController = TextEditingController();
   }
@@ -353,7 +372,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
               if (!_validateForm()) return;
               ref
                   .read(orderProvider.notifier)
-                  .placeOrderAndPay(context, totalPrice);
+                  .placeOrderAndPay(context, totalPrice, ref.read(orderBasePriceProvider));
             },
             child: Text("Оплатить", style: Styles.button1),
           ),

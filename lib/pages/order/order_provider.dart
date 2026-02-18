@@ -306,7 +306,8 @@ class OrderNotifier extends StateNotifier<OrderState> {
     }
   }
 
-  Future<void> placeOrderAndPay(BuildContext context, int totalAmount) async {
+  Future<void> placeOrderAndPay(
+      BuildContext context, int totalAmount, int basePrice) async {
     if (state.isLoading) return;
     state = state.copyWith(isLoading: true);
 
@@ -386,7 +387,6 @@ class OrderNotifier extends StateNotifier<OrderState> {
           break;
       }
 
-      final basePrice = _ref.read(orderBasePriceProvider);
       final discountAmount = max(0, basePrice - totalAmount);
 
       promoState.whenOrNull(
@@ -419,6 +419,9 @@ class OrderNotifier extends StateNotifier<OrderState> {
         'type': _mapOrderTypeToStrapi(state.orderType),
         'details': orderedDetailsList,
         'user': user?.id ?? 0,
+        'festival': state.orderType == OrderType.festival
+            ? (state.festival?.id ?? state.selectedFestival?.id)
+            : null,
         'festival_tariff':
             state.payableItem is FestivalTariff ? state.payableItem?.id : null,
         'laboratory_learning_type':

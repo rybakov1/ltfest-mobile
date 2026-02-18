@@ -393,7 +393,7 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
                     if (!_validateForm()) return;
                     ref
                         .read(orderProvider.notifier)
-                        .placeOrderAndPay(context, finalTotal);
+                        .placeOrderAndPay(context, finalTotal, ref.read(orderBasePriceProvider));
                   },
             child: orderState.isLoading
                 ? const SizedBox(

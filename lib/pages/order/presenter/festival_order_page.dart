@@ -57,19 +57,36 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
   void initState() {
     super.initState();
 
-    ref.read(orderProvider.notifier).startOrder(
-          type: OrderType.festival,
-          item: widget.args.tariff,
-          festival: widget.args.festival,
-        );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(orderProvider.notifier).startOrder(
+            type: OrderType.festival,
+            item: widget.args.tariff,
+            festival: widget.args.festival,
+          );
 
-    final state = ref.read(orderProvider);
+      // Обновляем контроллеры значениями из стейта, если они там уже есть
+      // Это нужно, если startOrder синхронно обновит стейт или если мы возвращаемся на экран
+      final state = ref.read(orderProvider);
+      if (_nameController.text != state.payerName) {
+        _nameController.text = state.payerName;
+      }
+      if (_emailController.text != state.email) {
+        _emailController.text = state.email;
+      }
+      if (_phoneController.text != state.phone) {
+        _phoneController.text = state.phone;
+      }
+      if (_collectiveNameController.text != state.collectiveName) {
+        _collectiveNameController.text = state.collectiveName ?? '';
+      }
+    });
 
-    _nameController = TextEditingController(text: state.payerName);
-    _emailController = TextEditingController(text: state.email);
-    _phoneController = TextEditingController(text: state.phone);
-    _collectiveNameController =
-        TextEditingController(text: state.collectiveName);
+    // Инициализируем контроллеры пустыми значениями или значениями по умолчанию
+    // Реальные данные прилетят после startOrder в addPostFrameCallback или через listener
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _collectiveNameController = TextEditingController();
     _participantsNameController = TextEditingController();
     loyaltyCardController = TextEditingController();
     promocodeController = TextEditingController();
@@ -289,7 +306,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
               if (!_validateForm()) {
                 return;
               }
-              orderNotifier.placeOrderAndPay(context, totalPrice);
+              orderNotifier.placeOrderAndPay(context, totalPrice, ref.read(orderBasePriceProvider));
             },
             child: Text("Оплатить", style: Styles.button1),
           ),

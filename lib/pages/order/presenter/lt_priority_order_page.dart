@@ -69,24 +69,44 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
   @override
   void initState() {
     super.initState();
-    ref.read(orderProvider.notifier).startOrder(
-          type: OrderType.ltpriority,
-          item: widget.tariff,
-        );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(orderProvider.notifier).startOrder(
+            type: OrderType.ltpriority,
+            item: widget.tariff,
+          );
 
-    final state = ref.read(orderProvider);
-    final user = ref.read(userProvider);
+      // Обновляем контроллеры значениями из стейта
+      final state = ref.read(orderProvider);
+      final user = ref.read(userProvider);
 
-    _nameController = TextEditingController(text: state.payerName);
-    _emailController = TextEditingController(text: state.email);
-    _phoneController = TextEditingController(text: state.phone);
-    _cityController = TextEditingController(text: user!.residence!);
+      if (_nameController.text != state.payerName) {
+        _nameController.text = state.payerName;
+      }
+      if (_emailController.text != state.email) {
+        _emailController.text = state.email;
+      }
+      if (_phoneController.text != state.phone) {
+        _phoneController.text = state.phone;
+      }
+      if (_cityController.text != (user?.residence ?? '')) {
+        _cityController.text = user?.residence ?? '';
+      }
+      if (_collectiveNameController.text != state.collectiveName) {
+        _collectiveNameController.text = state.collectiveName ?? '';
+      }
+      if (_addressController.text != state.deliveryAddress) {
+        _addressController.text = state.deliveryAddress;
+      }
+    });
 
-    _collectiveNameController =
-        TextEditingController(text: state.collectiveName);
-    _addressController = TextEditingController(text: state.deliveryAddress);
+    // Инициализируем контроллеры
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _cityController = TextEditingController();
+    _collectiveNameController = TextEditingController();
+    _addressController = TextEditingController();
     _passportController = TextEditingController();
-
     _loyaltyCardController = TextEditingController();
     _promocodeController = TextEditingController();
   }
@@ -322,7 +342,7 @@ class _LtPriorityOrderPageState extends ConsumerState<LtPriorityOrderPage> {
               if (!_validateForm()) return;
               ref
                   .read(orderProvider.notifier)
-                  .placeOrderAndPay(context, totalPrice);
+                  .placeOrderAndPay(context, totalPrice, ref.read(orderBasePriceProvider));
             },
             child: Text("Оплатить", style: Styles.button1),
           ),
