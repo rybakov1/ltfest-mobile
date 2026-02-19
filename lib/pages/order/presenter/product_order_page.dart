@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/festival.dart';
+import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/pages/order/order_provider.dart';
 
 import '../../../components/modal.dart';
@@ -157,8 +158,17 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
     });
 
     final baseTotal = ref.watch(orderBasePriceProvider); // <--- Начальная цена
+    final serviceFee =
+        ref.watch(orderServiceFeeProvider); // Комиссия платежного сервиса
     final finalTotal =
         ref.watch(orderTotalPriceProvider); // <--- Итоговая цена со скидкой
+
+    final cartState = ref.watch(cartProvider);
+    final itemsCount = cartState.valueOrNull?.items.fold<int>(
+          0,
+          (sum, item) => sum + item.quantity,
+        ) ??
+        0;
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -240,6 +250,8 @@ class _ProductOrderPageState extends ConsumerState<ProductOrderPage> {
                         promocodeController,
                         cartTotal: baseTotal,
                         finalTotal: finalTotal,
+                        serviceFee: serviceFee,
+                        serviceMultiplier: itemsCount,
                       ),
                     ),
                     const SizedBox(height: 2),

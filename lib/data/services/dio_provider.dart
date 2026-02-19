@@ -88,7 +88,8 @@ Dio dio(Ref ref) {
     ),
   );
 
-  (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
+  (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+    final client = HttpClient();
     client.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
     return client;

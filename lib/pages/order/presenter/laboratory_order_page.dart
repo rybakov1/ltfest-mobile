@@ -160,6 +160,7 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
     final validationState = ref.watch(laboratoryFormValidationProvider);
 
     final baseTotal = ref.watch(orderBasePriceProvider);
+    final serviceFee = ref.watch(orderServiceFeeProvider);
     final finalTotal = ref.watch(orderTotalPriceProvider);
 
     return Scaffold(
@@ -299,6 +300,8 @@ class _LaboratoryOrderPageState extends ConsumerState<LaboratoryOrderPage> {
                             promocodeController,
                             cartTotal: baseTotal,
                             finalTotal: finalTotal,
+                            serviceFee: serviceFee,
+                            serviceMultiplier: orderState.seatCount,
                           ),
                         ],
                       ),

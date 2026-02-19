@@ -44,8 +44,7 @@ class AuthNotifier extends _$AuthNotifier {
         }
       } catch (e) {
         if (e is DioException &&
-            (e.response?.statusCode == 401 ||
-                e.response?.statusCode == 403)) {
+            (e.response?.statusCode == 401 || e.response?.statusCode == 403)) {
           await _tokenStorage.clearToken();
           state = const AuthState.unauthenticated();
           Sentry.configureScope((scope) => scope.setUser(null));
@@ -84,7 +83,7 @@ class AuthNotifier extends _$AuthNotifier {
         if (user.firstname == user.phone || user.firstname == "Unknown") {
           return AuthState.needsRegistration(user: user);
         } else {
-           // Sentry User Context
+          // Sentry User Context
           Sentry.configureScope((scope) {
             scope.setUser(SentryUser(
               id: user.id.toString(),
@@ -98,8 +97,6 @@ class AuthNotifier extends _$AuthNotifier {
           return AuthState.authenticated(user: user);
         }
       } catch (e) {
-        print('Error verifying OTP or loading user: ${e.toString()}');
-        //await _tokenStorage.clearToken(); // Очистка токена при ошибке
         Sentry.captureException(e, stackTrace: StackTrace.current);
         return const AuthState
             .unauthenticated(); // Возвращаем дефолтное состояние
@@ -118,9 +115,8 @@ class AuthNotifier extends _$AuthNotifier {
     String? collectiveCity,
     String? masterName,
     String? educationPlace,
-    int? count_participant,
+    int? countParticipant,
     int? ageCategoryId,
-
   }) async {
     final currentState = state.value;
     final userId = await _tokenStorage.getUserId();
@@ -129,7 +125,6 @@ class AuthNotifier extends _$AuthNotifier {
           "Пользователь не аутентифицирован для завершения регистрации.");
     }
 
-    // state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       try {
         final updatedUser = await _apiService.updateProfile(
@@ -143,12 +138,11 @@ class AuthNotifier extends _$AuthNotifier {
           collectiveCity: collectiveCity,
           masterName: masterName,
           educationPlace: educationPlace,
-          count_participant: count_participant,
+          countParticipant: countParticipant,
           ageCategoryId: ageCategoryId,
           userId: userId!,
         );
 
-         // Update Sentry User Context
         Sentry.configureScope((scope) {
           scope.setUser(SentryUser(
             id: updatedUser.id.toString(),

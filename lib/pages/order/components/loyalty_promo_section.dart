@@ -198,6 +198,8 @@
 //     ],
 //   );
 // }
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -207,23 +209,24 @@ import '../../../providers/promocode_provider.dart';
 import 'custom_text_fields.dart';
 
 Widget buildLoyaltyOrPromoSection(
-    BuildContext context,
-    User user,
-    String? type,
-    WidgetRef ref,
-    TextEditingController loyaltyCardController, // Можно оставить в аргументах, чтобы не ломать вызов функции
-    TextEditingController promocodeController, {
-      required int cartTotal,
-      required int finalTotal,
-    }) {
+  BuildContext context,
+  User user,
+  String? type,
+  WidgetRef ref,
+  TextEditingController loyaltyCardController, // Можно оставить в аргументах, чтобы не ломать вызов функции
+  TextEditingController promocodeController, {
+  required int cartTotal,
+  required int finalTotal,
+  required int serviceFee,
+  int? serviceMultiplier,
+}) {
   final promoCodeState = ref.watch(promoCodeNotifierProvider);
   final promoCodeNotifier = ref.read(promoCodeNotifierProvider.notifier);
 
-  // Карты лояльности временно отключены, поэтому не следим за их состоянием
-  // final loyaltyCardState = ref.watch(loyaltyCardNotifierProvider);
-  // final loyaltyCardNotifier = ref.read(loyaltyCardNotifierProvider.notifier);
-
-  final discountAmount = cartTotal - finalTotal;
+  // Комиссия платежного сервиса передаётся отдельно.
+  // Скидка считается как: (база + комиссия) - итог.
+  final rawDiscountAmount = cartTotal + serviceFee - finalTotal;
+  final discountAmount = max(0, rawDiscountAmount);
 
   // Логика лейбла только для промокодов
   final String discountLabel = promoCodeState.maybeMap(
@@ -316,12 +319,28 @@ Widget buildLoyaltyOrPromoSection(
 
       const SizedBox(height: 16),
 
-      // Итоговые расчеты (без изменений визуально, но данные теперь только от промокода или чистые)
+      // Итоговые расчеты
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(type ?? "Стоимость заказа", style: Styles.b2),
           Text(Utils.formatMoney(cartTotal), style: Styles.h4),
+        ],
+      ),
+      const SizedBox(height: 8),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            serviceMultiplier != null && serviceMultiplier > 1
+                ? "Комиссия платежного сервиса (x$serviceMultiplier)"
+                : "Комиссия платежного сервиса",
+            style: Styles.b2,
+          ),
+          Text(
+            Utils.formatMoney(serviceFee),
+            style: Styles.h4,
+          ),
         ],
       ),
       const SizedBox(height: 8),

@@ -77,7 +77,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
         _phoneController.text = state.phone;
       }
       if (_collectiveNameController.text != state.collectiveName) {
-        _collectiveNameController.text = state.collectiveName ?? '';
+        _collectiveNameController.text = state.collectiveName;
       }
     });
 
@@ -129,6 +129,7 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
     final validationState = ref.watch(formValidationProvider);
 
     final baseTotal = ref.watch(orderBasePriceProvider);
+    final serviceFee = ref.watch(orderServiceFeeProvider);
     final finalTotal = ref.watch(orderTotalPriceProvider);
 
     return Scaffold(
@@ -237,6 +238,8 @@ class _FestivalOrderPageState extends ConsumerState<FestivalOrderPage> {
                             promocodeController,
                             cartTotal: baseTotal,
                             finalTotal: finalTotal,
+                            serviceFee: serviceFee,
+                            serviceMultiplier: orderState.seatCount,
                           ),
                         ],
                       ),

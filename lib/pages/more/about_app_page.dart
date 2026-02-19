@@ -148,14 +148,6 @@ class AboutAppPage extends StatelessWidget {
     return const Column(
       children: [
         _InfoLinkTile(
-            title: 'Политика обработки персональных данных ООО «МФД ЛТ»',
-            url: 'https://lt-world.ru/policy'),
-        SizedBox(height: 8),
-        _InfoLinkTile(
-            title: 'Политика обработки персональных данных ООО «ЛТ Фест»',
-            url: 'https://ltfest.ru/privacy'),
-        SizedBox(height: 8),
-        _InfoLinkTile(
             title: 'Основы режиссуры',
             url:
                 'https://drive.google.com/file/d/186cxovf8pIoNBP2-jQk7pE_hBB8cK12U/view'),
@@ -166,6 +158,14 @@ class AboutAppPage extends StatelessWidget {
                 'https://drive.google.com/file/d/1aH7Pxm-mCRl0GzoxvhE_fpIhduvHLlY1/view'),
         SizedBox(height: 8),
         _InfoLinkTile(
+            title: 'Политика обработки персональных данных ООО «ЛТ Фест»',
+            url: 'https://ltfest.ru/privacy'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
+            title: 'Политика обработки персональных данных ООО «МФД ЛТ»',
+            url: 'https://lt-world.ru/policy'),
+        SizedBox(height: 8),
+        _InfoLinkTile(
             title: 'Публичный договор-оферта',
             url: 'https://ltfest.ru/offerdoc'),
         SizedBox(height: 8),
@@ -174,17 +174,17 @@ class AboutAppPage extends StatelessWidget {
             url: 'https://ltfest.ru/offerdoc/add'),
         SizedBox(height: 8),
         _InfoLinkTile(
+          title: 'Публичный договор-оферта (международные фестивали)',
+          url: 'https://lt-world.ru/doc',
+        ),
+        SizedBox(height: 8),
+        _InfoLinkTile(
             title: 'Публичный договор-оферта «LT Счастливчик»',
             url: 'https://ltfest.ru/winner'),
         SizedBox(height: 8),
         _InfoLinkTile(
             title: 'Пользовательское соглашение «LT Консьерж»',
             url: 'https://ltfest.ru/concierge'),
-        SizedBox(height: 8),
-        _InfoLinkTile(
-          title: 'Публичный договор-оферта (международные фестивали)',
-          url: 'https://ltfest.ru/offerglobal',
-        ),
       ],
     );
   }

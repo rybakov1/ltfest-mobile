@@ -83,7 +83,7 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       backgroundColor: Palette.background,
       body: SafeArea(
         child: Padding(

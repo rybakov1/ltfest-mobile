@@ -131,7 +131,7 @@ class ApiService {
     required String residence,
     int? activityId,
     int? ageCategoryId,
-    int? count_participant,
+    int? countParticipant,
     String? collectiveName,
     String? collectiveCity,
     String? educationPlace,
@@ -150,7 +150,7 @@ class ApiService {
         'collectiveName': collectiveName,
         'collectiveCity': collectiveCity,
         'educationPlace': educationPlace,
-        'count_participant': count_participant,
+        'count_participant': countParticipant,
         'age_category': ageCategoryId,
         'masterName': masterName,
       };

@@ -63,12 +63,12 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       _masterFioController.text = user.masterName ?? '';
       _collectiveNameController.text = user.collectiveName ?? '';
       _collectiveCityController.text = user.collectiveCity ?? '';
-      _collectiveAgeCategoryController.text = user.age_category?.title ?? '';
+      _collectiveAgeCategoryController.text = user.ageCategory?.title ?? '';
       _collectiveCountParticipateController.text =
-          user.count_participant.toString() != "null"
-              ? user.count_participant.toString()
+          user.countParticipant.toString() != "null"
+              ? user.countParticipant.toString()
               : '';
-      _selectedAgeCategory = user.age_category;
+      _selectedAgeCategory = user.ageCategory;
     }
   }
 
@@ -132,7 +132,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
         collectiveCity: _collectiveCityController.text.trim(),
         educationPlace: _educationController.text.trim(),
         masterName: _masterFioController.text.trim(),
-        count_participant: _collectiveCountParticipateController.text.isEmpty
+        countParticipant: _collectiveCountParticipateController.text.isEmpty
             ? 0
             : int.parse(_collectiveCountParticipateController.text.trim()),
         ageCategoryId: _selectedAgeCategory?.id,

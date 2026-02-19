@@ -229,7 +229,7 @@ Widget _buildEditableField({
           hintText: hint,
           filled: readOnly,
           fillColor:
-              readOnly ? Colors.grey.withOpacity(0.1) : Colors.transparent,
+              readOnly ? Colors.grey.withValues(alpha: 0.1) : Colors.transparent,
           hintStyle: Styles.b2.copyWith(color: Palette.gray),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -104,10 +104,10 @@ class PaymentFailureScreen extends ConsumerWidget {
                                           extra: args);
                                     }
                                     break;
-                                  case OrderType.ltpriority:
-                                    context.push(AppRoutes.priorityOrder,
-                                        extra: orderState.payableItem);
-                                    break;
+                                  // case OrderType.ltpriority:
+                                  //   context.push(AppRoutes.priorityOrder,
+                                  //       extra: orderState.payableItem);
+                                  //   break;
                                 }
                               },
                               child:

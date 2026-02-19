@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/data/models/laboratory_order_args_model.dart';
-import 'package:ltfest/data/models/priority_tariff.dart';
 import 'package:ltfest/pages/more/about_app_page.dart';
 import 'package:ltfest/pages/more/account_settings_page.dart';
 import 'package:ltfest/pages/more/app_settings_page.dart';
 import 'package:ltfest/pages/news/news_details_page.dart';
 import 'package:ltfest/pages/order/presenter/festival_order_page.dart';
 import 'package:ltfest/pages/order/presenter/laboratory_order_page.dart';
-import 'package:ltfest/pages/order/presenter/lt_priority_order_page.dart';
 import 'package:ltfest/pages/order/presenter/product_order_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_details_page.dart';
 import 'package:ltfest/pages/shop/presenter/shop_page.dart';
@@ -357,13 +355,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           return NoTransitionPage(
             child: LaboratoryOrderPage(args: args),
           );
-        },
-      ),
-      GoRoute(
-        path: AppRoutes.priorityOrder,
-        pageBuilder: (context, state) {
-          final tariff = state.extra as PriorityTariff;
-          return NoTransitionPage(child: LtPriorityOrderPage(tariff: tariff));
         },
       ),
       GoRoute(

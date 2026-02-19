@@ -28,8 +28,10 @@ mixin _$User {
   String? get ltpriority;
   String? get educationPlace;
   String? get masterName;
-  int? get count_participant;
-  AgeCategory? get age_category;
+  @JsonKey(name: 'count_participant')
+  int? get countParticipant;
+  @JsonKey(name: 'age_category')
+  AgeCategory? get ageCategory;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -71,10 +73,10 @@ mixin _$User {
                 other.educationPlace == educationPlace) &&
             (identical(other.masterName, masterName) ||
                 other.masterName == masterName) &&
-            (identical(other.count_participant, count_participant) ||
-                other.count_participant == count_participant) &&
-            (identical(other.age_category, age_category) ||
-                other.age_category == age_category));
+            (identical(other.countParticipant, countParticipant) ||
+                other.countParticipant == countParticipant) &&
+            (identical(other.ageCategory, ageCategory) ||
+                other.ageCategory == ageCategory));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -95,12 +97,12 @@ mixin _$User {
       ltpriority,
       educationPlace,
       masterName,
-      count_participant,
-      age_category);
+      countParticipant,
+      ageCategory);
 
   @override
   String toString() {
-    return 'User(id: $id, firstname: $firstname, lastname: $lastname, email: $email, birthdate: $birthdate, residence: $residence, phone: $phone, activity: $activity, direction: $direction, collectiveName: $collectiveName, collectiveCity: $collectiveCity, ltpriority: $ltpriority, educationPlace: $educationPlace, masterName: $masterName, count_participant: $count_participant, age_category: $age_category)';
+    return 'User(id: $id, firstname: $firstname, lastname: $lastname, email: $email, birthdate: $birthdate, residence: $residence, phone: $phone, activity: $activity, direction: $direction, collectiveName: $collectiveName, collectiveCity: $collectiveCity, ltpriority: $ltpriority, educationPlace: $educationPlace, masterName: $masterName, countParticipant: $countParticipant, ageCategory: $ageCategory)';
   }
 }
 
@@ -124,12 +126,12 @@ abstract mixin class $UserCopyWith<$Res> {
       String? ltpriority,
       String? educationPlace,
       String? masterName,
-      int? count_participant,
-      AgeCategory? age_category});
+      @JsonKey(name: 'count_participant') int? countParticipant,
+      @JsonKey(name: 'age_category') AgeCategory? ageCategory});
 
   $ActivityCopyWith<$Res>? get activity;
   $DirectionCopyWith<$Res>? get direction;
-  $AgeCategoryCopyWith<$Res>? get age_category;
+  $AgeCategoryCopyWith<$Res>? get ageCategory;
 }
 
 /// @nodoc
@@ -158,8 +160,8 @@ class _$UserCopyWithImpl<$Res> implements $UserCopyWith<$Res> {
     Object? ltpriority = freezed,
     Object? educationPlace = freezed,
     Object? masterName = freezed,
-    Object? count_participant = freezed,
-    Object? age_category = freezed,
+    Object? countParticipant = freezed,
+    Object? ageCategory = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -218,13 +220,13 @@ class _$UserCopyWithImpl<$Res> implements $UserCopyWith<$Res> {
           ? _self.masterName
           : masterName // ignore: cast_nullable_to_non_nullable
               as String?,
-      count_participant: freezed == count_participant
-          ? _self.count_participant
-          : count_participant // ignore: cast_nullable_to_non_nullable
+      countParticipant: freezed == countParticipant
+          ? _self.countParticipant
+          : countParticipant // ignore: cast_nullable_to_non_nullable
               as int?,
-      age_category: freezed == age_category
-          ? _self.age_category
-          : age_category // ignore: cast_nullable_to_non_nullable
+      ageCategory: freezed == ageCategory
+          ? _self.ageCategory
+          : ageCategory // ignore: cast_nullable_to_non_nullable
               as AgeCategory?,
     ));
   }
@@ -261,13 +263,13 @@ class _$UserCopyWithImpl<$Res> implements $UserCopyWith<$Res> {
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $AgeCategoryCopyWith<$Res>? get age_category {
-    if (_self.age_category == null) {
+  $AgeCategoryCopyWith<$Res>? get ageCategory {
+    if (_self.ageCategory == null) {
       return null;
     }
 
-    return $AgeCategoryCopyWith<$Res>(_self.age_category!, (value) {
-      return _then(_self.copyWith(age_category: value));
+    return $AgeCategoryCopyWith<$Res>(_self.ageCategory!, (value) {
+      return _then(_self.copyWith(ageCategory: value));
     });
   }
 }
@@ -380,8 +382,8 @@ extension UserPatterns on User {
             String? ltpriority,
             String? educationPlace,
             String? masterName,
-            int? count_participant,
-            AgeCategory? age_category)?
+            @JsonKey(name: 'count_participant') int? countParticipant,
+            @JsonKey(name: 'age_category') AgeCategory? ageCategory)?
         $default, {
     required TResult orElse(),
   }) {
@@ -403,8 +405,8 @@ extension UserPatterns on User {
             _that.ltpriority,
             _that.educationPlace,
             _that.masterName,
-            _that.count_participant,
-            _that.age_category);
+            _that.countParticipant,
+            _that.ageCategory);
       case _:
         return orElse();
     }
@@ -440,8 +442,8 @@ extension UserPatterns on User {
             String? ltpriority,
             String? educationPlace,
             String? masterName,
-            int? count_participant,
-            AgeCategory? age_category)
+            @JsonKey(name: 'count_participant') int? countParticipant,
+            @JsonKey(name: 'age_category') AgeCategory? ageCategory)
         $default,
   ) {
     final _that = this;
@@ -462,8 +464,8 @@ extension UserPatterns on User {
             _that.ltpriority,
             _that.educationPlace,
             _that.masterName,
-            _that.count_participant,
-            _that.age_category);
+            _that.countParticipant,
+            _that.ageCategory);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -498,8 +500,8 @@ extension UserPatterns on User {
             String? ltpriority,
             String? educationPlace,
             String? masterName,
-            int? count_participant,
-            AgeCategory? age_category)?
+            @JsonKey(name: 'count_participant') int? countParticipant,
+            @JsonKey(name: 'age_category') AgeCategory? ageCategory)?
         $default,
   ) {
     final _that = this;
@@ -520,8 +522,8 @@ extension UserPatterns on User {
             _that.ltpriority,
             _that.educationPlace,
             _that.masterName,
-            _that.count_participant,
-            _that.age_category);
+            _that.countParticipant,
+            _that.ageCategory);
       case _:
         return null;
     }
@@ -546,8 +548,8 @@ class _User implements User {
       this.ltpriority,
       this.educationPlace,
       this.masterName,
-      this.count_participant,
-      this.age_category});
+      @JsonKey(name: 'count_participant') this.countParticipant,
+      @JsonKey(name: 'age_category') this.ageCategory});
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   @override
@@ -579,9 +581,11 @@ class _User implements User {
   @override
   final String? masterName;
   @override
-  final int? count_participant;
+  @JsonKey(name: 'count_participant')
+  final int? countParticipant;
   @override
-  final AgeCategory? age_category;
+  @JsonKey(name: 'age_category')
+  final AgeCategory? ageCategory;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -628,10 +632,10 @@ class _User implements User {
                 other.educationPlace == educationPlace) &&
             (identical(other.masterName, masterName) ||
                 other.masterName == masterName) &&
-            (identical(other.count_participant, count_participant) ||
-                other.count_participant == count_participant) &&
-            (identical(other.age_category, age_category) ||
-                other.age_category == age_category));
+            (identical(other.countParticipant, countParticipant) ||
+                other.countParticipant == countParticipant) &&
+            (identical(other.ageCategory, ageCategory) ||
+                other.ageCategory == ageCategory));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -652,12 +656,12 @@ class _User implements User {
       ltpriority,
       educationPlace,
       masterName,
-      count_participant,
-      age_category);
+      countParticipant,
+      ageCategory);
 
   @override
   String toString() {
-    return 'User(id: $id, firstname: $firstname, lastname: $lastname, email: $email, birthdate: $birthdate, residence: $residence, phone: $phone, activity: $activity, direction: $direction, collectiveName: $collectiveName, collectiveCity: $collectiveCity, ltpriority: $ltpriority, educationPlace: $educationPlace, masterName: $masterName, count_participant: $count_participant, age_category: $age_category)';
+    return 'User(id: $id, firstname: $firstname, lastname: $lastname, email: $email, birthdate: $birthdate, residence: $residence, phone: $phone, activity: $activity, direction: $direction, collectiveName: $collectiveName, collectiveCity: $collectiveCity, ltpriority: $ltpriority, educationPlace: $educationPlace, masterName: $masterName, countParticipant: $countParticipant, ageCategory: $ageCategory)';
   }
 }
 
@@ -682,15 +686,15 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
       String? ltpriority,
       String? educationPlace,
       String? masterName,
-      int? count_participant,
-      AgeCategory? age_category});
+      @JsonKey(name: 'count_participant') int? countParticipant,
+      @JsonKey(name: 'age_category') AgeCategory? ageCategory});
 
   @override
   $ActivityCopyWith<$Res>? get activity;
   @override
   $DirectionCopyWith<$Res>? get direction;
   @override
-  $AgeCategoryCopyWith<$Res>? get age_category;
+  $AgeCategoryCopyWith<$Res>? get ageCategory;
 }
 
 /// @nodoc
@@ -719,8 +723,8 @@ class __$UserCopyWithImpl<$Res> implements _$UserCopyWith<$Res> {
     Object? ltpriority = freezed,
     Object? educationPlace = freezed,
     Object? masterName = freezed,
-    Object? count_participant = freezed,
-    Object? age_category = freezed,
+    Object? countParticipant = freezed,
+    Object? ageCategory = freezed,
   }) {
     return _then(_User(
       id: null == id
@@ -779,13 +783,13 @@ class __$UserCopyWithImpl<$Res> implements _$UserCopyWith<$Res> {
           ? _self.masterName
           : masterName // ignore: cast_nullable_to_non_nullable
               as String?,
-      count_participant: freezed == count_participant
-          ? _self.count_participant
-          : count_participant // ignore: cast_nullable_to_non_nullable
+      countParticipant: freezed == countParticipant
+          ? _self.countParticipant
+          : countParticipant // ignore: cast_nullable_to_non_nullable
               as int?,
-      age_category: freezed == age_category
-          ? _self.age_category
-          : age_category // ignore: cast_nullable_to_non_nullable
+      ageCategory: freezed == ageCategory
+          ? _self.ageCategory
+          : ageCategory // ignore: cast_nullable_to_non_nullable
               as AgeCategory?,
     ));
   }
@@ -822,13 +826,13 @@ class __$UserCopyWithImpl<$Res> implements _$UserCopyWith<$Res> {
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $AgeCategoryCopyWith<$Res>? get age_category {
-    if (_self.age_category == null) {
+  $AgeCategoryCopyWith<$Res>? get ageCategory {
+    if (_self.ageCategory == null) {
       return null;
     }
 
-    return $AgeCategoryCopyWith<$Res>(_self.age_category!, (value) {
-      return _then(_self.copyWith(age_category: value));
+    return $AgeCategoryCopyWith<$Res>(_self.ageCategory!, (value) {
+      return _then(_self.copyWith(ageCategory: value));
     });
   }
 }

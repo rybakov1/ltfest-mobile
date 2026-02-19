@@ -137,7 +137,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         collectiveCity: _collectiveCityController.text.trim(),
         ageCategoryId:
             _isCollectiveFieldsEnabled ? _selectedAgeCategory?.id : null,
-        count_participant: _isCollectiveFieldsEnabled
+        countParticipant: _isCollectiveFieldsEnabled
             ? int.tryParse(_participantCountController.text.trim())
             : null,
       );
@@ -446,7 +446,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                    color: Palette.stroke.withOpacity(0.5), width: 1)),
+                    color: Palette.stroke.withValues(alpha: 0.5), width: 1)),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Palette.primaryLime, width: 1.5)),
@@ -530,7 +530,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       children: [
         Text(label,
             style: Styles.b3.copyWith(
-                color: enabled ? Palette.gray : Palette.gray.withOpacity(0.5))),
+                color: enabled ? Palette.gray : Palette.gray.withValues(alpha: 0.5))),
         const SizedBox(height: 6),
         TextFormField(
           controller: TextEditingController(text: value ?? ''),
@@ -543,7 +543,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             hintText: hint,
             hintStyle: Styles.b2.copyWith(color: Palette.gray),
             filled: !enabled,
-            fillColor: Palette.background.withOpacity(0.5),
+            fillColor: Palette.background.withValues(alpha: 0.5),
             suffixIcon:
                 Icon(Icons.chevron_right, size: 20, color: Palette.gray),
             contentPadding:
@@ -554,7 +554,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
             disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                    color: Palette.stroke.withOpacity(0.5), width: 1)),
+                    color: Palette.stroke.withValues(alpha: 0.5), width: 1)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Palette.stroke, width: 1)),
@@ -616,7 +616,7 @@ class CitySearchField extends StatelessWidget {
       children: [
         Text(label,
             style: Styles.b3.copyWith(
-                color: enabled ? Palette.gray : Palette.gray.withOpacity(0.5))),
+                color: enabled ? Palette.gray : Palette.gray.withValues(alpha: 0.5))),
         const SizedBox(height: 6),
         TypeAheadField<String>(
           hideOnUnfocus: false,
@@ -665,7 +665,7 @@ class CitySearchField extends StatelessWidget {
                   .copyWith(color: enabled ? Palette.black : Palette.gray),
               decoration: InputDecoration(
                 filled: !enabled,
-                fillColor: Palette.background.withOpacity(0.5),
+                fillColor: Palette.background.withValues(alpha: 0.5),
                 suffixIcon: Icon(
                   Icons.keyboard_arrow_right,
                   size: 20,
@@ -686,7 +686,7 @@ class CitySearchField extends StatelessWidget {
                 disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                        color: Palette.stroke.withOpacity(0.5), width: 1)),
+                        color: Palette.stroke.withValues(alpha: 0.5), width: 1)),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide:

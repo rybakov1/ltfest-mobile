@@ -23,8 +23,8 @@ abstract class User with _$User {
     String? ltpriority,
     String? educationPlace,
     String? masterName,
-    int? count_participant,
-    AgeCategory? age_category,
+    @JsonKey(name: 'count_participant') int? countParticipant,
+    @JsonKey(name: 'age_category') AgeCategory? ageCategory,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
