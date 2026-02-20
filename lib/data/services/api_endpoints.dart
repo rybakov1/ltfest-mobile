@@ -57,6 +57,6 @@ abstract class ApiEndpoints {
   static const String supportMessages = '/api/support-messages';
   static const String pushTokens = '/api/push-tokens';
 
-  static const String baseStrapiUrl = 'http://37.46.132.144:1338'; //staging
-  // static const String baseStrapiUrl = 'http://37.46.132.144:1337'; //prod
+  // static const String baseStrapiUrl = 'http://37.46.132.144:1338'; //staging
+  static const String baseStrapiUrl = 'http://37.46.132.144:1337'; //prod
 }
