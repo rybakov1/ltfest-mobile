@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "647489793588",
+    "project_id": "ltfest-push",
+    "storage_bucket": "ltfest-push.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647489793588:android:3df615f44f7878a43e2461",
+        "android_client_info": {
+          "package_name": "com.ltfest.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBurkCdSfxCu6975BzHC_WTYbGhXg43t3w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,7 @@
 name: ltfest
 description: "LT Fest"
 publish_to: 'none'
-version: 0.1.9+24
+version: 0.2.2+27
 
 uses-material-design: true
 
@@ -45,10 +45,11 @@ dependencies:
   dio_cache_interceptor: ^4.0.5
   http_cache_hive_store: ^5.0.1
   image_picker: ^1.2.1
-  # firebase_core: ^4.4.0
-  # firebase_messaging: ^16.1.1
-  # flutter_local_notifications: ^20.0.0
-  # huawei_push: ^6.14.0+300
+  firebase_core: ^4.4.0
+  firebase_messaging: ^16.1.1
+  flutter_local_notifications: ^20.0.0
+  huawei_push: ^6.14.0+300
+  google_api_availability: ^5.0.1
 
 dev_dependencies:
   sentry_dart_plugin: ^3.1.1

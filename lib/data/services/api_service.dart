@@ -808,33 +808,6 @@ class ApiService {
     }
   }
 
-  Future<void> registerPushToken({
-    required int userId,
-    required String token,
-    required String provider,
-    required String platform,
-  }) async {
-    try {
-      final data = {
-        'data': {
-          'users_permissions_user': userId,
-          'token': token,
-          'provider': provider,
-          'platform': platform,
-        }
-      };
-
-      _logRequest('POST', ApiEndpoints.pushTokens, data);
-
-      final response = await _dio.post(ApiEndpoints.pushTokens, data: data);
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ApiException(message: 'Не удалось зарегистрировать push token');
-      }
-    } catch (e) {
-      _handleError(e);
-    }
-  }
-
   Future<void> createAccountDeletionRequest({
     required int userId,
     required String reason,

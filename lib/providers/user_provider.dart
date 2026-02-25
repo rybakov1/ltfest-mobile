@@ -5,6 +5,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import '../data/models/user.dart';
 import '../data/services/api_service.dart';
 import '../data/services/token_storage.dart';
+import '../notifications/push_service.dart';
 import 'auth_state.dart';
 
 part 'user_provider.g.dart';
@@ -13,6 +14,7 @@ part 'user_provider.g.dart';
 class AuthNotifier extends _$AuthNotifier {
   late final ApiService _apiService = ref.read(apiServiceProvider);
   late final TokenStorage _tokenStorage = ref.read(tokenStorageProvider);
+  late final PushNotificationService _pushService = ref.read(pushNotificationServiceProvider);
 
   @override
   FutureOr<AuthState> build() async {
@@ -27,6 +29,8 @@ class AuthNotifier extends _$AuthNotifier {
     } else {
       try {
         final user = await _apiService.getMe();
+        _pushService.init(user.id);
+
         if (user.firstname == user.phone || user.firstname == "Unknown") {
           state = AuthState.needsRegistration(user: user);
         } else {
@@ -79,7 +83,7 @@ class AuthNotifier extends _$AuthNotifier {
       try {
         await _apiService.verifyOtp(phone, otp);
         final user = await _apiService.getMe();
-
+        _pushService.init(user.id);
         if (user.firstname == user.phone || user.firstname == "Unknown") {
           return AuthState.needsRegistration(user: user);
         } else {
