@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'dart:io';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:sentry_dio/sentry_dio.dart';
 import '../../providers/connectivity_provider.dart';
@@ -48,11 +47,8 @@ class AuthInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer $token';
     }
 
-    print('Request: ${options.method} ${options.uri}');
-    if (options.headers['Authorization'] != null) {
-      print('Authorization header sent.');
-    } else {
-      print('Authorization header NOT sent.');
+    if (kDebugMode) {
+      debugPrint('[Auth] ${options.method} ${options.uri}');
     }
 
     return super.onRequest(options, handler);
@@ -60,7 +56,9 @@ class AuthInterceptor extends Interceptor {
 
   @override
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
-    print('Error: ${err.message}, Response: ${err.response?.data}, Status: ${err.response?.statusCode}');
+    if (kDebugMode) {
+      debugPrint('[Auth] Error ${err.response?.statusCode}: ${err.message}');
+    }
 
     if (err.response?.statusCode == 401 || err.response?.statusCode == 403) {
       await _ref.read(tokenStorageProvider).clearToken();
@@ -72,7 +70,9 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print('Response: ${response.statusCode}'); // Убрал data для краткости лога
+    if (kDebugMode) {
+      debugPrint('[Auth] Response: ${response.statusCode}');
+    }
     super.onResponse(response, handler);
   }
 }
@@ -88,17 +88,10 @@ Dio dio(Ref ref) {
     ),
   );
 
-  (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-    final client = HttpClient();
-    client.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    return client;
-  };
-  
   dio.interceptors.add(DioConnectivityInterceptor(ref));
   dio.interceptors.add(RetryInterceptor(
     dio: dio,
-    logPrint: print,
+    logPrint: kDebugMode ? debugPrint : (_) {},
     retries: 3,
     retryDelays: const [
       Duration(seconds: 2),

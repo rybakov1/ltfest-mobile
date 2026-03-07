@@ -7,7 +7,7 @@ part of 'laboratory_provider.dart';
 // **************************************************************************
 
 String _$laboratoriesNotifierHash() =>
-    r'aa48ae6042cba6be057c13b804567c48154a388c';
+    r'c972611c9ac59d300de321c8494494a31402076e';
 
 /// See also [LaboratoriesNotifier].
 @ProviderFor(LaboratoriesNotifier)

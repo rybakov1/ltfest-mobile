@@ -17,12 +17,7 @@ import '../../components/lt_appbar.dart';
 import '../../providers/favorites_provider.dart';
 
 class FestivalPage extends ConsumerStatefulWidget {
-  final String category;
-
-  const FestivalPage({
-    super.key,
-    required this.category,
-  });
+  const FestivalPage({super.key});
 
   @override
   ConsumerState<FestivalPage> createState() => _FestivalPageState();
@@ -44,7 +39,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
   void initState() {
     super.initState();
     final initialQuery = ref
-            .read(festivalsNotifierProvider(widget.category))
+            .read(festivalsNotifierProvider(null))
             .valueOrNull
             ?.searchQuery ??
         '';
@@ -162,7 +157,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                           onPressed: () {
                             Navigator.pop(modalContext);
                             ref
-                                .read(festivalsNotifierProvider(widget.category)
+                                .read(festivalsNotifierProvider(null)
                                     .notifier)
                                 .setSelectedCities([]);
                           },
@@ -178,7 +173,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                         onPressed: () {
                           Navigator.pop(modalContext);
                           ref
-                              .read(festivalsNotifierProvider(widget.category)
+                              .read(festivalsNotifierProvider(null)
                                   .notifier)
                               .setSelectedCities(selected);
                         },
@@ -286,11 +281,11 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
   @override
   Widget build(BuildContext context) {
     final festivalsAsync =
-        ref.watch(festivalsNotifierProvider(widget.category));
+        ref.watch(festivalsNotifierProvider(null));
     final festivalState = festivalsAsync.valueOrNull ?? const FestivalsState();
 
     ref.listen(
-      festivalsNotifierProvider(widget.category),
+      festivalsNotifierProvider(null),
       (_, next) {
         final newState = next.valueOrNull;
         if (newState != null && newState.filteredFestivals.length <= 2) {
@@ -414,7 +409,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                             onChanged: (query) {
                               ref
                                   .read(
-                                      festivalsNotifierProvider(widget.category)
+                                      festivalsNotifierProvider(null)
                                           .notifier)
                                   .setSearchQuery(query);
                             },
@@ -492,7 +487,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
                             asyncValue: festivalsAsync,
                             items: festivalState.filteredFestivals,
                             onRefresh: () => ref.refresh(
-                                festivalsNotifierProvider(widget.category)
+                                festivalsNotifierProvider(null)
                                     .future),
                             itemBuilder: (context, index) {
                               final festival =
@@ -537,7 +532,7 @@ class _FestivalPageState extends ConsumerState<FestivalPage>
     return GestureDetector(
       onTap: () {
         context
-            .push('${AppRoutes.festivals}/${widget.category}/${festival.id}');
+            .push('${AppRoutes.festival}/${festival.id}');
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

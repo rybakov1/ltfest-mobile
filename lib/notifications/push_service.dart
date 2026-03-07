@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -7,22 +6,21 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:huawei_push/huawei_push.dart' as hms;
 import 'package:google_api_availability/google_api_availability.dart';
 
-import '../data/services/api_endpoints.dart';
-import '../data/services/api_exception.dart';
-import '../data/services/dio_provider.dart';
+import '../data/repositories/misc_repository.dart';
 
 part 'push_service.g.dart';
 
 @riverpod
 PushNotificationService pushNotificationService(Ref ref) {
-  final dio = ref.watch(dioProvider);
-  return PushNotificationService(dio: dio);
+  final miscRepo = ref.watch(miscRepositoryProvider);
+  return PushNotificationService(miscRepo: miscRepo);
 }
 
 class PushNotificationService {
-  final Dio _dio;
+  final MiscRepository _miscRepo;
 
-  PushNotificationService({required Dio dio}) : _dio = dio;
+  PushNotificationService({required MiscRepository miscRepo})
+      : _miscRepo = miscRepo;
 
   Future<void> init(int userId) async {
     try {
@@ -63,18 +61,36 @@ class PushNotificationService {
       return;
     }
 
+    if (Platform.isIOS) {
+      // На iOS FCM-токен зависит от APNs-токена.
+      // Ждём до 10 секунд пока APNs-токен станет доступен.
+      String? apnsToken;
+      for (var i = 0; i < 10; i++) {
+        apnsToken = await messaging.getAPNSToken();
+        if (apnsToken != null) break;
+        await Future.delayed(const Duration(seconds: 1));
+      }
+      if (apnsToken == null) {
+        debugPrint(
+            '⚠️[PushNotificationService] APNs token not available after waiting.');
+      }
+    }
+
     final token = await messaging.getToken();
     if (token != null) {
-      await _registerTokenOnServer(
+      await _registerToken(
         userId: userId,
         token: token,
         provider: 'fcm',
         platform: platform,
       );
+    } else {
+      debugPrint(
+          '⚠️[PushNotificationService] FCM token is null on $platform');
     }
 
     messaging.onTokenRefresh.listen((newToken) {
-      _registerTokenOnServer(
+      _registerToken(
         userId: userId,
         token: newToken,
         provider: 'fcm',
@@ -85,7 +101,7 @@ class PushNotificationService {
 
   Future<void> _initHuawei(int userId) async {
     hms.Push.getTokenStream.listen((String token) {
-      _registerTokenOnServer(
+      _registerToken(
         userId: userId,
         token: token,
         provider: 'hms',
@@ -98,48 +114,21 @@ class PushNotificationService {
     hms.Push.getToken("");
   }
 
-  Future<void> _registerTokenOnServer({
+  Future<void> _registerToken({
     required int userId,
     required String token,
     required String provider,
     required String platform,
   }) async {
     try {
-      final data = {
-        'data': {
-          'users_permissions_user': userId,
-          'token': token,
-          'provider': provider,
-          'platform': platform,
-        }
-      };
-
-      if (kDebugMode) {
-        debugPrint('📡 [POST] ${ApiEndpoints.pushTokens}');
-        debugPrint('Token data: provider=$provider, platform=$platform');
-      }
-
-      final response = await _dio.post(ApiEndpoints.pushTokens, data: data);
-
-      // Бэкенд сейчас отвечает 405 (Method Not Allowed) на этот эндпоинт.
-      // Чтобы не сыпать ошибками в логи и не ломать поток авторизации,
-      // воспринимаем 405 как «фича пока не включена на сервере».
-      if (response.statusCode == 405) {
-        debugPrint(
-            '⚠️ [PushNotificationService] /push-tokens недоступен (405). Токен не сохранён на сервере.');
-        return;
-      }
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ApiException(message: 'Не удалось зарегистрировать push token');
-      }
+      await _miscRepo.registerPushToken(
+        userId: userId,
+        token: token,
+        provider: provider,
+        platform: platform,
+      );
     } catch (e) {
-      if (e is DioException) {
-        debugPrint(
-            '❌ [PushNotificationService] API Error: ${e.response?.data}');
-      } else {
-        debugPrint('❌ [PushNotificationService] Error: $e');
-      }
+      debugPrint('❌ [PushNotificationService] Error: $e');
     }
   }
 }

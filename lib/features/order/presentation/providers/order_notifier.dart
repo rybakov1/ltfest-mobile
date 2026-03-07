@@ -6,8 +6,9 @@ import 'package:ltfest/data/models/festival_tariff.dart';
 import 'package:ltfest/data/models/laboratory.dart';
 import 'package:ltfest/data/models/laboratory_learning_type.dart';
 
+import '../../../../data/api/api_client.dart';
 import '../../../../data/models/festival.dart';
-import '../../../../data/services/api_service.dart';
+import '../../../../data/repositories/misc_repository.dart';
 import '../../../../pages/cart/provider/cart_provider.dart';
 import '../../../../pages/payment/payment_provider.dart';
 import '../../../../providers/promocode_provider.dart';
@@ -99,8 +100,6 @@ class OrderNotifier extends StateNotifier<OrderState> {
     prefillUserData();
   }
 
-  // --- ЛОГИКА ИНИЦИАЛИЗАЦИИ ---
-
   void startOrder({
     required OrderType type,
     required dynamic item,
@@ -114,14 +113,11 @@ class OrderNotifier extends StateNotifier<OrderState> {
       selectedFestival: festival,
       laboratory: laboratory,
     );
-
     prefillUserData();
   }
 
-  /// Заполнение данных из профиля пользователя
   void prefillUserData() {
     final user = _ref.read(userProvider);
-
     if (user != null) {
       String formattedBirthDate = '';
       try {
@@ -145,21 +141,19 @@ class OrderNotifier extends StateNotifier<OrderState> {
     }
   }
 
-  /// Сброс состояния
   void reset(OrderType type) {
     state = const OrderState();
     state = state.copyWith(orderType: type);
     prefillUserData();
   }
 
-  // --- ОБНОВЛЕНИЕ ПОЛЕЙ ВВОДА (UI) ---
-
   void updatePayerName(String value) =>
       state = state.copyWith(payerName: value);
   void updateEmail(String value) => state = state.copyWith(email: value);
   void updateBirthdate(String value) =>
       state = state.copyWith(birthdate: value);
-  void updateResidence(String value) => state = state.copyWith(residence: value);
+  void updateResidence(String value) =>
+      state = state.copyWith(residence: value);
   void updatePhone(String value) => state = state.copyWith(phone: value);
   void updateCollectiveName(String value) =>
       state = state.copyWith(collectiveName: value);
@@ -184,18 +178,13 @@ class OrderNotifier extends StateNotifier<OrderState> {
     }
   }
 
-  // --- ОСНОВНАЯ БИЗНЕС-ЛОГИКА ---
-
-  /// Приватный метод для сборки "Entity" (Сущности) из плоских полей стейта.
   OrderInfo? _buildOrderEntity() =>
       buildOrderEntityFromState(state: state, ref: _ref);
 
-  /// Процесс оплаты
   Future<void> placeOrderAndPay(
       BuildContext context, int totalAmount, int basePrice) async {
     if (state.isLoading) return;
 
-    // 1. Build Entity
     final orderEntity = _buildOrderEntity();
     if (orderEntity == null) {
       _showError(context, 'Недостаточно данных для оформления заказа');
@@ -205,16 +194,13 @@ class OrderNotifier extends StateNotifier<OrderState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      // 2. Применяем промокод (если нужно, логика осталась в старом коде,
-      // здесь мы просто вызываем сервис, если промокод есть в провайдере)
       final promoState = _ref.read(promoCodeNotifierProvider);
       await promoState.whenOrNull(
         success: (promoCode) async {
-          await _ref.read(apiServiceProvider).applyPromoCode(promoCode);
+          await _ref.read(miscRepositoryProvider).applyPromoCode(promoCode);
         },
       );
 
-      // 3. Отправляем заказ в репозиторий
       final response = await _repository.createPayment(
         order: orderEntity,
         totalAmount: totalAmount,
@@ -256,15 +242,11 @@ class OrderNotifier extends StateNotifier<OrderState> {
   }
 }
 
-// --- ПРОВАЙДЕРЫ ---
-
-/// Провайдер репозитория
 final orderRepositoryProvider = Provider<IOrderRepository>((ref) {
-  final apiService = ref.watch(apiServiceProvider);
-  return StrapiOrderRepository(apiService);
+  final client = ref.watch(apiClientProvider);
+  return StrapiOrderRepository(client);
 });
 
-/// Главный провайдер OrderNotifier
 final orderProvider = StateNotifierProvider<OrderNotifier, OrderState>((ref) {
   final repository = ref.watch(orderRepositoryProvider);
   return OrderNotifier(ref, repository);

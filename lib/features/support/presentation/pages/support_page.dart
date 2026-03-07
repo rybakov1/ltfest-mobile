@@ -12,6 +12,7 @@ import 'package:ltfest/components/lt_appbar.dart';
 import 'package:ltfest/features/support/presentation/providers/support_provider.dart';
 import 'package:ltfest/providers/user_provider.dart';
 import 'package:ltfest/router/app_routes.dart';
+import 'package:ltfest/utils/device_info.dart';
 
 const List<String> _supportReasons = [
   'Нашёл(а) ошибку в приложении',
@@ -109,11 +110,20 @@ class _SupportPageState extends ConsumerState<SupportPage> {
         _selectedReason == null;
     if (hasErrors) return;
 
+    final user = ref.read(userProvider);
+    final name = user?.firstname ?? '';
+
+    final device = await getDeviceString();
+    final appVersion = await getAppVersion();
+
     await ref.read(supportProvider.notifier).submit(
+          name: name,
           email: _emailController.text,
           phone: _phoneController.text,
           reason: _selectedReason!,
           message: _commentController.text,
+          device: device,
+          appVersion: appVersion,
           filePaths: _selectedFiles,
         );
   }
@@ -158,7 +168,6 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                                 "Email*",
                                 _emailController,
                                 "email@mail.com",
-                                enabled: false,
                                 errorText: _showRequiredErrors &&
                                         _emailController.text.isEmpty
                                     ? 'Обязательное поле'
@@ -170,7 +179,6 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                               child: _buildTextField("Номер телефона*",
                                   _phoneController, "+79099990011",
                                   formatter: _phoneFormatter,
-                                  enabled: false,
                                   errorText: _showRequiredErrors &&
                                           _phoneController.text.isEmpty
                                       ? 'Обязательное поле'

@@ -6,7 +6,7 @@ part of 'promocode_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$promoCodeNotifierHash() => r'68981659d9faa9790da77043b4b08efe8c4ff1ff';
+String _$promoCodeNotifierHash() => r'acc51008bebd9b017ea77c922e7187049ee5961a';
 
 /// See also [PromoCodeNotifier].
 @ProviderFor(PromoCodeNotifier)

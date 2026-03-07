@@ -169,12 +169,9 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: '${AppRoutes.festivals}/:category',
+            path: AppRoutes.festival,
             pageBuilder: (context, state) {
-              final categoryName =
-                  state.pathParameters['category'] ?? 'Неизвестно';
-              return NoTransitionPage(
-                  child: FestivalPage(category: categoryName));
+              return const NoTransitionPage(child: FestivalPage());
             },
           ),
           GoRoute(
@@ -249,12 +246,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: '${AppRoutes.festivals}/:category/:id',
+        path: '${AppRoutes.festival}/:id',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id']!;
-          final category = state.pathParameters['category']!;
           return NoTransitionPage(
-            child: FestivalDetailPage(id: id, category: category),
+            child: FestivalDetailPage(id: id),
           );
         },
       ),

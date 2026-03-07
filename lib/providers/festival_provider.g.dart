@@ -6,7 +6,7 @@ part of 'festival_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$festivalsNotifierHash() => r'ebfcb8c965707015bd3d14e36e3f9da37f277773';
+String _$festivalsNotifierHash() => r'8fdf80cf1dd0db6fadb73908a5d5031ab15e405e';
 
 /// Copied from Dart SDK
 class _SystemHash {

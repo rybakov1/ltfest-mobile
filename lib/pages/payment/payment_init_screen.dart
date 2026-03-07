@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ltfest/data/services/api_service.dart';
+import 'package:ltfest/data/repositories/order_repository.dart';
 import 'package:ltfest/router/app_routes.dart';
 
 class PaymentInitScreen extends ConsumerStatefulWidget {
@@ -60,8 +60,8 @@ class _PaymentInitScreenState extends ConsumerState<PaymentInitScreen>
     });
 
     try {
-      final apiService = ref.read(apiServiceProvider);
-      final response = await apiService.getPaymentState(widget.paymentId);
+      final orderRepo = ref.read(orderRepositoryProvider);
+      final response = await orderRepo.getPaymentState(widget.paymentId);
 
       if (!mounted) return;
 

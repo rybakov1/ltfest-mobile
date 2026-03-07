@@ -5,10 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ltfest/notifications/push_navigation_setup.dart';
 import 'package:ltfest/router/router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-
-// 05.02 build
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -37,8 +36,15 @@ Future<void> main() async {
       options.profilesSampleRate = 1.0;
       options.environment = kDebugMode ? 'development' : 'production';
     },
-    appRunner: () =>
-        runApp(SentryWidget(child: const ProviderScope(child: MyApp()))),
+    appRunner: () => runApp(
+      SentryWidget(
+        child: const ProviderScope(
+          child: PushNavigationSetup(
+            child: MyApp(),
+          ),
+        ),
+      ),
+    ),
   );
 }
 

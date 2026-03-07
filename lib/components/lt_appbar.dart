@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../constants.dart';
+import '../router/app_routes.dart';
 
 class LTAppBar extends StatelessWidget {
   final Color? suffixIconColor;
@@ -36,7 +37,13 @@ class LTAppBar extends StatelessWidget {
                   color: suffixIconColor ?? Palette.primaryLime,
                 ),
                 child: IconButton(
-                  onPressed: () => context.pop(),
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(AppRoutes.home);
+                    }
+                  },
                   icon: Icon(
                     Icons.arrow_back,
                     color: Palette.white,

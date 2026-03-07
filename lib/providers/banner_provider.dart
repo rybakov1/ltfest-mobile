@@ -1,23 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ltfest/providers/user_provider.dart';
-
 import '../data/models/ltbanner.dart';
-import '../data/services/api_service.dart';
-import 'auth_state.dart';
+import '../data/repositories/content_repository.dart';
 
-final bannerProvider = FutureProvider<List<LTBanner>>((ref) {
-  final authStateAsync = ref.watch(authNotifierProvider);
-
-  return authStateAsync.when(
-    data: (state) {
-      switch (state) {
-        case Authenticated():
-          return ref.read(apiServiceProvider).getBanners();
-        case _:
-          return [];
-      }
-    },
-    loading: () => [],
-    error: (e, s) => [],
-  );
+final bannerProvider = FutureProvider<List<LTBanner>>((ref) async {
+  final repo = ref.watch(contentRepositoryProvider);
+  try {
+    return await repo.getBanners();
+  } catch (e) {
+    return [];
+  }
 });

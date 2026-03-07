@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
 import 'package:ltfest/data/models/payment.dart';
-import 'package:ltfest/data/services/api_service.dart';
+import 'package:ltfest/data/repositories/order_repository.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
-import 'package:ltfest/pages/order/order_provider.dart';
+import 'package:ltfest/pages/order/order_provider.dart' hide orderRepositoryProvider;
 import 'package:ltfest/pages/payment/payment_failure_screen.dart';
 import 'package:ltfest/pages/payment/payment_provider.dart';
 import 'package:ltfest/pages/shop/presenter/shop_widget.dart';
@@ -48,19 +48,17 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
     }
 
     final notifier = ref.read(paymentNotifierProvider.notifier);
-    final apiService = ref.read(apiServiceProvider);
+    final orderRepo = ref.read(orderRepositoryProvider);
 
     notifier.setState(const AsyncLoading());
     try {
-      print("in widget id is ${widget.paymentId}");
-
-      final response = await apiService.getPaymentState(widget.paymentId);
+      final response = await orderRepo.getPaymentState(widget.paymentId);
 
       if (!mounted) return;
 
       if (response.success) {
         if (response.status == 'AUTHORIZED') {
-          await apiService.confirmPayment(widget.paymentId);
+          await orderRepo.confirmPayment(widget.paymentId);
           await notifier.handleOrderFulfillment(widget.paymentId);
 
           notifier.setState(AsyncData(PaymentState(

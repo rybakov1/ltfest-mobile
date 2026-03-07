@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ltfest/data/services/api_service.dart';
 import '../data/models/news.dart';
+import '../data/repositories/content_repository.dart';
 
 final newsNotifierProvider =
     AsyncNotifierProvider<NewsNotifier, List<News>>(NewsNotifier.new);
@@ -8,13 +8,13 @@ final newsNotifierProvider =
 class NewsNotifier extends AsyncNotifier<List<News>> {
   @override
   Future<List<News>> build() async {
-    final apiService = ref.read(apiServiceProvider);
-    return apiService.getNews();
+    final repo = ref.read(contentRepositoryProvider);
+    return repo.getNews();
   }
 
   Future<News> getNewsDetails(String id) {
-    final apiService = ref.read(apiServiceProvider);
-    return apiService.getNewsById(id);
+    final repo = ref.read(contentRepositoryProvider);
+    return repo.getNewsById(id);
   }
 
   Future<void> refresh() async {
@@ -25,9 +25,9 @@ class NewsNotifier extends AsyncNotifier<List<News>> {
 
 final newsByIdProvider = FutureProvider.family<News, String>(
   (ref, id) async {
-    final api = ref.read(apiServiceProvider);
+    final repo = ref.read(contentRepositoryProvider);
     try {
-      return await api.getNewsById(id);
+      return await repo.getNewsById(id);
     } catch (e, st) {
       Error.throwWithStackTrace(e, st);
     }

@@ -205,7 +205,7 @@ class _FavoriteCard extends StatelessWidget {
       switch (item.type) {
         case 'festival':
           context.push(
-              '${AppRoutes.festivals}/${item.direction!.title}/${item.id}');
+              '${AppRoutes.festival}/${item.id}');
           break;
         case 'laboratory':
           context.push('${AppRoutes.laboratories}/${item.id}');

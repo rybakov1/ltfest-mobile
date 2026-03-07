@@ -24,10 +24,8 @@ import '../../router/app_routes.dart';
 
 class FestivalDetailPage extends ConsumerStatefulWidget {
   final String id;
-  final String category;
 
-  const FestivalDetailPage(
-      {super.key, required this.id, required this.category});
+  const FestivalDetailPage({super.key, required this.id});
 
   @override
   ConsumerState<FestivalDetailPage> createState() => _FestivalDetailPageState();
@@ -123,7 +121,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: widget.category == "Театр"
+                          color: festival.direction.title == "Театр"
                               ? Palette.primaryLime
                               : Palette.primaryPink,
                           borderRadius: BorderRadius.circular(8),
@@ -716,7 +714,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
               );
             },
             child: Text("Заполнить заявку", style: Styles.button1),
-            backgroundColor: widget.category == "Театр"
+            backgroundColor: festival.direction.title == "Театр"
                 ? Palette.primaryLime
                 : Palette.primaryPink,
           ),
@@ -748,7 +746,7 @@ class _FestivalDetailPageState extends ConsumerState<FestivalDetailPage> {
                   description: tariff.description,
                   priceDescription: tariff.price_description,
                   factPrice: tariff.fact_price?.toInt(),
-                  category: widget.category,
+                  category: festival.direction.title,
                   bonuses:
                       tariff.feature.map((feature) => feature.title).toList(),
                   onBuyPressed: () {

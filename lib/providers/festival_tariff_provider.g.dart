@@ -6,7 +6,7 @@ part of 'festival_tariff_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$festivalTariffsHash() => r'c08b8daa9b15eb37003ac83d9b262ea8cb486b6b';
+String _$festivalTariffsHash() => r'7d90cbe96d2838622a901859170d2fcbe16c8f52';
 
 /// See also [festivalTariffs].
 @ProviderFor(festivalTariffs)
@@ -25,7 +25,7 @@ final festivalTariffsProvider =
 // ignore: unused_element
 typedef FestivalTariffsRef = AutoDisposeFutureProviderRef<List<FestivalTariff>>;
 String _$tariffsForFestivalHash() =>
-    r'8549b0fe584fe0c8a406a9eeaefa817145ca32a2';
+    r'ed15c399d12ef31224d93805df16c100c90eb955';
 
 /// Copied from Dart SDK
 class _SystemHash {

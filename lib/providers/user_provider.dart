@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import '../data/models/user.dart';
-import '../data/services/api_service.dart';
+import '../data/repositories/auth_repository.dart';
 import '../data/services/token_storage.dart';
 import '../notifications/push_service.dart';
 import 'auth_state.dart';
@@ -12,7 +13,7 @@ part 'user_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class AuthNotifier extends _$AuthNotifier {
-  late final ApiService _apiService = ref.read(apiServiceProvider);
+  late final AuthRepository _authRepo = ref.read(authRepositoryProvider);
   late final TokenStorage _tokenStorage = ref.read(tokenStorageProvider);
   late final PushNotificationService _pushService = ref.read(pushNotificationServiceProvider);
 
@@ -28,8 +29,8 @@ class AuthNotifier extends _$AuthNotifier {
       Sentry.configureScope((scope) => scope.setUser(null));
     } else {
       try {
-        final user = await _apiService.getMe();
-        _pushService.init(user.id);
+        final user = await _authRepo.getMe();
+        unawaited(_pushService.init(user.id));
 
         if (user.firstname == user.phone || user.firstname == "Unknown") {
           state = AuthState.needsRegistration(user: user);
@@ -40,9 +41,7 @@ class AuthNotifier extends _$AuthNotifier {
               id: user.id.toString(),
               email: user.email,
               username: user.phone,
-              data: {
-                'name': user.firstname,
-              },
+              data: {'name': user.firstname},
             ));
           });
         }
@@ -69,11 +68,7 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   Future<void> requestOtp(String phone) async {
-    try {
-      await _apiService.requestOtp(phone);
-    } catch (e) {
-      rethrow;
-    }
+    await _authRepo.requestOtp(phone);
   }
 
   Future<void> verifyOtpAndLogin(String phone, String otp) async {
@@ -81,29 +76,25 @@ class AuthNotifier extends _$AuthNotifier {
 
     state = await AsyncValue.guard(() async {
       try {
-        await _apiService.verifyOtp(phone, otp);
-        final user = await _apiService.getMe();
-        _pushService.init(user.id);
+        await _authRepo.verifyOtp(phone, otp);
+        final user = await _authRepo.getMe();
+        unawaited(_pushService.init(user.id));
         if (user.firstname == user.phone || user.firstname == "Unknown") {
           return AuthState.needsRegistration(user: user);
         } else {
-          // Sentry User Context
           Sentry.configureScope((scope) {
             scope.setUser(SentryUser(
               id: user.id.toString(),
               email: user.email,
               username: user.phone,
-              data: {
-                'name': user.firstname,
-              },
+              data: {'name': user.firstname},
             ));
           });
           return AuthState.authenticated(user: user);
         }
       } catch (e) {
         Sentry.captureException(e, stackTrace: StackTrace.current);
-        return const AuthState
-            .unauthenticated(); // Возвращаем дефолтное состояние
+        return const AuthState.unauthenticated();
       }
     });
   }
@@ -131,7 +122,7 @@ class AuthNotifier extends _$AuthNotifier {
 
     state = await AsyncValue.guard(() async {
       try {
-        final updatedUser = await _apiService.updateProfile(
+        final updatedUser = await _authRepo.updateProfile(
           firstName: firstName,
           lastName: lastName,
           email: email,
@@ -152,15 +143,13 @@ class AuthNotifier extends _$AuthNotifier {
             id: updatedUser.id.toString(),
             email: updatedUser.email,
             username: updatedUser.phone,
-            data: {
-              'name': updatedUser.firstname,
-            },
+            data: {'name': updatedUser.firstname},
           ));
         });
 
         return AuthState.authenticated(user: updatedUser);
       } catch (e, stackTrace) {
-        print('Error updating profile: $e');
+        debugPrint('Error updating profile: $e');
         Sentry.captureException(e, stackTrace: stackTrace);
         return currentState!;
       }

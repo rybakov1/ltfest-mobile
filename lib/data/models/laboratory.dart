@@ -30,7 +30,8 @@ abstract class Laboratory with _$Laboratory { // implements Favoritable
   factory Laboratory.fromJson(Map<String, dynamic> json) =>
       _$LaboratoryFromJson(json);
 
-  // НАШ НОВЫЙ ГЕТТЕР
+  String? get city => address;
+
   DateTime? get firstDayDate {
     if (days == null || days!.isEmpty) {
       return null;

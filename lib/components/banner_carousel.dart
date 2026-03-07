@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ltfest/data/services/api_service.dart';
+import 'package:ltfest/data/services/api_endpoints.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,7 +19,6 @@ class BannerCarousel extends ConsumerStatefulWidget {
 class _BannerCarouselState extends ConsumerState<BannerCarousel> {
   @override
   Widget build(BuildContext context) {
-    final apiService = ref.read(apiServiceProvider);
     final bannerAsyncValue = ref.watch(bannerProvider);
 
     return SizedBox(
@@ -41,7 +40,7 @@ class _BannerCarouselState extends ConsumerState<BannerCarousel> {
                 itemCount: bannerList.length,
                 itemBuilder: (context, index, realIndex) {
                   final banner = bannerList[index];
-                  final imageUrl = apiService.getImageUrl(banner.image?.url);
+                  final imageUrl = ApiEndpoints.imageUrl(banner.image?.url);
 
                   return InkWell(
                     onTap: () {

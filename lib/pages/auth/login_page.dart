@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ltfest/constants.dart';
+import 'package:ltfest/data/services/api_endpoints.dart';
 import 'package:ltfest/router/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -90,6 +91,20 @@ class _AuthorizationPageState extends ConsumerState<AuthorizationPage> {
           padding: const EdgeInsets.all(4.0),
           child: Column(
             children: [
+              if (ApiEndpoints.isTestServer)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  color: Palette.primaryLime.withValues(alpha: 0.3),
+                  child: Text(
+                    'Тестовый сервер',
+                    textAlign: TextAlign.center,
+                    style: Styles.b3.copyWith(
+                      color: Palette.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Image.asset(

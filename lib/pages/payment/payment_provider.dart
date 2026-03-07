@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ltfest/data/services/api_service.dart';
+import 'package:ltfest/data/repositories/shop_repository.dart';
 import 'package:ltfest/pages/cart/provider/cart_provider.dart';
 import 'package:ltfest/pages/order/order_provider.dart';
 import '../../data/models/payment.dart';
@@ -39,14 +39,13 @@ class PaymentNotifier extends StateNotifier<AsyncValue<PaymentState>> {
   }
 
   Future<void> handleOrderFulfillment(String paymentId) async {
-    final apiService = _ref.read(apiServiceProvider);
+    final shopRepo = _ref.read(shopRepositoryProvider);
     final orderNotifier = _ref.read(orderProvider.notifier);
-
     final lastOrderType = _ref.read(orderProvider).orderType;
 
     if (lastOrderType == OrderType.products) {
       try {
-        final cart = await apiService.getMyCart();
+        final cart = await shopRepo.getMyCart();
 
         for (final cartItem in cart.items) {
           if (cartItem.productInStock != null) {
@@ -55,13 +54,13 @@ class PaymentNotifier extends StateNotifier<AsyncValue<PaymentState>> {
                 productInStock.stockQuantity - cartItem.quantity;
 
             if (newQuantity >= 0) {
-              await apiService.updateProductInStockQuantity(
-                productInStockDocumentId: productInStock.documentId!,
+              await shopRepo.updateProductInStockQuantity(
+                documentId: productInStock.documentId!,
                 newQuantity: newQuantity,
               );
             } else {
               debugPrint(
-                  '[Fulfillment Error] Недостаточно товара ${productInStock.id} при подтверждении заказа!');
+                  '[Fulfillment Error] Недостаточно товара ${productInStock.id}');
             }
           }
         }

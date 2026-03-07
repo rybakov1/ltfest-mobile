@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../components/lt_appbar.dart';
 import '../../constants.dart';
-import '../../data/services/api_service.dart';
+import '../../data/repositories/auth_repository.dart';
 import '../../providers/auth_state.dart';
 import '../../providers/user_provider.dart';
 
@@ -64,7 +64,7 @@ class _DeleteAccountPageState extends ConsumerState<DeleteAccountPage> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(apiServiceProvider).createAccountDeletionRequest(
+      await ref.read(authRepositoryProvider).createAccountDeletionRequest(
             userId: user.id,
             reason: _reasonController.text,
           );

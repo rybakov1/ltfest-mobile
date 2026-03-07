@@ -15,24 +15,22 @@ import 'package:ltfest/router/app_routes.dart';
 import '../../components/modal.dart';
 import '../../data/models/activity.dart';
 import '../../data/models/age_category.dart';
-import '../../data/services/api_service.dart';
+import '../../data/repositories/content_repository.dart';
 
 final activitiesProvider = FutureProvider<List<Activity>>((ref) async {
-  final api = ref.watch(apiServiceProvider);
+  final repo = ref.watch(contentRepositoryProvider);
   try {
-    // Добавляем таймаут на 10 секунд
-    final activities = await api.getActivities().timeout(
+    final activities = await repo.getActivities().timeout(
       const Duration(seconds: 10),
       onTimeout: () {
         throw TimeoutException(
             'Запрос к API activities превысил время ожидания');
       },
     );
-    print('Activities loaded: ${activities.length}'); // Отладка
     return activities;
-  } catch (e, stackTrace) {
-    print('Error in activitiesProvider: $e\n$stackTrace'); // Отладка
-    rethrow; // Пробрасываем ошибку для обработки в asyncValue.when
+  } catch (e) {
+    debugPrint('Error in activitiesProvider: $e');
+    rethrow;
   }
 });
 

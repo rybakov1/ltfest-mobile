@@ -1,18 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:ltfest/data/models/festival_tariff.dart';
-import 'package:ltfest/data/services/api_service.dart';
+import '../data/models/festival_tariff.dart';
+import '../data/repositories/festival_repository.dart';
 
 part 'festival_tariff_provider.g.dart';
 
 @riverpod
 Future<List<FestivalTariff>> festivalTariffs(Ref ref) {
-  final api = ref.watch(apiServiceProvider);
-  return api.getFestivalTariffs();
+  final repo = ref.watch(festivalRepositoryProvider);
+  return repo.getFestivalTariffs();
 }
 
 @riverpod
 Future<List<FestivalTariff>> tariffsForFestival(Ref ref, int festivalId) {
-  final api = ref.watch(apiServiceProvider);
-  return api.getTariffsForFestival(festivalId);
+  final repo = ref.watch(festivalRepositoryProvider);
+  return repo.getTariffsForFestival(festivalId);
 }

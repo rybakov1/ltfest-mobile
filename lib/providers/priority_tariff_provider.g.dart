@@ -6,7 +6,7 @@ part of 'priority_tariff_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$priorityTariffsHash() => r'b6b5fa33598ffba900a7946e3957e64da331f746';
+String _$priorityTariffsHash() => r'0180bc58ab6f274acf998aaed10fa2b30c7ef30d';
 
 /// See also [priorityTariffs].
 @ProviderFor(priorityTariffs)

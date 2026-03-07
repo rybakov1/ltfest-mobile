@@ -115,9 +115,7 @@ class StoryViewerState extends State<StoryViewer> {
               Navigator.pop(context);
             }
           },
-          onStoryShow: (storyItem, index) {
-            print("Показывается сторис №$index из группы '${story.title}'");
-          },
+          onStoryShow: (storyItem, index) {},
           onVerticalSwipeComplete: (direction) {
             if (direction == Direction.down) {
               Navigator.pop(context);

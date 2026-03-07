@@ -1,13 +1,14 @@
 import 'package:ltfest/features/order/domain/entities/order_enums.dart';
 
-import '../../../../data/services/api_service.dart';
+import '../../../../data/api/api_client.dart';
+import '../../../../data/models/payment.dart';
 import '../../domain/entities/order_info.dart';
 import '../../domain/repositories/i_order_repository.dart';
 
 class StrapiOrderRepository implements IOrderRepository {
-  final ApiService _apiService;
+  final ApiClient _client;
 
-  StrapiOrderRepository(this._apiService);
+  StrapiOrderRepository(this._client);
 
   @override
   Future<PaymentResponse> createPayment({
@@ -15,33 +16,31 @@ class StrapiOrderRepository implements IOrderRepository {
     required int totalAmount,
   }) async {
     final orderData = _mapEntityToStrapi(order, totalAmount);
-    // Удаляем null значения
     orderData.removeWhere((key, value) => value == null);
 
-    final response = await _apiService.initPayment(
-      orderData: orderData,
-      paymentData: {
+    final res = await _client.initPayment({
+      'orderData': orderData,
+      'paymentData': {
         'amount': totalAmount,
         'description':
             'Оплата заказа от ${order.payerName} с мобильного приложения',
         'successUrl': 'ltfestapp://payment/success/{PaymentId}',
         'failUrl': 'ltfestapp://payment/fail/{PaymentId}',
       },
-    );
+    });
+
+    final parsed = PaymentInitResponse.fromJson(res as Map<String, dynamic>);
 
     return PaymentResponse(
-      success: response.success,
-      paymentUrl: response.paymentUrl,
-      paymentId: response.paymentId?.toString(),
-      orderId: response.orderId,
-      message: response.message,
+      success: parsed.success,
+      paymentUrl: parsed.paymentUrl,
+      paymentId: parsed.paymentId?.toString(),
+      orderId: parsed.orderId,
+      message: parsed.message,
     );
   }
 
-  Map<String, dynamic> _mapEntityToStrapi(
-    OrderInfo order,
-    int amount,
-  ) {
+  Map<String, dynamic> _mapEntityToStrapi(OrderInfo order, int amount) {
     final Map<String, dynamic> details = {};
 
     switch (order) {
@@ -77,9 +76,10 @@ class StrapiOrderRepository implements IOrderRepository {
               },
             )
             .toList();
-        details['Метод доставки'] = o.deliveryMethod == DeliveryMethod.onFestival
-            ? "Заберу на фестивале"
-            : "Доставка до адреса";
+        details['Метод доставки'] =
+            o.deliveryMethod == DeliveryMethod.onFestival
+                ? "Заберу на фестивале"
+                : "Доставка до адреса";
         if (o.address != null && o.address!.isNotEmpty) {
           details['Адрес доставки'] = o.address;
         }
@@ -93,7 +93,6 @@ class StrapiOrderRepository implements IOrderRepository {
       details['Промокод'] = order.promoCode;
     }
 
-    // Очистка деталей от пустых значений
     details.removeWhere((key, value) =>
         value == null || value == '' || (value is int && value == 0));
 
@@ -109,14 +108,11 @@ class StrapiOrderRepository implements IOrderRepository {
       'details': orderedDetailsList,
       'user': order.userId ?? 0,
       'promo_code': order.promoCode,
-      
       'festival': order is FestivalOrder
           ? order.festival.id
           : (order is ProductOrder ? order.selectedFestival?.id : null),
-          
       'festival_tariff':
           order is FestivalOrder ? order.festivalTariff.id : null,
-          
       'laboratory_learning_type':
           order is LaboratoryOrder ? order.learningType.id : null,
     };

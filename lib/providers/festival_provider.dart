@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:ltfest/data/models/festival.dart';
-import 'package:ltfest/data/services/api_service.dart';
+import 'package:ltfest/data/repositories/festival_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'festival_provider.g.dart';
@@ -23,8 +23,7 @@ class FestivalsState {
         .map((f) => f.address?.split(',').first.trim() ?? '')
         .where((c) => c.isNotEmpty)
         .toSet()
-      ..toList()
-      .sort();
+      ..toList().sort();
   }
 
   List<Festival> get filteredFestivals {
@@ -33,7 +32,7 @@ class FestivalsState {
           festival.title.toLowerCase().contains(searchQuery.toLowerCase());
       final addressMatch = selectedCities.isEmpty ||
           selectedCities.any((city) =>
-          festival.address?.toLowerCase().contains(city.toLowerCase()) ??
+              festival.address?.toLowerCase().contains(city.toLowerCase()) ??
               false);
       return titleMatch && addressMatch;
     }).toList();
@@ -56,13 +55,12 @@ class FestivalsState {
 
 @Riverpod(keepAlive: true)
 class FestivalsNotifier extends _$FestivalsNotifier {
-  ApiService get _api => ref.read(apiServiceProvider);
+  FestivalRepository get _repo => ref.read(festivalRepositoryProvider);
   String? _category;
 
   @override
   Future<FestivalsState> build([String? category]) async {
     _category = category;
-
     return _fetchFestivals(category);
   }
 
@@ -71,9 +69,9 @@ class FestivalsNotifier extends _$FestivalsNotifier {
       List<Festival> festivals;
 
       if (category == null || category.isEmpty) {
-        festivals = await _api.getFestivals();
+        festivals = await _repo.getFestivals();
       } else {
-        festivals = await _api.getFestivalsByDirection(category);
+        festivals = await _repo.getFestivalsByDirection(category);
       }
 
       festivals.sort((a, b) {
@@ -99,10 +97,10 @@ class FestivalsNotifier extends _$FestivalsNotifier {
     final result = await AsyncValue.guard(() => _fetchFestivals(_category));
 
     state = result.whenData((data) => data.copyWith(
-      searchQuery: prev.searchQuery,
-      selectedCities: prev.selectedCities,
-      isRefreshing: false,
-    ));
+          searchQuery: prev.searchQuery,
+          selectedCities: prev.selectedCities,
+          isRefreshing: false,
+        ));
   }
 
   void setSearchQuery(String query) {
@@ -119,10 +117,10 @@ class FestivalsNotifier extends _$FestivalsNotifier {
 }
 
 final festivalByIdProvider =
-FutureProvider.family<Festival, String>((ref, id) async {
-  final api = ref.read(apiServiceProvider);
+    FutureProvider.family<Festival, String>((ref, id) async {
+  final repo = ref.read(festivalRepositoryProvider);
   try {
-    return await api.getFestivalById(id);
+    return await repo.getFestivalById(id);
   } catch (e, st) {
     Error.throwWithStackTrace(e, st);
   }
