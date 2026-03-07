@@ -1,8 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../providers/user_provider.dart';
 import '../router/router.dart';
 import 'push_navigation.dart';
 
@@ -18,6 +18,7 @@ class PushNavigationSetup extends ConsumerStatefulWidget {
 
 class _PushNavigationSetupState extends ConsumerState<PushNavigationSetup> {
   bool _listenersSet = false;
+  RemoteMessage? _pendingInitialMessage;
 
   @override
   void initState() {
@@ -35,11 +36,21 @@ class _PushNavigationSetupState extends ConsumerState<PushNavigationSetup> {
 
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message != null) {
-        // Отложить навигацию до готовности роутера (следующий кадр)
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          pushNavigationHandler.handleMessageOpenedApp(message);
-        });
+        _pendingInitialMessage = message;
       }
+    });
+  }
+
+  void _tryNavigateFromInitialMessage() {
+    if (_pendingInitialMessage == null) return;
+
+    final authState = ref.read(authNotifierProvider);
+    if (authState.isLoading || authState.isReloading) return;
+
+    final msg = _pendingInitialMessage;
+    _pendingInitialMessage = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      pushNavigationHandler.handleMessageOpenedApp(msg!);
     });
   }
 
@@ -47,6 +58,12 @@ class _PushNavigationSetupState extends ConsumerState<PushNavigationSetup> {
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
     pushNavigationHandler.setRouter(router);
+
+    ref.listen(authNotifierProvider, (_, next) {
+      _tryNavigateFromInitialMessage();
+    });
+    _tryNavigateFromInitialMessage();
+
     return widget.child;
   }
 }
